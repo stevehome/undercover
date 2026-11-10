@@ -81,3 +81,31 @@ def run_totals(run_id: int) -> dict[str, Any]:
         "cost": money.from_nanos(tokens[2]),
         "work_ms": work_ms,
     }
+
+
+def claim_totals(run_id: int) -> dict[str, dict[str, Any]]:
+    """Sum each claim's model cost and working time within a run."""
+    calls = tables.model_calls
+    segments = tables.work_segments
+    with db.connection() as conn:
+        costs = conn.execute(
+            select(calls.c.claim_id, func.sum(calls.c.cost_nanos))
+            .where(calls.c.run_id == run_id)
+            .group_by(calls.c.claim_id)
+        )
+        totals: dict[str, dict[str, Any]] = {}
+        for claim_id, nanos in costs:
+            totals.setdefault(claim_id, {"cost": 0, "work_ms": 0})["cost"] = nanos
+        times = conn.execute(
+            select(
+                segments.c.claim_id, segments.c.started_on, segments.c.finished_on
+            ).where(segments.c.run_id == run_id)
+        )
+        for claim_id, started_on, finished_on in times:
+            totals.setdefault(claim_id, {"cost": 0, "work_ms": 0})["work_ms"] += (
+                _milliseconds(started_on, finished_on)
+            )
+    return {
+        claim_id: {"cost": money.from_nanos(total["cost"]), "work_ms": total["work_ms"]}
+        for claim_id, total in totals.items()
+    }

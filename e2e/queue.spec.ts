@@ -5,7 +5,9 @@ test("the queue page lists the claims", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "The claims queue" }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "CLM-1001" })).toBeVisible();
+  await expect(
+    page.getByRole("table").getByRole("link", { name: "CLM-1001" }),
+  ).toBeVisible();
 });
 
 test("the queue shows a claim's status as it moves through the four states", async ({

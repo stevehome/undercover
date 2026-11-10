@@ -246,6 +246,18 @@ def start_dispatch(start: StartDispatch) -> dict[str, int]:
     return {"run_id": agent_service.start_dispatch(start.concurrency)}
 
 
+@app.get("/api/evaluations", operation_id="list_evaluations")
+def list_evaluations() -> list[dict[str, Any]]:
+    """List the evaluations, newest first, with their measures."""
+    return evaluations.list_evaluations()
+
+
+@app.get("/api/evaluations/{run_id}", operation_id="get_evaluation")
+def get_evaluation(run_id: int) -> dict[str, Any]:
+    """Return one evaluation with each claim's answer beside the handler's."""
+    return evaluations.get_evaluation(run_id)
+
+
 @app.post("/api/evaluations", operation_id="start_evaluation", status_code=202)
 def start_evaluation(start: StartEvaluation) -> dict[str, int]:
     """Have the agent's service start an evaluation on one of the labelled sets."""

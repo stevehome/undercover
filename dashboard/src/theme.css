@@ -51,6 +51,7 @@ h3 {
   background: var(--panel);
   border-radius: 16px;
   padding: 2rem;
+  overflow-x: auto;
 }
 
 table {
@@ -113,4 +114,8 @@ pre {
   white-space: pre-wrap;
   font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
+}
+
+tr.miss td {
+  background: color-mix(in srgb, var(--raspberry) 15%, white);
 }

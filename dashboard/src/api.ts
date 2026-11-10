@@ -2,6 +2,9 @@ import { parseCents, parseNanos } from "./money";
 import type {
   Claim,
   ClaimSummary,
+  EvalSet,
+  Evaluation,
+  EvaluationClaim,
   Handler,
   Item,
   Run,
@@ -111,6 +114,70 @@ export async function fetchCurrentRun(): Promise<Run | null> {
     },
   };
 }
+
+type WireEvaluation = Omit<Evaluation, "measures" | "claims"> & {
+  measures: {
+    decision_accuracy: string;
+    accuracy: string;
+    straight_through: string;
+    cost_of_mistakes: string;
+    model_cost_per_claim: string;
+    seconds_per_claim: string;
+    run_seconds: string | null;
+  };
+  claims: (Omit<
+    EvaluationClaim,
+    "handler_payout" | "agent_payout" | "mistake_cost" | "cost_nanos"
+  > & {
+    handler_payout: string;
+    agent_payout: string | null;
+    mistake_cost: string;
+    cost: string;
+  })[];
+};
+
+function evaluationFromWire(wire: WireEvaluation): Evaluation {
+  const { measures, claims, ...rest } = wire;
+  return {
+    ...rest,
+    measures: {
+      decision_accuracy: Number(measures.decision_accuracy),
+      accuracy: Number(measures.accuracy),
+      straight_through: Number(measures.straight_through),
+      cost_of_mistakes: parseCents(measures.cost_of_mistakes),
+      model_cost_per_claim_nanos: parseNanos(measures.model_cost_per_claim),
+      seconds_per_claim: Number(measures.seconds_per_claim),
+      run_seconds:
+        measures.run_seconds === null ? null : Number(measures.run_seconds),
+    },
+    claims: claims.map(({ cost, ...claim }) => ({
+      ...claim,
+      handler_payout: parseCents(claim.handler_payout),
+      agent_payout: optionalCents(claim.agent_payout),
+      mistake_cost: parseCents(claim.mistake_cost),
+      cost_nanos: parseNanos(cost),
+    })),
+  };
+}
+
+/** The evaluations, newest first. */
+export async function fetchEvaluations(): Promise<Evaluation[]> {
+  const wire = await getJson<WireEvaluation[]>("/api/evaluations");
+  return wire.map(evaluationFromWire);
+}
+
+export async function fetchEvaluation(runId: string): Promise<Evaluation> {
+  return evaluationFromWire(
+    await getJson<WireEvaluation>(`/api/evaluations/${runId}`),
+  );
+}
+
+/** Start an evaluation on a labelled set, whole or just its tiny claims. */
+export const startEvaluation = (
+  concurrency: number,
+  evalSet: EvalSet,
+  tiny: boolean,
+) => post("/api/evaluations", { concurrency, eval_set: evalSet, tiny });
 
 /** Start a dispatch with this many claim agents at once. */
 export const startDispatch = (concurrency: number) =>

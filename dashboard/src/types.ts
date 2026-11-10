@@ -128,3 +128,48 @@ export interface Run {
   work_ms: number;
   summary: RunSummary;
 }
+
+export type EvalSet = "evaluation" | "held_out";
+
+export interface Measures {
+  /** Shares are from 0 to 1. */
+  decision_accuracy: number;
+  accuracy: number;
+  straight_through: number;
+  /** Whole cents. */
+  cost_of_mistakes: number;
+  /** Whole billionths of a dollar. */
+  model_cost_per_claim_nanos: number;
+  seconds_per_claim: number;
+  run_seconds: number | null;
+}
+
+export interface EvaluationClaim {
+  claim_id: string;
+  source_claim_id: string;
+  status: RunClaimStatus;
+  note: string | null;
+  handler_decision: Decision;
+  handler_payout: number;
+  agent_decision: Decision | null;
+  agent_payout: number | null;
+  reason: string | null;
+  right: boolean;
+  mistake_cost: number;
+  cost_nanos: number;
+  work_ms: number;
+}
+
+export interface Evaluation {
+  run_id: number;
+  status: "running" | "finished" | "stopped";
+  eval_set: EvalSet;
+  tiny: boolean;
+  concurrency: number;
+  model: string;
+  reasoning_effort: string;
+  started_on: string;
+  finished_on: string | null;
+  measures: Measures;
+  claims: EvaluationClaim[];
+}

@@ -13,6 +13,8 @@ export default defineConfig({
   testDir: "e2e",
   outputDir: "e2e/test-results",
   reporter: "list",
+  // Only one dispatch or evaluation can run at a time, so the specs take turns.
+  workers: 1,
   use: { baseURL: "http://localhost:5173" },
   webServer: [
     {

@@ -175,11 +175,13 @@ Built as planned. The held-out claims' policies and customers were already seede
 
 Success criteria:
 
-- [ ] The measures match ones worked out by hand on a small set with a wrongful decline, a wrongful approval, a needless referral, a wrong amount and a claim the agent never decided (counted as a referral).
-- [ ] Model cost per claim, time per claim and the run time are right for a run whose rows are known.
-- [ ] An end-to-end test plays an evaluation out through the API, as the old run test did, and the scoreboard shows it with every measure; another starts an evaluation on the scoreboard and the stand-in service sees N and the set.
-- [ ] I check the Scoreboard and an evaluation's page in the browser with the Playwright MCP server, including the misses and the links.
-- [ ] `npm run check` is green.
+- [x] The measures match ones worked out by hand on a small set with a wrongful decline, a wrongful approval, a needless referral, a wrong amount and a claim the agent never decided (counted as a referral).
+- [x] Model cost per claim, time per claim and the run time are right for a run whose rows are known.
+- [x] An end-to-end test plays an evaluation out through the API, as the old run test did, and the scoreboard shows it with every measure; another starts an evaluation on the scoreboard and the stand-in service sees N and the set.
+- [x] I check the Scoreboard and an evaluation's page in the browser with the Playwright MCP server, including the misses and the links. (Checked on a throwaway SQLite backend with a played-out evaluation of five held-out claims: the table showed every measure, the evaluation page showed the three misses in Raspberry, and the cost of mistakes, $2,180.00, matches 50 + 1,500 + 630 by hand. The link to a copy's page is covered by the end-to-end test.)
+- [x] `npm run check` is green.
+
+Built as planned. `e2e` now runs on one worker, since only one run can be running at a time and the specs share a backend.
 
 ## Phase 6: the docs and the live runs
 

@@ -1,6 +1,9 @@
 from collections import Counter
 
 import pytest
+from sqlalchemy import select
+
+from backend import db, tables
 
 EVALUATION = {
     "concurrency": 5,
@@ -104,3 +107,86 @@ def test_a_second_evaluation_is_refused_while_one_is_running(client):
 
 def test_an_evaluation_needs_a_known_set(client):
     assert start(client, eval_set="other").status_code == 422
+
+
+def answer_like_the_handlers(client, claim_id):
+    """Decide a copy as the handlers decided its source, read from the key."""
+    key = tables.answer_key.c
+    with db.connection() as conn:
+        row = conn.execute(
+            select(key.decision, key.payout_cents).where(
+                key.eval_set == "held_out", key.claim_id == claim_id.split("-", 2)[2]
+            )
+        ).one()
+    body = {
+        "decision": row.decision,
+        "payout": f"{row.payout_cents // 100}.{row.payout_cents % 100:02d}",
+        "reason": "Stubbed.",
+        "policy_reference": "S1",
+    }
+    client.post(f"/api/claims/{claim_id}/decision", json=body)
+
+
+def test_an_evaluation_is_scored_from_its_records(client):
+    run = start(client).json()
+    for claim in run["claims"]:
+        answer_like_the_handlers(client, claim["claim_id"])
+    first = run["claims"][0]["claim_id"]
+    client.post(
+        f"/api/claims/{first}/model-calls",
+        json={
+            "run_id": run["run_id"],
+            "model": "m",
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "total_tokens": 2,
+            "cost": "0.005",
+        },
+    )
+    client.post(
+        f"/api/claims/{first}/work-segments",
+        json={
+            "run_id": run["run_id"],
+            "started_on": "2026-01-01T00:00:00+00:00",
+            "finished_on": "2026-01-01T00:00:10+00:00",
+        },
+    )
+    client.post(f"/api/runs/{run['run_id']}/finish")
+
+    evaluation = client.get(f"/api/evaluations/{run['run_id']}").json()
+
+    measures = evaluation["measures"]
+    assert measures["decision_accuracy"] == "1.0000"
+    assert measures["accuracy"] == "1.0000"
+    assert measures["cost_of_mistakes"] == "0.00"
+    assert measures["model_cost_per_claim"] == "0.001000000"
+    assert measures["seconds_per_claim"] == "2.000"
+    assert measures["run_seconds"] is not None
+    claim = evaluation["claims"][0]
+    assert claim["claim_id"] == first
+    assert claim["handler_decision"] == claim["agent_decision"]
+    assert claim["handler_payout"] == claim["agent_payout"]
+    assert claim["right"] is True
+    assert (claim["cost"], claim["work_ms"]) == ("0.005000000", 10000)
+
+
+def test_the_evaluations_list_newest_first(client):
+    first = start(client).json()
+    client.post(f"/api/runs/{first['run_id']}/finish")
+    second = start(client, tiny=False).json()
+
+    listed = client.get("/api/evaluations").json()
+
+    assert [e["run_id"] for e in listed] == [second["run_id"], first["run_id"]]
+    assert listed[0]["status"] == "running"
+    assert listed[0]["measures"]["run_seconds"] is None
+
+
+def test_a_dispatch_is_not_an_evaluation(client):
+    run = client.post(
+        "/api/runs/dispatch",
+        json={"concurrency": 1, "model": "m", "reasoning_effort": "low"},
+    ).json()
+
+    assert client.get(f"/api/evaluations/{run['run_id']}").status_code == 404
+    assert client.get("/api/evaluations").json() == []
