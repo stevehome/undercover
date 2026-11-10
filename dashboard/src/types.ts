@@ -73,6 +73,8 @@ export interface Claim {
   signed_off_on: string | null;
   paid_amount: number | null;
   paid_on: string | null;
+  /** The evaluation this claim is a copy for, or null for a queue claim. */
+  evaluation_run_id: number | null;
   policy: Policy;
   customer_previous_claims: PreviousClaim[];
 }

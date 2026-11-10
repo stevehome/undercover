@@ -43,6 +43,7 @@ function makeClaim(overrides: Partial<Claim>): Claim {
     signed_off_on: null,
     paid_amount: null,
     paid_on: null,
+    evaluation_run_id: null,
     policy: {
       policy_id: "POL-2001",
       customer_id: "CUS-3001",

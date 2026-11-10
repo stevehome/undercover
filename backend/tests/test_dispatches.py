@@ -42,3 +42,16 @@ def test_a_start_says_so_when_the_agent_is_not_running(client, monkeypatch):
 def test_n_is_one_to_twenty_five(client, agent_stub, concurrency):
     assert start(client, concurrency).status_code == 422
     assert agent_stub.calls == []
+
+
+def test_an_evaluation_start_asks_the_agent_with_n_the_set_and_tiny(client, agent_stub):
+    response = client.post(
+        "/api/evaluations",
+        json={"concurrency": 5, "eval_set": "held_out", "tiny": True},
+    )
+
+    assert response.status_code == 202
+    assert agent_stub.calls == ["/api/evaluations"]
+    assert agent_stub.bodies == [
+        {"concurrency": 5, "eval_set": "held_out", "tiny": True}
+    ]

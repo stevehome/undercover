@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import and_, func, insert, or_, select, update
+from sqlalchemy import Connection, and_, func, insert, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
 from backend import db, money, tables, usage
@@ -94,10 +94,10 @@ def get_current_run() -> dict[str, Any] | None:
 
 
 def _claims_to_dispatch() -> list[str]:
-    """List the claims to work, oldest submitted first.
+    """List the queue's claims to work, oldest submitted first.
 
     Those in progress and those waiting, and any approved and ready to pay
-    that a restart left unpaid.
+    that a restart left unpaid. An evaluation's copies are never among them.
     """
     columns = tables.claims.c
     payable = and_(
@@ -109,53 +109,66 @@ def _claims_to_dispatch() -> list[str]:
         rows = conn.execute(
             select(columns.claim_id)
             .where(
+                columns.evaluation_run_id.is_(None),
                 or_(
                     columns.status.in_([ClaimStatus.WAITING, ClaimStatus.IN_PROGRESS]),
                     payable,
-                )
+                ),
             )
             .order_by(columns.submitted_on, columns.claim_id)
         )
         return [claim_id for (claim_id,) in rows]
 
 
-def create_dispatch(
-    concurrency: int, model: str, reasoning_effort: str
-) -> dict[str, Any]:
-    """Start a dispatch of every claim in progress and every waiting claim.
+def insert_run(conn: Connection, **values: Any) -> int:
+    """Insert a running run and return its id.
 
     Raises RunAlreadyGoing while another run is running; the database decides.
     """
-    claim_ids = _claims_to_dispatch()
     try:
-        with db.connection() as conn:
-            run_id = conn.execute(
-                insert(tables.runs)
-                .values(
-                    kind=RunKind.DISPATCH,
-                    status=RunStatus.RUNNING,
-                    concurrency=concurrency,
-                    model=model,
-                    reasoning_effort=reasoning_effort,
-                    started_on=db.now(),
-                )
-                .returning(tables.runs.c.run_id)
-            ).scalar_one()
-            if claim_ids:
-                conn.execute(
-                    insert(tables.run_claims),
-                    [
-                        {
-                            "run_id": run_id,
-                            "claim_id": claim_id,
-                            "position": position,
-                            "status": ItemStatus.TO_DO,
-                        }
-                        for position, claim_id in enumerate(claim_ids)
-                    ],
-                )
+        return conn.execute(
+            insert(tables.runs)
+            .values(status=RunStatus.RUNNING, started_on=db.now(), **values)
+            .returning(tables.runs.c.run_id)
+        ).scalar_one()
     except IntegrityError as error:
         raise RunAlreadyGoing("A dispatch or evaluation is already running") from error
+
+
+def insert_run_claims(
+    conn: Connection, run_id: int, claims: list[tuple[str, str | None]]
+) -> None:
+    """Add a run's claims, each as (claim id, the claim it is a copy of), to do."""
+    if claims:
+        conn.execute(
+            insert(tables.run_claims),
+            [
+                {
+                    "run_id": run_id,
+                    "claim_id": claim_id,
+                    "source_claim_id": source_claim_id,
+                    "position": position,
+                    "status": ItemStatus.TO_DO,
+                }
+                for position, (claim_id, source_claim_id) in enumerate(claims)
+            ],
+        )
+
+
+def create_dispatch(
+    concurrency: int, model: str, reasoning_effort: str
+) -> dict[str, Any]:
+    """Start a dispatch of every claim in progress and every waiting claim."""
+    claim_ids = _claims_to_dispatch()
+    with db.connection() as conn:
+        run_id = insert_run(
+            conn,
+            kind=RunKind.DISPATCH,
+            concurrency=concurrency,
+            model=model,
+            reasoning_effort=reasoning_effort,
+        )
+        insert_run_claims(conn, run_id, [(claim_id, None) for claim_id in claim_ids])
     return get_run(run_id)
 
 

@@ -2,6 +2,7 @@
 
 import logging
 import os
+from typing import Any
 
 import httpx
 
@@ -13,7 +14,7 @@ TIMEOUT_SECONDS = 5
 logger = logging.getLogger(__name__)
 
 
-def _post(path: str, body: dict[str, int] | None = None) -> httpx.Response:
+def _post(path: str, body: dict[str, Any] | None = None) -> httpx.Response:
     base_url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
     return httpx.post(f"{base_url}{path}", json=body, timeout=TIMEOUT_SECONDS)
 
@@ -29,16 +30,27 @@ def notify_sign_off(claim_id: str) -> None:
         )
 
 
-def start_dispatch(concurrency: int) -> int:
-    """Ask the agent to start a dispatch with this many claim agents; return its run.
+def _start(path: str, body: dict[str, Any]) -> int:
+    """Ask the agent to start a run; return its id.
 
     Raises Conflict while a run is going and ServiceUnavailable if the agent is down.
     """
     try:
-        response = _post("/api/dispatches", {"concurrency": concurrency})
+        response = _post(path, body)
     except httpx.HTTPError as error:
         raise ServiceUnavailable("The agent's service isn't running") from error
     if response.status_code == httpx.codes.CONFLICT:
         raise Conflict(response.json()["detail"])
     response.raise_for_status()
     return response.json()["run_id"]
+
+
+def start_dispatch(concurrency: int) -> int:
+    """Ask the agent to start a dispatch with this many claim agents at once."""
+    return _start("/api/dispatches", {"concurrency": concurrency})
+
+
+def start_evaluation(concurrency: int, eval_set: str, tiny: bool) -> int:
+    """Ask the agent to start an evaluation on a labelled set."""
+    body = {"concurrency": concurrency, "eval_set": eval_set, "tiny": tiny}
+    return _start("/api/evaluations", body)

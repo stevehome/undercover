@@ -10,6 +10,7 @@ from backend import (
     agent_process,
     agent_service,
     claims,
+    evaluations,
     payouts,
     reference,
     runs,
@@ -87,6 +88,23 @@ class WorkSegment(BaseModel):
 
 class StartDispatch(BaseModel):
     concurrency: Concurrency
+
+
+EvalSet = Literal["evaluation", "held_out"]
+
+
+class StartEvaluation(BaseModel):
+    concurrency: Concurrency
+    eval_set: EvalSet
+    tiny: bool
+
+
+class NewEvaluation(BaseModel):
+    concurrency: Concurrency
+    eval_set: EvalSet
+    tiny: bool
+    model: str
+    reasoning_effort: str
 
 
 class NewDispatch(BaseModel):
@@ -226,6 +244,19 @@ def requeue_claim(claim_id: str) -> dict[str, Any]:
 def start_dispatch(start: StartDispatch) -> dict[str, int]:
     """Have the agent's service start a dispatch with N claim agents at once."""
     return {"run_id": agent_service.start_dispatch(start.concurrency)}
+
+
+@app.post("/api/evaluations", operation_id="start_evaluation", status_code=202)
+def start_evaluation(start: StartEvaluation) -> dict[str, int]:
+    """Have the agent's service start an evaluation on one of the labelled sets."""
+    run_id = agent_service.start_evaluation(**start.model_dump())
+    return {"run_id": run_id}
+
+
+@app.post("/api/runs/evaluation", operation_id="create_evaluation")
+def create_evaluation(evaluation: NewEvaluation) -> dict[str, Any]:
+    """Start an evaluation on a labelled set, working copies of its claims."""
+    return evaluations.start_evaluation(**evaluation.model_dump())
 
 
 @app.post("/api/runs/dispatch", operation_id="create_dispatch")

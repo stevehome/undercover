@@ -43,7 +43,9 @@ def list_summaries() -> list[dict[str, Any]]:
                 columns.summary,
                 columns.amount_claimed_cents,
                 columns.status,
-            ).order_by(columns.submitted_on, columns.claim_id)
+            )
+            .where(columns.evaluation_run_id.is_(None))
+            .order_by(columns.submitted_on, columns.claim_id)
         )
         return [money.dollar_fields(dict(row._mapping)) for row in rows]
 
@@ -138,6 +140,8 @@ def list_steps(claim_id: str) -> list[dict[str, Any]]:
 def sign_off(claim_id: str, handler_id: str) -> dict[str, Any]:
     """Have a handler sign off an over-limit approval; the agent then pays it."""
     row = get_row(claim_id)
+    if row["evaluation_run_id"] is not None:
+        raise Conflict("An evaluation's claim can't be signed off")
     if row["signed_off_by"] == handler_id:
         return row
     if row["status"] != ClaimStatus.WAITING_FOR_SIGN_OFF:

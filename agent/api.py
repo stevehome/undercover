@@ -205,6 +205,20 @@ def create_dispatch(concurrency: int, model: str, reasoning_effort: str) -> int:
     return _call("POST", "/api/runs/dispatch", json=body)["run_id"]
 
 
+def create_evaluation(
+    concurrency: int, eval_set: str, tiny: bool, model: str, reasoning_effort: str
+) -> int:
+    """Start an evaluation on a labelled set; return the run's id."""
+    body = {
+        "concurrency": concurrency,
+        "eval_set": eval_set,
+        "tiny": tiny,
+        "model": model,
+        "reasoning_effort": reasoning_effort,
+    }
+    return _call("POST", "/api/runs/evaluation", json=body)["run_id"]
+
+
 def get_run(run_id: int) -> dict[str, Any]:
     """Return a run with its claims and totals."""
     return _call("GET", f"/api/runs/{run_id}")

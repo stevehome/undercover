@@ -6,7 +6,7 @@ import pytest
 from langchain_core.exceptions import ModelRateLimitError, ModelTimeoutError
 from langgraph.types import RetryPolicy
 
-from agent import api, dispatcher, work
+from agent import agents, api, dispatcher, work
 
 DECISION = {
     "decision": "approve",
@@ -164,3 +164,31 @@ def test_no_claim_is_decided_twice(backend):
     run(start(), decide)
 
     assert len(decisions) == len(set(decisions)) == 25
+
+
+def test_a_held_approval_in_an_evaluation_is_finished_and_its_progress_cleared(
+    backend, script, saver
+):
+    run_id = api.create_evaluation(1, "held_out", True, "stub/model", "low")
+    copies = [c["claim_id"] for c in api.get_run(run_id)["claims"]]
+    approve = (
+        "decide_claim",
+        {
+            "decision": "approve",
+            "payout": "1200.00",
+            "reason": "Stubbed.",
+            "policy_reference": "S1",
+        },
+    )
+
+    def decide(claim_id, run_id):
+        return agents.decide_claim(claim_id, script(approve, "Done."), saver, run_id)
+
+    rows = run(run_id, decide, 1)
+
+    assert {r["status"] for r in rows.values()} == {"done"}
+    assert {r["note"] for r in rows.values()} == {
+        "Approved $1,200.00, waiting for sign-off"
+    }
+    assert [api.get_claim(c)["status"] for c in copies] == ["waiting for sign-off"] * 5
+    assert list(saver.list(None)) == []

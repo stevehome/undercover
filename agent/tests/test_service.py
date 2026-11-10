@@ -75,3 +75,22 @@ def test_starting_the_service_stops_runs_that_were_going(backend, started, monke
         pass
 
     assert api.get_run(run_id)["status"] == "stopped"
+
+
+def test_an_evaluation_starts_on_its_set_and_is_refused_while_a_run_is_going(
+    backend, started
+):
+    client = TestClient(service.app)
+    body = {"concurrency": 5, "eval_set": "held_out", "tiny": True}
+
+    first = client.post("/api/evaluations", json=body)
+
+    run = api.get_run(first.json()["run_id"])
+    assert (run["kind"], run["eval_set"], run["tiny"], len(run["claims"])) == (
+        "evaluation",
+        "held_out",
+        True,
+        5,
+    )
+    assert started == [(run["run_id"], 5)]
+    assert client.post("/api/evaluations", json=body).status_code == 409

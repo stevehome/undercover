@@ -51,6 +51,29 @@ def _claim_row(claim: dict[str, Any]) -> dict[str, Any]:
     return {**row, "status": ClaimStatus.WAITING}
 
 
+def _held_out_row(claim: dict[str, Any]) -> dict[str, Any]:
+    return money.cents_columns({k: v for k, v in claim.items() if k != "status"})
+
+
+def _answer_key_rows() -> list[dict[str, Any]]:
+    """The handlers' decisions on the two labelled sets, which only scoring reads."""
+    files = {
+        "evaluation": "evals/decisions.json",
+        "held_out": "evals/held_out_decisions.json",
+    }
+    return [
+        {
+            "eval_set": eval_set,
+            "claim_id": answer["claim_id"],
+            "tiny": answer["tiny"],
+            "decision": answer["decision"],
+            "payout_cents": money.to_cents(answer["payout"]),
+        }
+        for eval_set, filename in files.items()
+        for answer in _load_json(filename)
+    ]
+
+
 def records() -> dict[Table, list[dict[str, Any]]]:
     """Return every table's starting rows."""
     plan_data = _load_json("plans.json")
@@ -72,4 +95,8 @@ def records() -> dict[Table, list[dict[str, Any]]]:
         tables.handlers: _load_json("handlers.json"),
         tables.document_sections: _document_rows(),
         tables.claims: [_claim_row(claim) for claim in _load_json("claims.json")],
+        tables.held_out_claims: [
+            _held_out_row(claim) for claim in _load_json("evals/held_out_claims.json")
+        ],
+        tables.answer_key: _answer_key_rows(),
     }

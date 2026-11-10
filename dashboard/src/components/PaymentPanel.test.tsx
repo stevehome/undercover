@@ -35,6 +35,7 @@ function makeClaim(overrides: Partial<Claim>): Claim {
     signed_off_on: null,
     paid_amount: null,
     paid_on: null,
+    evaluation_run_id: null,
     policy: {
       policy_id: "POL-2003",
       customer_id: "CUS-3003",
@@ -127,4 +128,24 @@ it("shows the paid amount once a claim has been paid", async () => {
   expect(
     await screen.findByText(/Signed off by Dana Whitfield on/),
   ).toBeDefined();
+});
+
+it("shows no sign-off buttons on an evaluation's copy", () => {
+  const impl = (input: FetchInput): Promise<Response> =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify(requestUrl(input).includes("handlers") ? [] : {}),
+      ),
+    );
+  vi.stubGlobal("fetch", vi.fn(impl));
+
+  render(
+    <PaymentPanel
+      claim={makeClaim({ evaluation_run_id: 7 })}
+      onUpdated={() => undefined}
+    />,
+  );
+
+  expect(screen.getByText(/never signed off/)).toBeDefined();
+  expect(screen.queryByRole("button")).toBeNull();
 });

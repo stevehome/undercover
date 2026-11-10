@@ -1,7 +1,7 @@
 """The agent's service: the web entry point the backend calls.
 
-It carries on a signed-off claim, and starts dispatches. Both are answered at
-once and worked in the background.
+It carries on a signed-off claim, and starts dispatches and evaluations.
+Each is answered at once and worked in the background.
 """
 
 from collections.abc import Callable
@@ -26,6 +26,20 @@ app = FastAPI(title="UnderCover Agent", lifespan=lifespan)
 
 class StartDispatch(BaseModel):
     concurrency: int
+
+
+class StartEvaluation(BaseModel):
+    concurrency: int
+    eval_set: str
+    tiny: bool
+
+
+def _create(create: Callable[..., int], *arguments: object) -> int:
+    """Create a run through the backend, which refuses a second one running."""
+    try:
+        return create(*arguments)
+    except api.ApiRefusal as refusal:
+        raise HTTPException(refusal.status_code, refusal.detail) from refusal
 
 
 def claim_worker() -> Callable[[str], str]:
@@ -63,11 +77,28 @@ def start_dispatch(
 ) -> dict[str, int]:
     """Start a dispatch with N claim agents at once; refused while a run is going."""
     model = harness.model_settings()
-    try:
-        run_id = api.create_dispatch(
-            start.concurrency, model.name, model.reasoning_effort
-        )
-    except api.ApiRefusal as refusal:
-        raise HTTPException(refusal.status_code, refusal.detail) from refusal
+    run_id = _create(
+        api.create_dispatch, start.concurrency, model.name, model.reasoning_effort
+    )
+    background.add_task(worker, run_id, start.concurrency)
+    return {"run_id": run_id}
+
+
+@app.post("/api/evaluations", operation_id="start_evaluation", status_code=202)
+def start_evaluation(
+    start: StartEvaluation,
+    background: BackgroundTasks,
+    worker: Annotated[Callable[[int, int], object], Depends(dispatch_worker)],
+) -> dict[str, int]:
+    """Start an evaluation on a labelled set; refused while a run is going."""
+    model = harness.model_settings()
+    run_id = _create(
+        api.create_evaluation,
+        start.concurrency,
+        start.eval_set,
+        start.tiny,
+        model.name,
+        model.reasoning_effort,
+    )
     background.add_task(worker, run_id, start.concurrency)
     return {"run_id": run_id}

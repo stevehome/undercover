@@ -91,9 +91,21 @@ def test_only_seed_data_reads_the_data_folder():
             assert '"data"' not in path.read_text(), path.name
 
 
-def test_the_answer_key_is_never_mentioned_outside_tests():
+ANSWER_KEY_READERS = {"tables.py", "seed_data.py", "evaluations.py", "scoring.py"}
+
+
+def test_only_seeding_opens_the_evals_folder():
     for path in [*(ROOT / "backend").glob("*.py"), *(ROOT / "agent").glob("*.py")]:
-        assert "evals" not in path.read_text(), path.name
+        if path.name != "seed_data.py":
+            assert "evals" not in path.read_text(), path.name
+
+
+def test_the_answer_key_is_read_only_where_an_evaluation_is_scored():
+    for path in [*(ROOT / "backend").glob("*.py"), *(ROOT / "agent").glob("*.py")]:
+        if path.name not in ANSWER_KEY_READERS:
+            text = path.read_text()
+            assert "answer_key" not in text, path.name
+            assert "held_out_claims" not in text, path.name
 
 
 def test_only_the_dispatcher_fans_out_with_send():

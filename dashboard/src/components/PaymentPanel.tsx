@@ -16,6 +16,14 @@ export function PaymentPanel({
     if (waiting || signedOffBy !== null) void fetchHandlers().then(setHandlers);
   }, [waiting, signedOffBy]);
 
+  if (waiting && claim.evaluation_run_id !== null) {
+    return (
+      <section>
+        <p>This is a copy for an evaluation, so it is never signed off.</p>
+      </section>
+    );
+  }
+
   if (waiting) {
     return (
       <section>

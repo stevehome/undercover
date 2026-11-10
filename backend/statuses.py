@@ -16,6 +16,7 @@ class RunKind(StrEnum):
     """What a run is for."""
 
     DISPATCH = "dispatch"
+    EVALUATION = "evaluation"
 
 
 class RunStatus(StrEnum):

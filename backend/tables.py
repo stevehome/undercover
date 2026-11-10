@@ -126,6 +126,7 @@ claims = Table(
     Column("paid_on", String),
     Column("lease_owner", String),
     Column("lease_expires_on", String),
+    Column("evaluation_run_id", Integer),
 )
 
 STATE_COLUMNS = [
@@ -144,6 +145,7 @@ STATE_COLUMNS = [
         "signed_off_on",
         "paid_cents",
         "paid_on",
+        "evaluation_run_id",
     ]
 ]
 CONTENT_COLUMNS = [
@@ -180,6 +182,8 @@ runs = Table(
     Column("kind", String, nullable=False),
     Column("status", String, nullable=False),
     Column("concurrency", Integer, nullable=False),
+    Column("eval_set", String),
+    Column("tiny", Boolean),
     Column("model", String, nullable=False),
     Column("reasoning_effort", String, nullable=False),
     Column("started_on", String, nullable=False),
@@ -200,6 +204,7 @@ run_claims = Table(
     Column("run_id", Integer, primary_key=True),
     Column("claim_id", String, primary_key=True),
     Column("position", Integer, nullable=False),
+    Column("source_claim_id", String),
     Column("status", String, nullable=False),
     Column("attempts", Integer, nullable=False, server_default="0"),
     Column("note", String),
@@ -226,4 +231,23 @@ work_segments = Table(
     Column("run_id", Integer),
     Column("started_on", String, nullable=False),
     Column("finished_on", String, nullable=False),
+)
+
+held_out_claims = Table(
+    "held_out_claims",
+    metadata,
+    *[
+        Column(c.name, c.type, primary_key=c.primary_key, nullable=c.nullable)
+        for c in CONTENT_COLUMNS
+    ],
+)
+
+answer_key = Table(
+    "answer_key",
+    metadata,
+    Column("eval_set", String, primary_key=True),
+    Column("claim_id", String, primary_key=True),
+    Column("tiny", Boolean, nullable=False),
+    Column("decision", String, nullable=False),
+    Column("payout_cents", Integer, nullable=False),
 )

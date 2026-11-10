@@ -153,14 +153,16 @@ Success criteria:
 
 Success criteria:
 
-- [ ] After an evaluation the queue is as it was: the same claims, the same counts per status, before and after.
-- [ ] A dispatch never carries on an evaluation's copies.
-- [ ] A held approval in a copy counts as finished, and its checkpoint is gone (a test with `InMemorySaver` shows no thread left).
-- [ ] Signing off a copy is a 409, and its page has no sign-off form.
-- [ ] `get_claim` on a copy holds nothing from the handlers' decisions: a test compares every value in the response against the answer key's decision, payout and reason.
-- [ ] The evaluation records its set, N, the model and the effort, and for each claim the decision, payout, reason, cost and time.
-- [ ] A run stopped partway shows as `stopped`, and its copies are never carried on.
-- [ ] `npm run check` is green.
+- [x] After an evaluation the queue is as it was: the same claims, the same counts per status, before and after.
+- [x] A dispatch never carries on an evaluation's copies.
+- [x] A held approval in a copy counts as finished, and its checkpoint is gone (a test with `InMemorySaver` shows no thread left).
+- [x] Signing off a copy is a 409, and its page has no sign-off form.
+- [x] `get_claim` on a copy holds nothing from the handlers' decisions: a test compares every value in the response against the answer key's decision, payout and reason.
+- [x] The evaluation records its set, N, the model and the effort, and for each claim the decision, payout, reason, cost and time. (Kept in the copy's own records and the cost and time tables; Phase 5 reads them together.)
+- [x] A run stopped partway shows as `stopped`, and its copies are never carried on.
+- [x] `npm run check` is green.
+
+Built as planned. The held-out claims' policies and customers were already seeded. `held_out_claims` and `answer_key` are read only by `tables.py`, `seed_data.py`, `evaluations.py` and (Phase 5) `scoring.py`; a structure test enforces it. The held approval's saved progress is cleared in `agents.decide_claim`, which holds the saver, not in `dispatcher.py` or `checkpoint.py`.
 
 ## Phase 5: the Scoreboard
 
