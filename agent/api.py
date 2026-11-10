@@ -138,6 +138,29 @@ def pay_claim(claim_id: str, amount: Amount) -> dict[str, Any]:
     return _call("POST", f"/api/claims/{claim_id}/payment", json=body)
 
 
+def record_model_call(
+    claim_id: str, run_id: int | None, model: str, usage: dict[str, Any]
+) -> None:
+    """Record one model call, from the `token_usage` OpenRouter reports with it."""
+    body = {
+        "run_id": run_id,
+        "model": model,
+        "input_tokens": usage["prompt_tokens"],
+        "output_tokens": usage["completion_tokens"],
+        "total_tokens": usage["total_tokens"],
+        "cost": format(Decimal(str(usage["cost"])), "f"),
+    }
+    _call("POST", f"/api/claims/{claim_id}/model-calls", json=body)
+
+
+def record_work_segment(
+    claim_id: str, run_id: int | None, started_on: str, finished_on: str
+) -> None:
+    """Record one stretch of the agent working on a claim."""
+    body = {"run_id": run_id, "started_on": started_on, "finished_on": finished_on}
+    _call("POST", f"/api/claims/{claim_id}/work-segments", json=body)
+
+
 def acquire_lease(claim_id: str, owner: str) -> int | None:
     """Lease a claim, or renew the lease: its length in seconds, or None if held."""
     response = client.post(f"/api/claims/{claim_id}/lease", json={"owner": owner})

@@ -6,7 +6,15 @@ from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, model_validator
 
-from backend import agent_process, agent_service, claims, payouts, reference, runs
+from backend import (
+    agent_process,
+    agent_service,
+    claims,
+    payouts,
+    reference,
+    runs,
+    usage,
+)
 from backend.errors import Conflict, NotFound
 from backend.instructions import CLAIM_INSTRUCTIONS, QUEUE_INSTRUCTIONS
 from backend.money import Amount
@@ -60,6 +68,12 @@ class PayoutRequest(BaseModel):
     benefit: Benefit
     lines: list[Line]
     paid_by_others: Amount
+
+
+class WorkSegment(BaseModel):
+    run_id: int | None
+    started_on: str
+    finished_on: str
 
 
 class StartRun(BaseModel):
@@ -183,6 +197,18 @@ def release_lease(claim_id: str, lease: Lease) -> dict[str, str]:
     """Give up a claim's lease, if the agent still holds it."""
     claims.release_lease(claim_id, lease.owner)
     return {"claim_id": claim_id}
+
+
+@app.post("/api/claims/{claim_id}/model-calls", operation_id="record_model_call")
+def record_model_call(claim_id: str, call: usage.ModelCall) -> dict[str, Any]:
+    """Record one model call's tokens and cost, with its run if it has one."""
+    return usage.record_model_call(claim_id, call)
+
+
+@app.post("/api/claims/{claim_id}/work-segments", operation_id="record_work_segment")
+def record_work_segment(claim_id: str, segment: WorkSegment) -> dict[str, Any]:
+    """Record one stretch of the agent working on a claim, with its run if any."""
+    return usage.record_work_segment(claim_id, **segment.model_dump())
 
 
 @app.post("/api/claims/{claim_id}/run", operation_id="run_agent")

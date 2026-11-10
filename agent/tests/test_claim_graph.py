@@ -3,7 +3,7 @@ from langchain_core.messages import AIMessage
 
 from agent import agents, api
 from agent.claim_nodes import MAX_MODEL_CALLS, ModelCallLimit
-from agent.tests.conftest import StubModel
+from agent.tests.conftest import REPLY_USAGE, StubModel
 
 CLAIM = "CLM-1001"
 
@@ -96,7 +96,9 @@ class Stopped(BaseException):
 def stops_after_reading_the_claim():
     """A stub model that reads the claim, then is stopped."""
     call = AIMessage(
-        content="", tool_calls=[{"name": "get_claim", "args": {}, "id": "1"}]
+        content="",
+        tool_calls=[{"name": "get_claim", "args": {}, "id": "1"}],
+        response_metadata=REPLY_USAGE,
     )
     yield call
     raise Stopped

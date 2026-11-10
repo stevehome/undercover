@@ -6,8 +6,11 @@ from typing import Annotated, Any
 from pydantic import Field
 
 CENT = Decimal("0.01")
+NANO = Decimal("0.000000001")
 
 Amount = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=2)]
+
+Cost = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=9)]
 
 MONEY_KEYS = {
     "amount",
@@ -40,6 +43,16 @@ def to_cents(amount: Decimal) -> int:
 def from_cents(cents: int) -> Decimal:
     """Return whole cents as dollars."""
     return dollars(Decimal(cents) / 100)
+
+
+def to_nanos(cost: Decimal) -> int:
+    """Return a model cost in whole billionths of a dollar."""
+    return int(cost / NANO)
+
+
+def from_nanos(nanos: int) -> Decimal:
+    """Return billionths of a dollar as dollars, to the billionth."""
+    return (Decimal(nanos) * NANO).quantize(NANO)
 
 
 def convert(value: Any) -> Any:

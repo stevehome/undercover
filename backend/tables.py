@@ -181,3 +181,26 @@ run_items = Table(
     Column("attempts", Integer, nullable=False, server_default="0"),
     Column("note", String),
 )
+
+model_calls = Table(
+    "model_calls",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("claim_id", String, nullable=False),
+    Column("run_id", Integer),
+    Column("model", String, nullable=False),
+    Column("input_tokens", Integer, nullable=False),
+    Column("output_tokens", Integer, nullable=False),
+    Column("total_tokens", Integer, nullable=False),
+    Column("cost_nanos", Integer, nullable=False),
+)
+
+work_segments = Table(
+    "work_segments",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("claim_id", String, nullable=False),
+    Column("run_id", Integer),
+    Column("started_on", String, nullable=False),
+    Column("finished_on", String, nullable=False),
+)

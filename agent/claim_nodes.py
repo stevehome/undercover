@@ -23,14 +23,21 @@ class ModelCallLimit(Exception):  # noqa: N818 - a failure of the claim
 
 def agent(
     state: ClaimState,
+    runtime: Runtime[ClaimContext],
     *,
     model: Runnable[LanguageModelInput, AIMessage],
     instructions: str,
 ) -> dict[str, Any]:
-    """Call the model with the conversation so far."""
+    """Call the model with the conversation so far, and record what it cost."""
     if state["model_calls"] >= MAX_MODEL_CALLS:
         raise ModelCallLimit(f"More than {MAX_MODEL_CALLS} model calls on one claim")
     reply = model.invoke([SystemMessage(instructions), *state["messages"]])
+    api.record_model_call(
+        runtime.context.claim_id,
+        runtime.context.run_id,
+        reply.response_metadata["model_name"],
+        reply.response_metadata["token_usage"],
+    )
     return {"messages": [reply], "model_calls": state["model_calls"] + 1}
 
 

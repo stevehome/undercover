@@ -7,6 +7,16 @@ from langgraph.checkpoint.memory import InMemorySaver
 from agent import api
 from backend.main import app
 
+REPLY_USAGE = {
+    "model_name": "stub/model",
+    "token_usage": {
+        "prompt_tokens": 100,
+        "completion_tokens": 20,
+        "total_tokens": 120,
+        "cost": 0.000312,
+    },
+}
+
 
 class StubModel(GenericFakeChatModel):
     """A chat model that gives scripted replies in place of a real model."""
@@ -30,11 +40,12 @@ def script():
 
     def build(*steps):
         replies = [
-            AIMessage(content=step)
+            AIMessage(content=step, response_metadata=REPLY_USAGE)
             if isinstance(step, str)
             else AIMessage(
                 content="",
                 tool_calls=[{"name": step[0], "args": step[1], "id": str(i)}],
+                response_metadata=REPLY_USAGE,
             )
             for i, step in enumerate(steps)
         ]
