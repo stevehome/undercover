@@ -1,45 +1,50 @@
 """The agent's saved progress: the one module that talks to Postgres.
 
 LangGraph saves a claim's state here after every step, in the same Supabase
-database as the backend, in the `undercover` schema.
+database as the backend, in the `undercover` schema. Claims worked at once
+share the process's few connections and wait for one rather than fail.
 """
 
 import os
 from functools import lru_cache
 from threading import Lock
+from typing import Any
 
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
 SCHEMA = "undercover"
-CONNECTIONS_PER_PROCESS = 2
+CONNECTIONS_PER_PROCESS = 4
+WAIT_FOR_CONNECTION_SECONDS = 600
 
 
 _creating = Lock()
 
 
 def saver() -> PostgresSaver:
-    """Return this process's checkpointer, made once even when claims race for it.
+    """Return a checkpointer of its own on this process's pool of connections.
 
-    Claims are worked in parallel threads, and each racing thread would
-    otherwise open a pool of its own, using up the database's connections.
+    A saver holds a lock around every read and write, so claims worked in
+    parallel each need one. The pool is made once even when claims race for it.
     """
     with _creating:
-        return _make_saver()
+        pool = _make_pool()
+    return PostgresSaver(pool)  # pyright: ignore[reportArgumentType]
 
 
 def forget() -> None:
-    """Forget this process's checkpointer, so the next use makes one again."""
-    _make_saver.cache_clear()
+    """Forget this process's pool, so the next use makes one again."""
+    _make_pool.cache_clear()
 
 
 @lru_cache
-def _make_saver() -> PostgresSaver:
+def _make_pool() -> ConnectionPool[Any]:
     pool = ConnectionPool(
         os.environ["DATABASE_URL"],
         min_size=CONNECTIONS_PER_PROCESS,
         max_size=CONNECTIONS_PER_PROCESS,
+        timeout=WAIT_FOR_CONNECTION_SECONDS,
         kwargs={
             "autocommit": True,
             "prepare_threshold": 0,
@@ -51,6 +56,5 @@ def _make_saver() -> PostgresSaver:
     pool.open()
     with pool.connection() as connection:
         connection.execute(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}")
-    checkpointer = PostgresSaver(pool)  # pyright: ignore[reportArgumentType]
-    checkpointer.setup()
-    return checkpointer
+    PostgresSaver(pool).setup()  # pyright: ignore[reportArgumentType]
+    return pool

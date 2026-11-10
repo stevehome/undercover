@@ -1,5 +1,5 @@
 import { parseCents } from "./money";
-import type { Claim, ClaimSummary, Handler, Item, Run, Step } from "./types";
+import type { Claim, ClaimSummary, Handler, Item, Step } from "./types";
 
 type WireSummary = Omit<ClaimSummary, "amount_claimed"> & {
   amount_claimed: string;
@@ -66,12 +66,6 @@ export const fetchHandlers = () => getJson<Handler[]>("/api/handlers");
 
 export const fetchClaimInstructions = () =>
   getInstructions("/api/claim-instructions");
-
-export const fetchQueueInstructions = () =>
-  getInstructions("/api/queue-instructions");
-
-/** The most recent run, or null before the first one. */
-export const fetchCurrentRun = () => getJson<Run | null>("/api/runs/current");
 
 export const runAgent = (claimId: string) => post(`/api/claims/${claimId}/run`);
 

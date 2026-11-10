@@ -1,4 +1,4 @@
-"""The UnderCover Agent: decides one claim, or works the whole queue."""
+"""The UnderCover Agent: decides one claim, or carries it on."""
 
 from contextvars import Context
 from typing import Any
@@ -11,9 +11,8 @@ from langgraph.types import Command
 from agent import api, checkpoint, lease, timing, tracing
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
-from agent.contexts import ClaimContext, RunContext
-from agent.harness import AgentSpec, model, run_agent
-from agent.tools import QUEUE_TOOLS
+from agent.contexts import ClaimContext
+from agent.harness import model
 
 
 def decide_claim(
@@ -26,8 +25,8 @@ def decide_claim(
 
     `run_id` is the run the work and its cost are recorded with, if any.
 
-    It runs in a fresh context, so a claim worked inside a queue run shares
-    neither the queue agent's callbacks nor its trace with it.
+    It runs in a fresh context, so a claim worked in a dispatch has a trace of
+    its own, tagged with the run.
 
     A claim waiting at its sign-off carries on only once a handler has signed off.
     A claim another agent is working is left to that agent.
@@ -49,7 +48,8 @@ def _work_traced(
     graph: Any, claim: dict[str, Any], thread_id: str, run_id: int | None
 ) -> str:
     """Work a claim in a trace of its own, in one Langfuse session."""
-    with tracing.trace(thread_id) as traced:
+    tags = [] if run_id is None else [f"run-{run_id}"]
+    with tracing.trace(thread_id, tags) as traced:
         config: RunnableConfig = {**traced, "configurable": {"thread_id": thread_id}}
         return _work(graph, config, claim, run_id)
 
@@ -72,41 +72,3 @@ def _work(
     with timing.segment(claim_id, run_id):
         result = graph.invoke(start, config, context=context, durability="sync")
     return result["messages"][-1].text
-
-
-def carry_on(
-    llm: BaseChatModel | None = None, checkpointer: BaseCheckpointSaver | None = None
-) -> None:
-    """Carry on with claims stopped or signed off while the agent was away.
-
-    Claims on an unfinished run are left to that run, which keeps their attempts.
-    """
-    run = api.get_unfinished_run()
-    on_the_run = {item["claim_id"] for item in run["items"]} if run else set()
-    for claim_id in api.list_unfinished_claims():
-        if claim_id not in on_the_run:
-            decide_claim(claim_id, llm, checkpointer)
-
-
-def run_queue(cap: int | None = None, llm: BaseChatModel | None = None) -> str:
-    """Work the waiting claims (the first `cap` of them, if capped) as one run.
-
-    An unfinished run is finished first, and it keeps its own list of claims.
-    """
-    carry_on()
-    run = api.get_unfinished_run()
-    if run:
-        run_id = run["run_id"]
-    else:
-        waiting = [
-            c["claim_id"] for c in api.list_claims() if c["status"] == api.WAITING
-        ]
-        run_id = api.start_run(waiting[:cap])
-    with tracing.trace(f"run-{run_id}") as config:
-        return run_agent(
-            AgentSpec(api.queue_instructions(), QUEUE_TOOLS),
-            RunContext(run_id, decide_claim),
-            "Work the claims queue.",
-            llm,
-            config,
-        )

@@ -1,6 +1,16 @@
 """The tables: UnderCover's records and the state of its work."""
 
-from sqlalchemy import JSON, Boolean, Column, Integer, MetaData, String, Table
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    Index,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    text,
+)
 
 metadata = MetaData()
 
@@ -167,16 +177,29 @@ runs = Table(
     "runs",
     metadata,
     Column("run_id", Integer, primary_key=True, autoincrement=True),
+    Column("kind", String, nullable=False),
+    Column("status", String, nullable=False),
+    Column("concurrency", Integer, nullable=False),
+    Column("model", String, nullable=False),
+    Column("reasoning_effort", String, nullable=False),
     Column("started_on", String, nullable=False),
     Column("finished_on", String),
-    Column("summary", String),
 )
 
-run_items = Table(
-    "run_items",
+Index(
+    "one_running_run",
+    runs.c.status,
+    unique=True,
+    sqlite_where=text("status = 'running'"),
+    postgresql_where=text("status = 'running'"),
+)
+
+run_claims = Table(
+    "run_claims",
     metadata,
     Column("run_id", Integer, primary_key=True),
     Column("claim_id", String, primary_key=True),
+    Column("position", Integer, nullable=False),
     Column("status", String, nullable=False),
     Column("attempts", Integer, nullable=False, server_default="0"),
     Column("note", String),

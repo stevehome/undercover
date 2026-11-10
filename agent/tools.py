@@ -8,9 +8,9 @@ from typing import Any
 
 from langchain.tools import ToolRuntime, tool
 
-from agent import api, work
+from agent import api
 from agent.api import Amount, Benefit, Decision, Document, Line
-from agent.contexts import ClaimContext, RunContext
+from agent.contexts import ClaimContext
 
 
 @tool
@@ -75,25 +75,4 @@ def decide_claim(
     return "Recorded"
 
 
-@tool
-def get_to_do() -> list[dict[str, Any]]:
-    """List the run's claims and their to-do status."""
-    return api.get_current_run()["items"]
-
-
-@tool
-def work_claim(claim_id: str, runtime: ToolRuntime[RunContext]) -> str:
-    """Hand one claim to a fresh subagent and report what happened."""
-    context = runtime.context
-    return work.work_claim(context.run_id, claim_id, context.decide)
-
-
-@tool
-def finish_run(summary: str, runtime: ToolRuntime[RunContext]) -> str:
-    """Finish the run with a short summary, once every claim is settled."""
-    outstanding = api.finish_run(runtime.context.run_id, summary)
-    return f"Not finished — {outstanding}" if outstanding else "Run finished."
-
-
 CLAIM_TOOLS = [get_claim, list_sections, read_section, calculate_payout, decide_claim]
-QUEUE_TOOLS = [get_to_do, work_claim, finish_run]

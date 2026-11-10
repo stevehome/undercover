@@ -4,7 +4,7 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import and_, insert, or_, select, update
+from sqlalchemy import insert, or_, select, update
 
 from backend import db, money, payouts, reference, tables
 from backend.errors import Conflict, NotFound
@@ -233,31 +233,6 @@ def release_lease(claim_id: str, owner: str) -> None:
             .where(columns.claim_id == claim_id, columns.lease_owner == owner)
             .values(lease_owner=None, lease_expires_on=None)
         )
-
-
-def list_unfinished() -> list[str]:
-    """List the claims to carry on with: stopped or ready to pay, and not leased."""
-    payable = and_(
-        tables.claims.c.decision == "approve",
-        tables.claims.c.paid_cents.is_(None),
-        or_(
-            tables.claims.c.over_approval_limit == 0,
-            tables.claims.c.signed_off_by.is_not(None),
-        ),
-    )
-    with db.connection() as conn:
-        rows = conn.execute(
-            select(tables.claims.c.claim_id)
-            .where(
-                or_(tables.claims.c.status == ClaimStatus.IN_PROGRESS, payable),
-                or_(
-                    tables.claims.c.lease_expires_on.is_(None),
-                    tables.claims.c.lease_expires_on < db.now(),
-                ),
-            )
-            .order_by(tables.claims.c.claim_id)
-        )
-        return [claim_id for (claim_id,) in rows]
 
 
 def start_work(claim_id: str, launch: Callable[[str], None]) -> dict[str, Any]:

@@ -15,6 +15,7 @@ from backend import money, seed_data, tables
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "undercover.db"
 SCHEMA = "undercover"
 CONNECTIONS_PER_PROCESS = 4
+WAIT_FOR_CONNECTION_SECONDS = 600
 
 
 def db_path() -> Path:
@@ -47,6 +48,7 @@ def make_engine(url: str) -> Engine:
         **json_options,
         pool_size=CONNECTIONS_PER_PROCESS,
         max_overflow=0,
+        pool_timeout=WAIT_FOR_CONNECTION_SECONDS,
         connect_args={"options": f"-c search_path={SCHEMA}"},
     )
 

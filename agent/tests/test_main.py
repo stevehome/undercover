@@ -1,27 +1,11 @@
-import pytest
-
 from agent import __main__ as cli
 
 
-@pytest.fixture
-def calls(monkeypatch):
+def test_main_works_the_named_claim(monkeypatch):
     calls = []
     monkeypatch.setattr(cli, "decide_claim", calls.append)
-    monkeypatch.setattr(cli, "run_queue", lambda cap=None: calls.append(("queue", cap)))
-    return calls
-
-
-@pytest.mark.parametrize(
-    ("argv", "expected"),
-    [
-        (["--claim", "CLM-1001"], ["CLM-1001"]),
-        (["--cap", "5"], [("queue", 5)]),
-        ([], [("queue", None)]),
-    ],
-)
-def test_main(monkeypatch, calls, argv, expected):
-    monkeypatch.setattr("sys.argv", ["cli.py", *argv])
+    monkeypatch.setattr("sys.argv", ["cli.py", "CLM-1001"])
 
     cli.main()
 
-    assert calls == expected
+    assert calls == ["CLM-1001"]

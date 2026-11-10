@@ -94,3 +94,20 @@ def test_only_seed_data_reads_the_data_folder():
 def test_the_answer_key_is_never_mentioned_outside_tests():
     for path in [*(ROOT / "backend").glob("*.py"), *(ROOT / "agent").glob("*.py")]:
         assert "evals" not in path.read_text(), path.name
+
+
+def test_only_the_dispatcher_fans_out_with_send():
+    for path in AGENT_MODULES:
+        if path.name != "dispatcher.py":
+            assert not any(
+                isinstance(node, ast.ImportFrom)
+                and any(alias.name == "Send" for alias in node.names)
+                for node in ast.walk(ast.parse(path.read_text()))
+            ), path.name
+
+
+def test_only_agents_builds_the_claim_graph():
+    for path in AGENT_MODULES:
+        if path.name not in ("agents.py", "claim_graph.py"):
+            assert "claim_graph" not in _imported_modules(path), path.name
+            assert "build_graph" not in path.read_text(), path.name

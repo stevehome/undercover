@@ -1,81 +1,134 @@
-def test_start_run_creates_items_to_do(client):
-    response = client.post("/api/runs", json={"claim_ids": ["CLM-1001", "CLM-1002"]})
-    assert response.status_code == 200
-    run = response.json()
-    assert run["finished_on"] is None
-    assert [item["status"] for item in run["items"]] == ["to do", "to do"]
+import pytest
+
+DISPATCH = {"concurrency": 3, "model": "stub/model", "reasoning_effort": "low"}
 
 
-def test_update_run_item_tracks_attempts(client):
-    run = client.post("/api/runs", json={"claim_ids": ["CLM-1001"]}).json()
+def dispatch(client, **changes):
+    return client.post("/api/runs/dispatch", json={**DISPATCH, **changes})
 
-    response = client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-1001",
-        json={"status": "in progress", "note": ""},
-    )
-    assert response.json() == {
-        "claim_id": "CLM-1001",
-        "status": "in progress",
-        "attempts": 1,
-        "note": "",
+
+def decide(client, claim_id, payout):
+    body = {
+        "decision": "approve",
+        "payout": payout,
+        "reason": "Stubbed.",
+        "policy_reference": "S1",
     }
+    client.post(f"/api/claims/{claim_id}/decision", json=body)
 
-    response = client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-1001",
-        json={"status": "done", "note": "Decided: approve for $420.00"},
+
+def test_a_dispatch_takes_waiting_and_in_progress_claims_oldest_first(client):
+    queue = [c["claim_id"] for c in client.get("/api/claims").json()]
+    client.post(f"/api/claims/{queue[3]}/steps", json={"text": "started"})
+    decide(client, queue[1], "420.00")
+    client.post(f"/api/claims/{queue[1]}/payment", json={"amount": "420.00"})
+
+    run = dispatch(client).json()
+
+    assert [c["claim_id"] for c in run["claims"]] == [c for c in queue if c != queue[1]]
+    assert {c["status"] for c in run["claims"]} == {"to do"}
+    assert (run["kind"], run["status"], run["concurrency"]) == (
+        "dispatch",
+        "running",
+        3,
     )
-    assert response.json()["status"] == "done"
-    assert response.json()["attempts"] == 1
+    assert (run["model"], run["reasoning_effort"]) == ("stub/model", "low")
 
 
-def test_update_run_item_unknown_claim_is_404(client):
-    run = client.post("/api/runs", json={"claim_ids": ["CLM-1001"]}).json()
-    response = client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-9999",
-        json={"status": "done", "note": ""},
+def test_a_dispatch_takes_an_approval_a_restart_left_unpaid(client):
+    decide(client, "CLM-1001", "420.00")
+    decide(client, "CLM-1002", "1200.00")
+    decide(client, "CLM-1003", "1200.00")
+    client.post("/api/claims/CLM-1003/sign-off", json={"handler_id": "HND-01"})
+
+    claims = [c["claim_id"] for c in dispatch(client).json()["claims"]]
+
+    assert "CLM-1001" in claims
+    assert "CLM-1002" not in claims
+    assert "CLM-1003" in claims
+
+
+def test_a_second_dispatch_is_refused_while_one_is_running(client):
+    assert dispatch(client).status_code == 200
+
+    second = dispatch(client)
+
+    assert second.status_code == 409
+    assert "already running" in second.json()["detail"]
+
+
+def test_a_finished_or_stopped_run_lets_the_next_start(client):
+    first = dispatch(client).json()
+    client.post(f"/api/runs/{first['run_id']}/finish")
+    second = dispatch(client).json()
+    assert second["run_id"] != first["run_id"]
+
+    assert client.post("/api/runs/stop-unfinished").json() == {"stopped": 1}
+
+    assert client.get(f"/api/runs/{second['run_id']}").json()["status"] == "stopped"
+    assert client.get(f"/api/runs/{first['run_id']}").json()["status"] == "finished"
+    assert dispatch(client).status_code == 200
+
+
+@pytest.mark.parametrize("concurrency", [0, 26])
+def test_concurrency_is_one_to_twenty_five(client, concurrency):
+    assert dispatch(client, concurrency=concurrency).status_code == 422
+
+
+def test_update_run_claim_tracks_attempts(client):
+    run = dispatch(client).json()
+    url = f"/api/runs/{run['run_id']}/claims/CLM-1001"
+
+    started = client.post(url, json={"status": "in progress", "note": ""}).json()
+    done = client.post(url, json={"status": "done", "note": "Declined"}).json()
+
+    assert started["attempts"] == 1
+    assert (done["status"], done["attempts"], done["note"]) == ("done", 1, "Declined")
+    assert (
+        client.post(
+            f"/api/runs/{run['run_id']}/claims/CLM-9999",
+            json={"status": "done", "note": ""},
+        ).status_code
+        == 404
     )
-    assert response.status_code == 404
 
 
-def test_finish_run_blocked_while_items_outstanding(client):
-    run = client.post("/api/runs", json={"claim_ids": ["CLM-1001", "CLM-1002"]}).json()
+def test_a_run_carries_its_own_cost_and_time(client):
+    run = dispatch(client).json()
+    claim = "/api/claims/CLM-1001"
     client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-1001",
-        json={"status": "done", "note": "Decided"},
-    )
-
-    response = client.post(f"/api/runs/{run['run_id']}/finish", json={"summary": "x"})
-    assert response.status_code == 409
-    assert "CLM-1002" in response.json()["detail"]
-
-
-def test_finish_run_succeeds_once_all_items_settled(client):
-    run = client.post("/api/runs", json={"claim_ids": ["CLM-1001", "CLM-1002"]}).json()
-    client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-1001",
-        json={"status": "done", "note": "Decided"},
+        f"{claim}/model-calls",
+        json={
+            "run_id": run["run_id"],
+            "model": "stub/model",
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cost": "0.000138675",
+        },
     )
     client.post(
-        f"/api/runs/{run['run_id']}/items/CLM-1002",
-        json={"status": "left for a handler", "note": "Failed twice"},
+        f"{claim}/work-segments",
+        json={
+            "run_id": run["run_id"],
+            "started_on": "2026-01-01T00:00:00+00:00",
+            "finished_on": "2026-01-01T00:00:02+00:00",
+        },
     )
-
-    response = client.post(
-        f"/api/runs/{run['run_id']}/finish", json={"summary": "Worked 2 claims."}
-    )
-    assert response.status_code == 200
-    assert response.json()["summary"] == "Worked 2 claims."
-    assert response.json()["finished_on"] is not None
 
     current = client.get("/api/runs/current").json()
-    assert current["run_id"] == run["run_id"]
-    assert current["summary"] == "Worked 2 claims."
+
+    assert (current["model_calls"], current["total_tokens"]) == (1, 15)
+    assert current["cost"] == "0.000138675"
+    assert current["work_ms"] == 2000
 
 
 def test_get_current_run_is_null_when_none_started(client):
-    response = client.get("/api/runs/current")
-    assert response.status_code == 200
-    assert response.json() is None
+    assert client.get("/api/runs/current").json() is None
+
+
+def test_an_unknown_run_is_404(client):
+    assert client.get("/api/runs/99").status_code == 404
 
 
 def test_requeue_claim(client):

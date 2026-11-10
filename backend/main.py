@@ -1,10 +1,10 @@
 """The UnderCover backend: the HTTP routes, each a thin call into the logic modules."""
 
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from backend import (
     agent_process,
@@ -16,10 +16,12 @@ from backend import (
     usage,
 )
 from backend.errors import Conflict, NotFound
-from backend.instructions import CLAIM_INSTRUCTIONS, QUEUE_INSTRUCTIONS
+from backend.instructions import CLAIM_INSTRUCTIONS
 from backend.money import Amount
 from backend.payouts import Benefit, Line
 from backend.statuses import ItemStatus
+
+MAX_CONCURRENCY = 25
 
 app = FastAPI(title="UnderCover")
 
@@ -76,17 +78,15 @@ class WorkSegment(BaseModel):
     finished_on: str
 
 
-class StartRun(BaseModel):
-    claim_ids: list[str]
+class NewDispatch(BaseModel):
+    concurrency: Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
+    model: str
+    reasoning_effort: str
 
 
-class RunItemUpdate(BaseModel):
+class RunClaimUpdate(BaseModel):
     status: ItemStatus
     note: str
-
-
-class FinishRun(BaseModel):
-    summary: str
 
 
 @app.get("/api/health", operation_id="health")
@@ -125,12 +125,6 @@ def get_claim_instructions() -> dict[str, str]:
     return {"instructions": CLAIM_INSTRUCTIONS}
 
 
-@app.get("/api/queue-instructions", operation_id="get_queue_instructions")
-def get_queue_instructions() -> dict[str, str]:
-    """Return the instructions for running the claims queue, read only."""
-    return {"instructions": QUEUE_INSTRUCTIONS}
-
-
 @app.post("/api/payouts", operation_id="calculate_payout")
 def calculate_payout(request: PayoutRequest) -> dict[str, Any]:
     """Work out the payout on an approved claim with UnderCover's payout rules."""
@@ -143,12 +137,6 @@ def calculate_payout(request: PayoutRequest) -> dict[str, Any]:
 def list_handlers() -> list[dict[str, Any]]:
     """List the claims handlers who can sign off an over-limit payout."""
     return reference.approvers()
-
-
-@app.get("/api/unfinished-claims", operation_id="list_unfinished_claims")
-def list_unfinished_claims() -> list[str]:
-    """List the claims the agent must carry on with: stopped, or ready to pay."""
-    return claims.list_unfinished()
 
 
 @app.post("/api/claims/{claim_id}/decision", operation_id="decide_claim")
@@ -223,27 +211,39 @@ def requeue_claim(claim_id: str) -> dict[str, Any]:
     return claims.requeue(claim_id)
 
 
-@app.post("/api/runs", operation_id="start_run")
-def start_run(start: StartRun) -> dict[str, Any]:
-    """Start a run with one to-do item per claim."""
-    return runs.start_run(start.claim_ids)
+@app.post("/api/runs/dispatch", operation_id="create_dispatch")
+def create_dispatch(dispatch: NewDispatch) -> dict[str, Any]:
+    """Start a dispatch of the claims in progress and the waiting ones."""
+    return runs.create_dispatch(**dispatch.model_dump())
 
 
 @app.get("/api/runs/current", operation_id="get_current_run")
 def get_current_run() -> dict[str, Any] | None:
-    """Return the most recently started run, with its items, or null."""
+    """Return the most recently started run, with its claims and totals, or null."""
     return runs.get_current_run()
 
 
-@app.post("/api/runs/{run_id}/items/{claim_id}", operation_id="update_run_item")
-def update_run_item(
-    run_id: int, claim_id: str, update: RunItemUpdate
+@app.get("/api/runs/{run_id}", operation_id="get_run")
+def get_run(run_id: int) -> dict[str, Any]:
+    """Return one run with its claims and its model cost and working time."""
+    return runs.get_run(run_id)
+
+
+@app.post("/api/runs/{run_id}/claims/{claim_id}", operation_id="update_run_claim")
+def update_run_claim(
+    run_id: int, claim_id: str, update: RunClaimUpdate
 ) -> dict[str, Any]:
-    """Update one run item's status and note."""
-    return runs.update_run_item(run_id, claim_id, update.status, update.note)
+    """Update the status and note of one claim of a run."""
+    return runs.update_run_claim(run_id, claim_id, update.status, update.note)
 
 
 @app.post("/api/runs/{run_id}/finish", operation_id="finish_run")
-def finish_run(run_id: int, finish: FinishRun) -> dict[str, Any]:
-    """Finish a run, recording its summary for the handlers."""
-    return runs.finish_run(run_id, finish.summary)
+def finish_run(run_id: int) -> dict[str, Any]:
+    """Finish a run."""
+    return runs.finish_run(run_id)
+
+
+@app.post("/api/runs/stop-unfinished", operation_id="stop_unfinished_runs")
+def stop_unfinished_runs() -> dict[str, int]:
+    """Mark every run still running as stopped, as the agent's service does on start."""
+    return {"stopped": runs.stop_unfinished_runs()}

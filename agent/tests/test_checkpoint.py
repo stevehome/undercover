@@ -35,7 +35,7 @@ class FakeSaver:
         pass
 
 
-def test_racing_threads_open_one_pool(monkeypatch):
+def test_racing_threads_open_one_pool_and_each_gets_a_saver(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@host/db")
     monkeypatch.setattr(checkpoint, "ConnectionPool", FakePool)
     monkeypatch.setattr(checkpoint, "PostgresSaver", FakeSaver)
@@ -45,5 +45,5 @@ def test_racing_threads_open_one_pool(monkeypatch):
         savers = list(threads.map(lambda _: checkpoint.saver(), range(8)))
 
     assert FakePool.opened == 1
-    assert len({id(saver) for saver in savers}) == 1
+    assert len({id(saver) for saver in savers}) == 8
     checkpoint.forget()

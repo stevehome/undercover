@@ -1,4 +1,4 @@
-"""The statuses a claim and a run's to-do item can have, written once."""
+"""The statuses a claim, a run and a run's claim can have, written once."""
 
 from enum import StrEnum
 
@@ -12,10 +12,25 @@ class ClaimStatus(StrEnum):
     DECIDED = "decided"
 
 
+class RunKind(StrEnum):
+    """What a run is for."""
+
+    DISPATCH = "dispatch"
+
+
+class RunStatus(StrEnum):
+    """Where a run stands; only one run can be running."""
+
+    RUNNING = "running"
+    FINISHED = "finished"
+    STOPPED = "stopped"
+
+
 class ItemStatus(StrEnum):
-    """Where a to-do item on a run stands."""
+    """Where one claim of a run stands."""
 
     TO_DO = "to do"
     IN_PROGRESS = "in progress"
     DONE = "done"
     LEFT_FOR_A_HANDLER = "left for a handler"
+    STILL_IN_PROGRESS = "still in progress"

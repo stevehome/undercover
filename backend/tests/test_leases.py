@@ -46,17 +46,6 @@ def test_only_the_holder_can_release(client):
     assert acquire(client, "b").status_code == 409
 
 
-def test_a_leased_claim_is_not_unfinished_until_the_lease_ends(client):
-    client.post(f"{CLAIM}/steps", json={"text": "started"})
-    assert client.get("/api/unfinished-claims").json() == ["CLM-1001"]
-
-    acquire(client, "a")
-    assert client.get("/api/unfinished-claims").json() == []
-
-    release(client, "a")
-    assert client.get("/api/unfinished-claims").json() == ["CLM-1001"]
-
-
 def test_an_unknown_claim_has_no_lease(client):
     assert (
         client.post("/api/claims/CLM-0/lease", json={"owner": "a"}).status_code == 404

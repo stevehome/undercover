@@ -1,9 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, expect, it, vi } from "vitest";
-import { requestUrl, summaryToWire } from "../testHelpers";
-import type { FetchInput } from "../testHelpers";
-import type { ClaimSummary, Run } from "../types";
+import { summaryToWire } from "../testHelpers";
+import type { ClaimSummary } from "../types";
 import { QueuePage } from "./QueuePage";
 
 afterEach(() => {
@@ -29,17 +28,9 @@ const claims: ClaimSummary[] = [
   },
 ];
 
-function stubFetch(run: Run | null) {
-  const impl = (input: FetchInput): Promise<Response> => {
-    if (requestUrl(input).endsWith("/runs/current")) {
-      return Promise.resolve(
-        run ? new Response(JSON.stringify(run)) : new Response("null"),
-      );
-    }
-    return Promise.resolve(
-      new Response(JSON.stringify(claims.map(summaryToWire))),
-    );
-  };
+function stubFetch() {
+  const impl = (): Promise<Response> =>
+    Promise.resolve(new Response(JSON.stringify(claims.map(summaryToWire))));
   vi.stubGlobal("fetch", vi.fn(impl));
 }
 
@@ -56,13 +47,10 @@ it("shows dashes in the totals until the data arrives", () => {
   );
 
   expect(screen.getByText("Waiting").nextElementSibling?.textContent).toBe("–");
-  expect(
-    screen.getByText("Left for a handler").nextElementSibling?.textContent,
-  ).toBe("–");
 });
 
 it("lists claims with their status", async () => {
-  stubFetch(null);
+  stubFetch();
 
   render(
     <MemoryRouter>
@@ -76,41 +64,6 @@ it("lists claims with their status", async () => {
   expect(screen.getByText("Waiting").nextElementSibling?.textContent).toBe("1");
   expect(screen.getByText("Decided").nextElementSibling?.textContent).toBe("1");
   expect(screen.getByText("decided")).toBeDefined();
-  expect(screen.queryByText("The current run")).toBeNull();
-});
-
-it("shows the current run's to-do list", async () => {
-  stubFetch({
-    run_id: 1,
-    started_on: "2026-01-01T00:00:00Z",
-    finished_on: null,
-    summary: null,
-    items: [
-      { claim_id: "CLM-1001", status: "in progress", attempts: 1, note: "" },
-      {
-        claim_id: "CLM-1002",
-        status: "left for a handler",
-        attempts: 2,
-        note: "boom",
-      },
-    ],
-  });
-
-  render(
-    <MemoryRouter>
-      <QueuePage />
-    </MemoryRouter>,
-  );
-
-  expect(await screen.findByText("The current run")).toBeDefined();
-  expect(screen.getByText("in progress")).toBeDefined();
-  expect(screen.getByText("left for a handler")).toBeDefined();
-  expect(screen.getByText(/boom/)).toBeDefined();
-
-  const left = screen.getByText("Left for a handler").nextElementSibling;
-  expect(left?.textContent).toBe("1");
-  const inProgress = screen.getByText("In progress").nextElementSibling;
-  expect(inProgress?.textContent).toBe("0");
 });
 
 it("says so when the queue cannot be loaded", async () => {

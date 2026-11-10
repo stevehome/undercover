@@ -111,7 +111,6 @@ def test_a_stopped_claim_carries_on_from_its_last_step(backend, script, saver):
         )
 
     assert api.get_claim(CLAIM)["status"] == "in progress"
-    assert api.list_unfinished_claims() == [CLAIM]
     agents.decide_claim(CLAIM, script(decision(), "Done."), saver)
 
     claim = api.get_claim(CLAIM)

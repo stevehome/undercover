@@ -27,7 +27,9 @@ Benefit = Literal[
 ]
 WAITING = "waiting"
 WAITING_FOR_SIGN_OFF = "waiting for sign-off"
-RunItemStatus = Literal["to do", "in progress", "done", "left for a handler"]
+RunClaimStatus = Literal[
+    "to do", "in progress", "done", "left for a handler", "still in progress"
+]
 
 
 class Line(BaseModel):
@@ -82,11 +84,6 @@ def _call(method: str, path: str, **kwargs: Any) -> Any:
 def claim_instructions() -> str:
     """Return the instructions for deciding one claim."""
     return _call("GET", "/api/claim-instructions")["instructions"]
-
-
-def queue_instructions() -> str:
-    """Return the instructions for running the claims queue."""
-    return _call("GET", "/api/queue-instructions")["instructions"]
 
 
 def list_claims() -> list[dict[str, Any]]:
@@ -175,11 +172,6 @@ def release_lease(claim_id: str, owner: str) -> None:
     _call("POST", f"/api/claims/{claim_id}/lease/release", json={"owner": owner})
 
 
-def list_unfinished_claims() -> list[str]:
-    """List the claims the agent must carry on with."""
-    return _call("GET", "/api/unfinished-claims")
-
-
 def calculate_payout(
     policy_id: str, benefit: Benefit, lines: list[Line], paid_by_others: Amount
 ) -> dict[str, Any]:
@@ -198,34 +190,34 @@ def requeue_claim(claim_id: str) -> None:
     _call("POST", f"/api/claims/{claim_id}/requeue")
 
 
-def start_run(claim_ids: list[str]) -> int:
-    """Start a run with one to-do item per claim, and return its id."""
-    return _call("POST", "/api/runs", json={"claim_ids": claim_ids})["run_id"]
+def create_dispatch(concurrency: int, model: str, reasoning_effort: str) -> int:
+    """Start a dispatch of the claims to work; return the run's id."""
+    body = {
+        "concurrency": concurrency,
+        "model": model,
+        "reasoning_effort": reasoning_effort,
+    }
+    return _call("POST", "/api/runs/dispatch", json=body)["run_id"]
 
 
-def get_current_run() -> dict[str, Any]:
-    """Return the most recently started run, with its to-do items."""
-    return _call("GET", "/api/runs/current")
+def get_run(run_id: int) -> dict[str, Any]:
+    """Return a run with its claims and totals."""
+    return _call("GET", f"/api/runs/{run_id}")
 
 
-def get_unfinished_run() -> dict[str, Any] | None:
-    """Return the most recently started run, unless it has finished or there is none."""
-    run = _call("GET", "/api/runs/current")
-    return None if run is None or run["finished_on"] else run
-
-
-def update_run_item(
-    run_id: int, claim_id: str, status: RunItemStatus, note: str
+def update_run_claim(
+    run_id: int, claim_id: str, status: RunClaimStatus, note: str
 ) -> None:
-    """Set a to-do item's status and note."""
+    """Set the status and note of one claim of a run."""
     body = {"status": status, "note": note}
-    _call("POST", f"/api/runs/{run_id}/items/{claim_id}", json=body)
+    _call("POST", f"/api/runs/{run_id}/claims/{claim_id}", json=body)
 
 
-def finish_run(run_id: int, summary: str) -> str | None:
-    """Finish a run; if items are still unsettled, return what is outstanding."""
-    response = client.post(f"/api/runs/{run_id}/finish", json={"summary": summary})
-    if response.status_code == HTTPStatus.CONFLICT:
-        return response.json()["detail"]
-    response.raise_for_status()
-    return None
+def finish_run(run_id: int) -> None:
+    """Finish a run."""
+    _call("POST", f"/api/runs/{run_id}/finish")
+
+
+def stop_unfinished_runs() -> None:
+    """Mark every run still running as stopped."""
+    _call("POST", "/api/runs/stop-unfinished")

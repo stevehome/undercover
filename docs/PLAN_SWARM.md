@@ -65,11 +65,11 @@ A run's totals are the sums of its own rows. The operations take `run_id` as a r
 
 **The default model.** `openai/gpt-6-luna` with reasoning effort `low`. With `MODEL_NAME` set, that model runs with no effort set, and a run records it as `none`. `harness.model_settings()` returns the name and the effort, used both to build the model and to record the run.
 
-**Langfuse.** Each claim still has its own session. `tracing.trace` also takes the run's tag (`dispatch-12` or `evaluation-12`) and puts it in `langfuse_tags` in the metadata, so a whole run is found by its tag.
+**Langfuse.** Each claim still has its own session. `tracing.trace` also takes the run's tag (`run-12`, since a dispatch and an evaluation never share an id) and puts it in `langfuse_tags` in the metadata, so a whole run is found by its tag.
 
 ## New dependencies
 
-None expected. `langgraph`, `langchain`, `psycopg_pool` and `langfuse` are already in `pyproject.toml`.
+`langgraph>=1.2.20` is now named in `pyproject.toml` (it was only a transitive dependency): in 1.2.12 an error handled by a node's `error_handler` was still re-raised when a step ran several tasks, which is every dispatch, and 1.2.20 fixes it (shown with a small graph in both versions). The others are already there.
 
 ## Phase 1: GPT-6 Luna as the default, and cost and time
 
@@ -107,16 +107,18 @@ Success criteria:
 
 Success criteria:
 
-- [ ] Never more than N claims are worked at once: a test with a worker that counts how many are inside it at the same moment sees at most N for N of 1, 3 and 25.
-- [ ] A dispatch works every claim in progress and every waiting claim, oldest submitted first, and a claim in progress carries on from its saved step as the same attempt with one decision.
-- [ ] A claim that raises `ModelRateLimitError` once carries on as the same attempt, with one decision.
-- [ ] A claim that keeps raising it ends the dispatch with the claim still `in progress`, the other claims done, and the dispatch finished.
-- [ ] A claim that fails with another error is requeued and tried once more in the same dispatch, and a claim that fails twice is left for a handler. Neither stops the dispatch.
-- [ ] A claim another agent holds the lease on is skipped, and counted as done with a note.
-- [ ] No claim is decided or paid twice in any of these tests.
-- [ ] The queue agent, its tools, its instructions, the to-do list and `uv run -m agent` without a claim id are gone, and `uv run -m agent CLM-1001` still works one claim.
-- [ ] `agent/tests/test_structure.py` still passes, with checks added that only `dispatcher.py` imports `Send`, and that no module outside `agents.py` calls the claim graph.
-- [ ] `npm run check` is green.
+- [x] Never more than N claims are worked at once: a test with a worker that counts how many are inside it at the same moment sees at most N for N of 1, 3 and 25.
+- [x] A dispatch works every claim in progress and every waiting claim, oldest submitted first, and a claim in progress carries on from its saved step as the same attempt with one decision.
+- [x] A claim that raises `ModelRateLimitError` once carries on as the same attempt, with one decision.
+- [x] A claim that keeps raising it ends the dispatch with the claim still `in progress`, the other claims done, and the dispatch finished.
+- [x] A claim that fails with another error is requeued and tried once more in the same dispatch, and a claim that fails twice is left for a handler. Neither stops the dispatch.
+- [x] A claim another agent holds the lease on is skipped, and counted as done with a note.
+- [x] No claim is decided or paid twice in any of these tests.
+- [x] The queue agent, its tools, its instructions, the to-do list and `uv run -m agent` without a claim id are gone, and `uv run -m agent CLM-1001` still works one claim.
+- [x] `agent/tests/test_structure.py` still passes, with checks added that only `dispatcher.py` imports `Send`, and that no module outside `agents.py` calls the claim graph.
+- [x] `npm run check` is green.
+
+Built as planned, with these differences: a dispatch also takes an approved claim a restart left unpaid (the old startup pass did, and the brief wants recovery after a restart); the worker's `decide` is a `Decide` protocol (`decide(claim_id, run_id=...)`) so tests pass a stand-in; the tag is `run-<id>`.
 
 ## Phase 3: starting a dispatch from the dashboard
 

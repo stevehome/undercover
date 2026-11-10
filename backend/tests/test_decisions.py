@@ -173,20 +173,6 @@ def test_the_same_sign_off_twice_is_done_once(client):
     assert second.json()["signed_off_on"] == first["signed_off_on"]
 
 
-def test_unfinished_claims_are_stopped_or_ready_to_pay(client):
-    client.post("/api/claims/CLM-1001/steps", json={"text": "started"})
-    decide_other(client, "CLM-1002", "420.00")
-    decide_other(client, "CLM-1003", "1200.00")
-    decide_other(client, "CLM-1004", "1200.00")
-    client.post("/api/claims/CLM-1004/sign-off", json={"handler_id": "HND-01"})
-    decide_other(client, "CLM-1005", "300.00")
-    client.post("/api/claims/CLM-1005/payment", json={"amount": "300.00"})
-
-    claims = client.get("/api/unfinished-claims").json()
-
-    assert claims == ["CLM-1001", "CLM-1002", "CLM-1004"]
-
-
 def test_payment_must_equal_the_approved_payout(client):
     decide(client, "420.00")
 

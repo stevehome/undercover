@@ -18,8 +18,10 @@ def enabled() -> bool:
 
 
 @contextmanager
-def trace(session_id: str) -> Iterator[RunnableConfig]:
+def trace(session_id: str, tags: list[str]) -> Iterator[RunnableConfig]:
     """Trace the work inside as a trace of its own, in one Langfuse session.
+
+    The tags (such as its run's) are on the trace, so a whole run is found together.
 
     Call it with nothing else of the agent in the context, so it starts a trace
     of its own rather than joining another.
@@ -32,5 +34,8 @@ def trace(session_id: str) -> Iterator[RunnableConfig]:
         client.start_as_current_observation(name=session_id),
         propagate_attributes(session_id=session_id),
     ):
-        yield {"callbacks": [CallbackHandler()]}
+        yield {
+            "callbacks": [CallbackHandler()],
+            "metadata": {"langfuse_tags": tags},
+        }
     client.flush()

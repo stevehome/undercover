@@ -1,11 +1,10 @@
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
-import { fetchClaims, fetchCurrentRun } from "../api";
+import { fetchClaims } from "../api";
 import { LoadError } from "../components/LoadError";
-import { RunItemBadge } from "../components/RunItemBadge";
 import { StatusBadge } from "../components/StatusBadge";
 import { formatMoney } from "../money";
-import type { ClaimSummary, Run } from "../types";
+import type { ClaimSummary } from "../types";
 import { usePolling } from "../usePolling";
 
 const TOTALS = [
@@ -17,27 +16,15 @@ const TOTALS = [
 
 export function QueuePage() {
   const [claims, setClaims] = useState<ClaimSummary[] | null>(null);
-  const [run, setRun] = useState<Run | null | undefined>(undefined);
 
-  const load = useCallback(
-    () =>
-      Promise.all([
-        fetchClaims().then(setClaims),
-        fetchCurrentRun().then(setRun),
-      ]),
-    [],
+  const load = useCallback(() => fetchClaims().then(setClaims), []);
+  const failed = usePolling(
+    load,
+    claims?.some((claim) => claim.status !== "decided") ?? true,
   );
-  const stillChanging =
-    !run?.finished_on || claims?.some((claim) => claim.status !== "decided");
-  const failed = usePolling(load, Boolean(stillChanging));
 
   const count = (status: string) =>
     claims ? claims.filter((claim) => claim.status === status).length : "–";
-  const leftForHandler =
-    run === undefined
-      ? "–"
-      : (run?.items.filter((item) => item.status === "left for a handler")
-          .length ?? 0);
 
   return (
     <main className="panel">
@@ -51,27 +38,7 @@ export function QueuePage() {
             <dd>{count(status)}</dd>
           </div>
         ))}
-        <div>
-          <dt>Left for a handler</dt>
-          <dd>{leftForHandler}</dd>
-        </div>
       </dl>
-
-      {run && (
-        <>
-          <h2>The current run</h2>
-          <ul>
-            {run.items.map((item) => (
-              <li key={item.claim_id}>
-                <span className="mono">{item.claim_id}</span>{" "}
-                <RunItemBadge status={item.status} />
-                {item.note ? ` — ${item.note}` : ""}
-              </li>
-            ))}
-          </ul>
-          {run.summary && <p>{run.summary}</p>}
-        </>
-      )}
 
       <table>
         <thead>

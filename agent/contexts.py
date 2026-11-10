@@ -1,6 +1,5 @@
-"""What each kind of agent run knows, handed to its tools through `ToolRuntime`."""
+"""What a claim run knows, handed to its tools and nodes."""
 
-from collections.abc import Callable
 from dataclasses import dataclass
 
 
@@ -10,11 +9,3 @@ class ClaimContext:
 
     claim_id: str
     run_id: int | None
-
-
-@dataclass
-class RunContext:
-    """The queue run an orchestrator is working, and how it decides one claim."""
-
-    run_id: int
-    decide: Callable[[str], str]
