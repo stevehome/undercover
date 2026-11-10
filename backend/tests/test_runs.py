@@ -123,6 +123,38 @@ def test_a_run_carries_its_own_cost_and_time(client):
     assert current["work_ms"] == 2000
 
 
+def test_the_summary_is_built_from_the_records(client):
+    run = dispatch(client).json()
+    for claim_id, kind, payout in [
+        ("CLM-1001", "approve", "420.00"),
+        ("CLM-1002", "approve", "1200.00"),
+        ("CLM-1003", "decline", "0.00"),
+        ("CLM-1004", "refer", "0.00"),
+    ]:
+        body = {
+            "decision": kind,
+            "payout": payout,
+            "reason": "Stubbed.",
+            "policy_reference": "S1",
+        }
+        client.post(f"/api/claims/{claim_id}/decision", json=body)
+    url = f"/api/runs/{run['run_id']}/claims"
+    client.post(f"{url}/CLM-1004", json={"status": "left for a handler", "note": ""})
+    client.post(f"{url}/CLM-1005", json={"status": "left for a handler", "note": ""})
+    client.post(f"{url}/CLM-1006", json={"status": "still in progress", "note": ""})
+
+    summary = client.get(f"/api/runs/{run['run_id']}").json()["summary"]
+
+    assert summary["approved"] == 2
+    assert summary["declined"] == 1
+    assert summary["referred"] == 1
+    assert summary["waiting_for_sign_off"] == [
+        {"claim_id": "CLM-1002", "payout": "1200.00"}
+    ]
+    assert summary["left_for_a_handler"] == ["CLM-1004", "CLM-1005"]
+    assert summary["still_in_progress"] == ["CLM-1006"]
+
+
 def test_get_current_run_is_null_when_none_started(client):
     assert client.get("/api/runs/current").json() is None
 

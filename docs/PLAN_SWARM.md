@@ -133,12 +133,12 @@ Built as planned, with these differences: a dispatch also takes an approved clai
 
 Success criteria:
 
-- [ ] A second start while a run is going is refused with a 409, and a start with the service down says "The agent's service isn't running".
-- [ ] The summary is built from the records: a test with known claims in each state checks every count and each payout waiting for sign-off.
-- [ ] The run panel shows the claims, the cost and the time, polling while the run is going.
-- [ ] An end-to-end test starts a dispatch on the queue page and the stand-in service sees N (checked for the default of 3 and for a changed N).
-- [ ] I check the queue page in the browser with the Playwright MCP server: the N chooser, the start, the panel and the 409 message.
-- [ ] `npm run check` is green.
+- [x] A second start while a run is going is refused with a 409, and a start with the service down says "The agent's service isn't running".
+- [x] The summary is built from the records: a test with known claims in each state checks every count and each payout waiting for sign-off.
+- [x] The run panel shows the claims, the cost and the time, polling while the run is going.
+- [x] An end-to-end test starts a dispatch on the queue page and the stand-in service sees N (checked for the default of 3 and for a changed N).
+- [x] I check the queue page in the browser with the Playwright MCP server: the N chooser, the start, the panel and the 409 message. (Checked on a throwaway SQLite backend with the e2e stand-in: the chooser starts at 3, the start reached the stand-in with 3, and the panel listed the 25 claims as `to do` with cost and time. The 409 and 503 messages are covered by unit tests; the stand-in always answers 202.)
+- [x] `npm run check` is green.
 
 ## Phase 4: evaluations
 

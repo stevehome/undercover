@@ -1,5 +1,13 @@
-import { parseCents } from "./money";
-import type { Claim, ClaimSummary, Handler, Item, Step } from "./types";
+import { parseCents, parseNanos } from "./money";
+import type {
+  Claim,
+  ClaimSummary,
+  Handler,
+  Item,
+  Run,
+  RunSummary,
+  Step,
+} from "./types";
 
 type WireSummary = Omit<ClaimSummary, "amount_claimed"> & {
   amount_claimed: string;
@@ -24,13 +32,25 @@ async function getJson<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+/** An error whose message is the reason the backend gave, if it gave one. */
+async function refusal(path: string, response: Response): Promise<Error> {
+  const body = (await response.json().catch(() => ({}))) as {
+    detail?: unknown;
+  };
+  return new Error(
+    typeof body.detail === "string"
+      ? body.detail
+      : `${path}: ${String(response.status)}`,
+  );
+}
+
 async function post(path: string, body?: object): Promise<void> {
   const response = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body && JSON.stringify(body),
   });
-  if (!response.ok) throw new Error(`${path}: ${String(response.status)}`);
+  if (!response.ok) throw await refusal(path, response);
 }
 
 async function getInstructions(path: string): Promise<string> {
@@ -66,6 +86,35 @@ export const fetchHandlers = () => getJson<Handler[]>("/api/handlers");
 
 export const fetchClaimInstructions = () =>
   getInstructions("/api/claim-instructions");
+
+type WireRun = Omit<Run, "cost_nanos" | "summary"> & {
+  cost: string;
+  summary: Omit<RunSummary, "waiting_for_sign_off"> & {
+    waiting_for_sign_off: { claim_id: string; payout: string }[];
+  };
+};
+
+/** The most recent run, or null before the first one. */
+export async function fetchCurrentRun(): Promise<Run | null> {
+  const run = await getJson<WireRun | null>("/api/runs/current");
+  if (run === null) return null;
+  const { cost, summary, ...rest } = run;
+  return {
+    ...rest,
+    cost_nanos: parseNanos(cost),
+    summary: {
+      ...summary,
+      waiting_for_sign_off: summary.waiting_for_sign_off.map((claim) => ({
+        ...claim,
+        payout: parseCents(claim.payout),
+      })),
+    },
+  };
+}
+
+/** Start a dispatch with this many claim agents at once. */
+export const startDispatch = (concurrency: number) =>
+  post("/api/dispatches", { concurrency });
 
 export const runAgent = (claimId: string) => post(`/api/claims/${claimId}/run`);
 

@@ -7,3 +7,7 @@ class NotFound(Exception):
 
 class Conflict(Exception):
     """The request clashes with the current state (409)."""
+
+
+class ServiceUnavailable(Exception):
+    """A service we depend on can't be reached (503)."""

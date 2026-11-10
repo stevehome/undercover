@@ -1,10 +1,12 @@
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
-import { fetchClaims } from "../api";
+import { fetchClaims, fetchCurrentRun } from "../api";
 import { LoadError } from "../components/LoadError";
+import { RunPanel } from "../components/RunPanel";
+import { StartDispatch } from "../components/StartDispatch";
 import { StatusBadge } from "../components/StatusBadge";
 import { formatMoney } from "../money";
-import type { ClaimSummary } from "../types";
+import type { ClaimSummary, Run } from "../types";
 import { usePolling } from "../usePolling";
 
 const TOTALS = [
@@ -17,10 +19,20 @@ const TOTALS = [
 export function QueuePage() {
   const [claims, setClaims] = useState<ClaimSummary[] | null>(null);
 
-  const load = useCallback(() => fetchClaims().then(setClaims), []);
+  const [run, setRun] = useState<Run | null>(null);
+
+  const load = useCallback(
+    () =>
+      Promise.all([
+        fetchClaims().then(setClaims),
+        fetchCurrentRun().then(setRun),
+      ]),
+    [],
+  );
   const failed = usePolling(
     load,
-    claims?.some((claim) => claim.status !== "decided") ?? true,
+    run?.status === "running" ||
+      (claims?.some((claim) => claim.status !== "decided") ?? true),
   );
 
   const count = (status: string) =>
@@ -31,6 +43,8 @@ export function QueuePage() {
       <h1>The claims queue</h1>
       {failed && <LoadError />}
 
+      <StartDispatch onStarted={() => void load()} />
+
       <dl className="totals">
         {TOTALS.map(([label, status]) => (
           <div key={status}>
@@ -39,6 +53,8 @@ export function QueuePage() {
           </div>
         ))}
       </dl>
+
+      {run && <RunPanel run={run} />}
 
       <table>
         <thead>

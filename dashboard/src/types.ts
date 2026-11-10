@@ -89,3 +89,40 @@ export interface Handler {
   email: string;
   can_approve_over_limit: boolean;
 }
+
+export type RunClaimStatus =
+  "to do" | "in progress" | "done" | "left for a handler" | "still in progress";
+
+export interface RunClaim {
+  claim_id: string;
+  status: RunClaimStatus;
+  attempts: number;
+  note: string | null;
+}
+
+export interface RunSummary {
+  approved: number;
+  declined: number;
+  referred: number;
+  waiting_for_sign_off: { claim_id: string; payout: number }[];
+  left_for_a_handler: string[];
+  still_in_progress: string[];
+}
+
+export interface Run {
+  run_id: number;
+  kind: "dispatch" | "evaluation";
+  status: "running" | "finished" | "stopped";
+  concurrency: number;
+  model: string;
+  reasoning_effort: string;
+  started_on: string;
+  finished_on: string | null;
+  claims: RunClaim[];
+  model_calls: number;
+  total_tokens: number;
+  /** Model cost in whole billionths of a dollar. */
+  cost_nanos: number;
+  work_ms: number;
+  summary: RunSummary;
+}

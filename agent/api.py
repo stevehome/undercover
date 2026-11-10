@@ -71,12 +71,17 @@ client = httpx.Client(base_url=BACKEND_URL, timeout=10)
 class ApiRefusal(Exception):  # noqa: N818 - a refusal, not a failure
     """The backend refused a request; the message says why, for the model to read."""
 
+    def __init__(self, status_code: int, detail: str) -> None:
+        super().__init__(f"{status_code}: {detail}")
+        self.status_code = status_code
+        self.detail = detail
+
 
 def _call(method: str, path: str, **kwargs: Any) -> Any:
     response = client.request(method, path, **kwargs)
     if response.is_client_error:
         detail = response.json().get("detail", response.text)
-        raise ApiRefusal(f"{response.status_code}: {detail}")
+        raise ApiRefusal(response.status_code, str(detail))
     response.raise_for_status()
     return response.json()
 

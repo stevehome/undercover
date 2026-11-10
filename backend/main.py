@@ -15,13 +15,11 @@ from backend import (
     runs,
     usage,
 )
-from backend.errors import Conflict, NotFound
+from backend.errors import Conflict, NotFound, ServiceUnavailable
 from backend.instructions import CLAIM_INSTRUCTIONS
 from backend.money import Amount
 from backend.payouts import Benefit, Line
 from backend.statuses import ItemStatus
-
-MAX_CONCURRENCY = 25
 
 app = FastAPI(title="UnderCover")
 
@@ -34,6 +32,15 @@ def not_found(_: Request, error: NotFound) -> JSONResponse:
 @app.exception_handler(Conflict)
 def conflict(_: Request, error: Conflict) -> JSONResponse:
     return JSONResponse({"detail": str(error)}, status_code=409)
+
+
+@app.exception_handler(ServiceUnavailable)
+def service_unavailable(_: Request, error: ServiceUnavailable) -> JSONResponse:
+    return JSONResponse({"detail": str(error)}, status_code=503)
+
+
+MAX_CONCURRENCY = 25
+Concurrency = Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
 
 
 class Decision(BaseModel):
@@ -78,8 +85,12 @@ class WorkSegment(BaseModel):
     finished_on: str
 
 
+class StartDispatch(BaseModel):
+    concurrency: Concurrency
+
+
 class NewDispatch(BaseModel):
-    concurrency: Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
+    concurrency: Concurrency
     model: str
     reasoning_effort: str
 
@@ -209,6 +220,12 @@ def run_agent(claim_id: str) -> dict[str, Any]:
 def requeue_claim(claim_id: str) -> dict[str, Any]:
     """Put a stuck claim back in the queue as waiting."""
     return claims.requeue(claim_id)
+
+
+@app.post("/api/dispatches", operation_id="start_dispatch", status_code=202)
+def start_dispatch(start: StartDispatch) -> dict[str, int]:
+    """Have the agent's service start a dispatch with N claim agents at once."""
+    return {"run_id": agent_service.start_dispatch(start.concurrency)}
 
 
 @app.post("/api/runs/dispatch", operation_id="create_dispatch")

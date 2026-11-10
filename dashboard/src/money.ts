@@ -17,3 +17,16 @@ export function formatMoney(cents: number): string {
   const dollars = Math.trunc(cents / 100).toLocaleString("en-US");
   return `$${dollars}.${String(cents % 100).padStart(2, "0")}`;
 }
+
+/** Read a wire model cost such as "0.000138675" as whole billionths of a dollar. */
+export function parseNanos(cost: string): number {
+  const [dollars = "0", fraction = ""] = cost.split(".");
+  return Number(dollars) * 1e9 + Number(fraction.padEnd(9, "0"));
+}
+
+/** Format a model cost in billionths of a dollar, such as "$0.0031". */
+export function formatCost(nanos: number): string {
+  const tenThousandths = Math.round(nanos / 1e5);
+  const dollars = Math.trunc(tenThousandths / 1e4);
+  return `$${String(dollars)}.${String(tenThousandths % 1e4).padStart(4, "0")}`;
+}

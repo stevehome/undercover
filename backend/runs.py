@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy import and_, func, insert, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
-from backend import db, tables, usage
+from backend import db, money, tables, usage
 from backend.errors import Conflict, NotFound
 from backend.statuses import ClaimStatus, ItemStatus, RunKind, RunStatus
 
@@ -33,7 +33,57 @@ def get_run(run_id: int) -> dict[str, Any]:
             .order_by(tables.run_claims.c.position)
         )
         claims = [dict(row._mapping) for row in rows]
-    return {**run._mapping, "claims": claims, **usage.run_totals(run_id)}
+    return {
+        **run._mapping,
+        "claims": claims,
+        **usage.run_totals(run_id),
+        "summary": _summary(run_id),
+    }
+
+
+def _summary(run_id: int) -> dict[str, Any]:
+    """Count how a run's claims turned out, from the records and with no model."""
+    columns = tables.claims.c
+    in_run = tables.run_claims.c
+    with db.connection() as conn:
+        rows = [
+            row._mapping
+            for row in conn.execute(
+                select(
+                    in_run.claim_id,
+                    in_run.status.label("run_status"),
+                    columns.decision,
+                    columns.status,
+                    columns.payout_cents,
+                )
+                .join(tables.claims, columns.claim_id == in_run.claim_id)
+                .where(in_run.run_id == run_id)
+                .order_by(in_run.position)
+            )
+        ]
+    return {
+        "approved": sum(row["decision"] == "approve" for row in rows),
+        "declined": sum(row["decision"] == "decline" for row in rows),
+        "referred": sum(row["decision"] == "refer" for row in rows),
+        "waiting_for_sign_off": [
+            {
+                "claim_id": row["claim_id"],
+                "payout": money.from_cents(row["payout_cents"]),
+            }
+            for row in rows
+            if row["status"] == ClaimStatus.WAITING_FOR_SIGN_OFF
+        ],
+        "left_for_a_handler": [
+            row["claim_id"]
+            for row in rows
+            if row["run_status"] == ItemStatus.LEFT_FOR_A_HANDLER
+        ],
+        "still_in_progress": [
+            row["claim_id"]
+            for row in rows
+            if row["run_status"] == ItemStatus.STILL_IN_PROGRESS
+        ],
+    }
 
 
 def get_current_run() -> dict[str, Any] | None:
