@@ -35,7 +35,7 @@ When the last phase is done, review the whole change once more against the check
 
 - A passing check proves the code works, not that it is well made. The structure rules in `docs/CODE_STANDARDS.md` apply to every change, and the ones a machine can check live in `agent/tests/test_structure.py` and `eslint.config.js`. When you find a new way for code to be bad that no check catches, add the check or the rule in the same change.
 - Add tests with each change. Tests never call a model, the end-to-end tests included: use a stub model, or test the screens with data already in place.
-- For any live run with a real model, reseed first and cap the run at five claims.
+- For any live run with a real model, reseed first. Keep to the runs the brief asks for: otherwise a dispatch works the queue, so cap it by working one claim (`uv run -m agent CLM-1001`), or run an evaluation on a set's five `tiny` claims.
 - When a build changes the agent, run it on one claim with a real model before you hand the work over, with `MODEL_NAME=openrouter/free` unless asked otherwise, and report what it decided. This is a check by hand, not a test.
 - Outside a plan, commit each change once you have checked it.
 - Run `npm run check` before you hand work over.

@@ -17,24 +17,26 @@ We want an AI agent, the UnderCover Agent, to work the queue the way a handler d
 
 Our goal is to handle claims straight through, as accurately as our handlers do.
 
-Someone starts the agent from the command line, for one run that works every waiting claim, in whatever order it chooses, or a trial run capped at a number of claims, or one named claim. The agent plans the run as a to-do list, which the team can watch. A claim shows as in progress while the agent works on it, and the run ends with a short summary for the handlers.
+A handler starts a dispatch on the queue page, choosing how many claim agents work at once, from 1 to 25. A dispatch works every claim left in progress and every waiting claim, oldest submitted first, with no model choosing the order. Only one dispatch or evaluation runs at a time. The page shows each claim of the dispatch and where it stands, the model cost and the time, and when the dispatch ends a summary built from our records: how many claims were approved, declined and referred, each payout waiting for a sign-off, and each claim left for a handler or still in progress. A claim shows as in progress while the agent works on it. Someone can also start the agent on one named claim from the command line.
 
-When the agent approves a payout over $1,000, it stops and waits for a handler, keeping everything it has worked out. As soon as a handler signs off on the dashboard, the agent picks the claim up from where it stopped and pays it. Between the sign-off and the payment the claim shows as in progress, and the payment records who signed off and when. If the agent isn't running when a handler signs off, it picks the claim up the next time it runs. A handler can only sign off for now; rejecting a held payout comes later.
+When the agent approves a payout over $1,000, it stops and waits for a handler, keeping everything it has worked out. As soon as a handler signs off on the dashboard, the agent picks the claim up from where it stopped and pays it. Between the sign-off and the payment the claim shows as in progress, and the payment records who signed off and when. If the agent isn't running when a handler signs off, the next dispatch picks the claim up. A handler can only sign off for now; rejecting a held payout comes later.
 
-If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C, it carries on with that claim from where it got to the next time it runs, and that doesn't count as a new attempt. A claim that fails with an error goes back in the queue and starts afresh. A run that was stopped is finished by the next run. No claim is ever decided or paid twice.
+If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C, it carries on with that claim from where it got to the next time it runs, and that doesn't count as a new attempt. A claim that hits a rate limit or a timeout waits and carries on from where it got to, and if it is still hitting them it stays in progress for the next dispatch. A claim that fails with any other error goes back in the queue and the same dispatch tries it once more, and a claim that fails twice is left for a handler. One bad claim never stops a dispatch. A dispatch that was stopped is finished by the next one. No claim is ever decided or paid twice.
 
 ## What the team needs to see
 
 - The queue, with where each claim stands: waiting, in progress, waiting for sign-off or decided.
 - Each claim in full, with the agent's decision and its reasons.
 - What the agent is doing on a claim while it works, step by step.
+- What each claim cost to work, in model cost and time, and the totals for each dispatch.
+- How well the agent is doing: on a Scoreboard, evaluations on our two labelled sets, the evaluation set and the held-out set, each whole or just its five `tiny` claims. Each shows how often the agent agrees with our handlers, how much its mistakes would cost, how many claims go straight through, and what a claim costs and how long it takes, with each claim's decision beside the handler's.
 - The agent's instructions, read only.
 
 ## Rules
 
 - A payout over $1,000 needs a handler's sign-off. The agent can approve such a claim, but the payment waits until a handler signs off. The system must block the payment until then, even if the agent tries to pay.
 - Decisions follow the policy wording.
-- Our handlers' own decisions on these claims are in `data/evals/`. We use them to check the agent's work. The agent must never see them.
+- Our handlers' own decisions on these claims are in `data/evals/`. We use them to check the agent's work in evaluations, which work copies of the claims that never show in the queue and can't be signed off. The agent must never see them.
 - Amounts are in US dollars.
 
 ## Our records

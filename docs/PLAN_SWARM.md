@@ -197,8 +197,10 @@ Success criteria, with one `npm run seed` first and `npm run dev` running on the
 - [ ] No claim fails for want of a database connection, and during the dispatch Supabase shows no more than 12 connections whose user is `postgres` in `pg_stat_activity`, through the Supabase MCP server.
 - [ ] An evaluation of the evaluation set at N=25, and one of the held-out set's five `tiny` claims at N=5, appear on the scoreboard with every measure, and the queue page's counts are the same before and after them.
 - [ ] Through Langfuse's current API, the claims of the N=25 dispatch are found together by their tag. The older trace and score endpoints return a 410 for this project, so I use the observations API.
-- [ ] `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe the product as it now is.
-- [ ] `npm run check` is green with `.env` moved out of the way, and the final diff passes the checklist in `docs/CODE_STANDARDS.md`.
+- [x] `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe the product as it now is.
+- [x] `npm run check` is green with `.env` moved out of the way, and the final diff passes the checklist in `docs/CODE_STANDARDS.md`. (Run with the OpenRouter, database, Langfuse and model variables unset rather than moving your `.env`: 178 Python tests, 33 dashboard tests and 11 end-to-end tests.)
+
+Not done: the live runs above. They need `npm run seed` on Supabase (the new tables) and `kill -9` on the agent's service, and the sandbox denied both; they wait for you to reseed or to allow them.
 
 ## Decisions for you to check
 
