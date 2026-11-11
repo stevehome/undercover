@@ -88,7 +88,7 @@ Success criteria:
 - [x] A failed attempt still has its segment, and a run's totals include it.
 - [x] Two runs' totals are separate, and the rows with no run belong to neither.
 - [x] `harness.model_settings()` returns `openai/gpt-6-luna` and `low` by default, and `MODEL_NAME` gives that name and `none`.
-- [ ] `uv run -m agent --claim CLM-1002` on the default model works one claim and its `model_calls` and `work_segments` rows exist on Supabase (checked through the Supabase MCP server). I report what it decided. (Not done: the first try wrote the table with a six-place cost and was refused; `npm run seed` is needed to rebuild the table and the sandbox denied it. Waiting for the user to reseed.)
+- [x] `uv run -m agent --claim CLM-1002` on the default model works one claim and its `model_calls` and `work_segments` rows exist on Supabase (checked through the Supabase MCP server). I report what it decided. (After the user reseeded: CLM-1002 approved $580.00, with 7 `model_calls` rows from `openai/gpt-6-luna` costing $0.0013 and 1 `work_segments` row on Supabase. The first try, before the reseed, was refused for a six-place cost.)
 - [x] I look at the reply shape of `MODEL_NAME=openrouter/free` before deciding how to read cost, and report what it returns. (Both it and GPT-6 Luna return `response_metadata["token_usage"]["cost"]`, `0` for the free model, and a model name that, for the free router, is the model it chose.)
 - [x] `npm run check` is green.
 
@@ -190,17 +190,25 @@ Built as planned. `e2e` now runs on one worker, since only one run can be runnin
 
 Success criteria, with one `npm run seed` first and `npm run dev` running on the default model, checked through the Playwright MCP server:
 
-- [ ] Start a dispatch at N=3 and stop it partway with `kill -9` on every process listening on port 8002 (`lsof -ti tcp:8002`, which finds uvicorn's reloader and its worker), then start `npm run dev` again.
-- [ ] A dispatch at N=25 then carries on the claims left in progress as the same attempts, and works the rest with 25 at once, which the claims' start times show. The run takes well under the sum of its claims' times.
-- [ ] Claims worked from the start take about as long as at N=3. If they are slower, I report where the time goes, keeping to 4 connections.
+- [x] Start a dispatch at N=3 and stop it partway with `kill -9` on every process listening on port 8002 (`lsof -ti tcp:8002`, which finds uvicorn's reloader and its worker), then start `npm run dev` again.
+- [x] A dispatch at N=25 then carries on the claims left in progress as the same attempts, and works the rest with 25 at once, which the claims' start times show. The run takes well under the sum of its claims' times.
+- [x] Claims worked from the start take about as long as at N=3. If they are slower, I report where the time goes, keeping to 4 connections.
 - [ ] Claims held for sign-off wait, and a sign-off still pays within five seconds.
 - [ ] No claim fails for want of a database connection, and during the dispatch Supabase shows no more than 12 connections whose user is `postgres` in `pg_stat_activity`, through the Supabase MCP server.
-- [ ] An evaluation of the evaluation set at N=25, and one of the held-out set's five `tiny` claims at N=5, appear on the scoreboard with every measure, and the queue page's counts are the same before and after them.
-- [ ] Through Langfuse's current API, the claims of the N=25 dispatch are found together by their tag. The older trace and score endpoints return a 410 for this project, so I use the observations API.
+- [x] An evaluation of the evaluation set at N=25, and one of the held-out set's five `tiny` claims at N=5, appear on the scoreboard with every measure, and the queue page's counts are the same before and after them.
+- [x] Through Langfuse's current API, the claims of the N=25 dispatch are found together by their tag. The older trace and score endpoints return a 410 for this project, so I use the observations API.
 - [x] `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe the product as it now is.
 - [x] `npm run check` is green with `.env` moved out of the way, and the final diff passes the checklist in `docs/CODE_STANDARDS.md`. (Run with the OpenRouter, database, Langfuse and model variables unset rather than moving your `.env`: 178 Python tests, 33 dashboard tests and 11 end-to-end tests.)
 
-Not done: the live runs above. They need `npm run seed` on Supabase (the new tables) and `kill -9` on the agent's service, and the sandbox denied both; they wait for you to reseed or to allow them.
+Live results (after the user's reseed and `kill -9`; run 1 is the N=3 dispatch, 2 the N=25 dispatch, 3 and 4 the evaluations, 5 a repeat of 3 to measure the backend):
+
+- N=3 dispatch killed partway: run 1 was marked stopped on restart (4 done, 2 left for a handler, 3 in progress). The N=25 dispatch then carried those on: every claim of the queue has exactly one `Decided` step and thread 1, and every row of run 2 has attempts 1. It worked 18 claims with all starts within 2.4 s, in 44 s against 565 s of summed claim time.
+- Slower claims: claims worked from the start averaged 18.7 s at N=3, 19.4 s at N=5, 31.4 s at N=25 (38.1 s in the evaluation), with the same model calls (about 7) and tokens. The model calls took 2.6 s each at N=3 and about 5 s at N=25. The backend is where I can see the time go: one `get_claim` read took 365 ms idle, and during an N=25 evaluation a median of 616 ms, p95 3.4 s, max 3.9 s, with the backend at 4 connections and the checkpointer at 4. Each claim makes dozens of sequential backend calls, each a round trip to Supabase, and 25 claims queue for 4 connections. I did not separate this from slowness on OpenRouter's side. Options, none built: fewer calls per step (record a step and a model call together), or more connections (the free plan allows 15, so at most about 7 each).
+- Connections: 13 `postgres` connections (12 Supavisor, 1 `pg_net`) at the start of the N=25 dispatch, right after the `kill -9`, which is over the 12 in the brief; I think it was the killed processes' connections not yet released but did not prove it. Idle afterwards 9, and 9 at both samples during a clean N=25 evaluation. I did not sample continuously.
+- Evaluations: the evaluation set at N=25 (92% decision accuracy, 84% accuracy, $445.00 cost of mistakes, 69.8 s) and the held-out `tiny` set at N=5 (100%, 100%, $0.00, 26.9 s) are on the scoreboard with every measure. The queue had the same 25 claims in the same statuses (22 decided, 3 waiting for sign-off) after them.
+- Langfuse: through the observations API, the tag `run-2` finds the 18 claims of the N=25 dispatch together, `run-3` the evaluation's 27 traces (two claims were retried on a second thread), and `run-1` the killed dispatch's 6.
+- Sign-off: not checked by me. The sandbox denied my click on a sign-off button (CLM-1003 is waiting for one), so the five-second payment check is left for the user.
+- Cost of the live runs: about $0.08 in all.
 
 ## Decisions for you to check
 
