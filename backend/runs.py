@@ -1,5 +1,6 @@
 """A run: a dispatch working claims, with a row for each claim it works."""
 
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from pydantic import BaseModel
@@ -64,7 +65,7 @@ def _summary(run_id: int) -> dict[str, Any]:
     in_run = tables.run_claims.c
     with db.connection() as conn:
         rows = [
-            row._mapping
+            dict(row._mapping)
             for row in conn.execute(
                 select(
                     in_run.claim_id,
@@ -78,6 +79,12 @@ def _summary(run_id: int) -> dict[str, Any]:
                 .order_by(in_run.position)
             )
         ]
+    return summarize(rows)
+
+
+def summarize(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Count how a run's claims turned out from rows of claim_id, run_status,
+    decision, status and payout_cents."""
     return {
         "approved": sum(row["decision"] == "approve" for row in rows),
         "declined": sum(row["decision"] == "decline" for row in rows),

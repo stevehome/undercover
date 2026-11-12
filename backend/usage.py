@@ -58,54 +58,65 @@ def _milliseconds(started_on: str, finished_on: str) -> int:
     return span // timedelta(milliseconds=1)
 
 
-def run_totals(run_id: int) -> dict[str, Any]:
-    """Sum a run's model calls and working time, failed attempts included."""
-    calls = tables.model_calls
-    with db.connection() as conn:
-        tokens = conn.execute(
-            select(
-                func.count(),
-                func.coalesce(func.sum(calls.c.total_tokens), 0),
-                func.coalesce(func.sum(calls.c.cost_nanos), 0),
-            ).where(calls.c.run_id == run_id)
-        ).one()
-        segments = conn.execute(
-            select(
-                tables.work_segments.c.started_on, tables.work_segments.c.finished_on
-            ).where(tables.work_segments.c.run_id == run_id)
-        )
-        work_ms = sum(_milliseconds(*row) for row in segments)
-    return {
-        "model_calls": tokens[0],
-        "total_tokens": tokens[1],
-        "cost": money.from_nanos(tokens[2]),
-        "work_ms": work_ms,
+def totals(run_ids: list[int]) -> dict[int, dict[str, Any]]:
+    """Sum each run's and each claim's model calls and working time, in two queries.
+
+    Failed attempts are included. A run with no work has zero totals.
+    """
+    calls, segments = tables.model_calls.c, tables.work_segments.c
+    found: dict[int, dict[str, Any]] = {
+        run_id: {"model_calls": 0, "total_tokens": 0, "cost": 0, "work_ms": 0}
+        | {"claims": {}}
+        for run_id in run_ids
     }
-
-
-def claim_totals(run_id: int) -> dict[str, dict[str, Any]]:
-    """Sum each claim's model cost and working time within a run."""
-    calls = tables.model_calls
-    segments = tables.work_segments
     with db.connection() as conn:
         costs = conn.execute(
-            select(calls.c.claim_id, func.sum(calls.c.cost_nanos))
-            .where(calls.c.run_id == run_id)
-            .group_by(calls.c.claim_id)
+            select(
+                calls.run_id,
+                calls.claim_id,
+                func.count(),
+                func.sum(calls.total_tokens),
+                func.sum(calls.cost_nanos),
+            )
+            .where(calls.run_id.in_(run_ids))
+            .group_by(calls.run_id, calls.claim_id)
         )
-        totals: dict[str, dict[str, Any]] = {}
-        for claim_id, nanos in costs:
-            totals.setdefault(claim_id, {"cost": 0, "work_ms": 0})["cost"] = nanos
+        for run_id, claim_id, count, tokens, nanos in costs:
+            run = found[run_id]
+            run["model_calls"] += count
+            run["total_tokens"] += int(tokens)
+            run["cost"] += nanos
+            run["claims"].setdefault(claim_id, {"cost": 0, "work_ms": 0})["cost"] = (
+                nanos
+            )
         times = conn.execute(
             select(
-                segments.c.claim_id, segments.c.started_on, segments.c.finished_on
-            ).where(segments.c.run_id == run_id)
+                segments.run_id,
+                segments.claim_id,
+                segments.started_on,
+                segments.finished_on,
+            ).where(segments.run_id.in_(run_ids))
         )
-        for claim_id, started_on, finished_on in times:
-            totals.setdefault(claim_id, {"cost": 0, "work_ms": 0})["work_ms"] += (
-                _milliseconds(started_on, finished_on)
-            )
+        for run_id, claim_id, started_on, finished_on in times:
+            run = found[run_id]
+            milliseconds = _milliseconds(started_on, finished_on)
+            run["work_ms"] += milliseconds
+            run["claims"].setdefault(claim_id, {"cost": 0, "work_ms": 0})[
+                "work_ms"
+            ] += milliseconds
     return {
-        claim_id: {"cost": money.from_nanos(total["cost"]), "work_ms": total["work_ms"]}
-        for claim_id, total in totals.items()
+        run_id: {
+            **run,
+            "cost": money.from_nanos(run["cost"]),
+            "claims": {
+                claim_id: {**claim, "cost": money.from_nanos(claim["cost"])}
+                for claim_id, claim in run["claims"].items()
+            },
+        }
+        for run_id, run in found.items()
     }
+
+
+def run_totals(run_id: int) -> dict[str, Any]:
+    """Sum a run's model calls and working time, failed attempts included."""
+    return {k: v for k, v in totals([run_id])[run_id].items() if k != "claims"}

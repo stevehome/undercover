@@ -83,8 +83,10 @@ def _row(proposal_id: int) -> dict[str, Any]:
     return dict(row._mapping)
 
 
-def _change_view(content: dict[str, Any]) -> dict[str, Any]:
-    base = versions.get_configuration(content["base_version"])
+def _change_view(
+    content: dict[str, Any], configurations: dict[int, dict[str, Any]]
+) -> dict[str, Any]:
+    base = configurations[content["base_version"]]
     return {
         "from_version": base["version"],
         "lines": diffs.diff_lines(base["instructions"], content["instructions"]),
@@ -95,30 +97,54 @@ def _change_view(content: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _recipe_view(content: dict[str, Any]) -> dict[str, Any]:
-    base = [
-        r for r in versions.list_recipes() if r["version"] == content["base_version"]
-    ][0]
+def _recipe_view(
+    content: dict[str, Any], recipes: dict[int, dict[str, Any]]
+) -> dict[str, Any]:
+    base = recipes[content["base_version"]]
     return {
         "from_version": base["version"],
         "lines": diffs.diff_lines(base["text"], content["recipe"]),
     }
 
 
+def _views(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Proposals with what each would change and who decided it, in a few queries."""
+    names = {h["handler_id"]: h["name"] for h in reference.handlers()}
+    configurations = {c["version"]: c for c in versions.list_configurations()}
+    recipes = {r["version"]: r for r in versions.list_recipes()}
+    return [
+        {
+            **row,
+            "decided_by": names.get(row["decided_by"]),
+            **(
+                _change_view(row["content"], configurations)
+                if row["kind"] == ProposalKind.CHANGE
+                else _recipe_view(row["content"], recipes)
+            ),
+        }
+        for row in rows
+    ]
+
+
 def get_proposal(proposal_id: int) -> dict[str, Any]:
     """Return a proposal with what it would change and who decided it."""
-    row = _row(proposal_id)
-    names = {h["handler_id"]: h["name"] for h in reference.handlers()}
-    view = (
-        _change_view(row["content"])
-        if row["kind"] == ProposalKind.CHANGE
-        else _recipe_view(row["content"])
-    )
-    return {
-        **row,
-        "decided_by": names.get(row["decided_by"]),
-        **view,
-    }
+    return _views([_row(proposal_id)])[0]
+
+
+def for_rounds(round_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """Return each round's proposals in order, in a fixed number of queries."""
+    columns = tables.proposals.c
+    with db.connection() as conn:
+        rows = conn.execute(
+            select(tables.proposals)
+            .where(columns.round_id.in_(round_ids))
+            .order_by(columns.proposal_id)
+        )
+        found = [dict(row._mapping) for row in rows]
+    by_round: dict[int, list[dict[str, Any]]] = {round_id: [] for round_id in round_ids}
+    for proposal in _views(found):
+        by_round[proposal["round_id"]].append(proposal)
+    return by_round
 
 
 def record_decision(

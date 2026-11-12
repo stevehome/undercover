@@ -112,36 +112,49 @@ def _grade(row: dict[str, Any] | None) -> dict[str, Any]:
     }
 
 
-def _claim_rows(run: dict[str, Any]) -> list[dict[str, Any]]:
-    """Each claim of an evaluation: the agent's answer beside the handler's."""
+def _copies(run_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """Each run's claims in order, with the agent's answer beside the handler's."""
     in_run, claims, key = tables.run_claims.c, tables.claims.c, tables.answer_key.c
-    totals = usage.claim_totals(run["run_id"])
-    graded = grading.grades(run["run_id"])
+    run = tables.runs.c
+    found: dict[int, list[dict[str, Any]]] = {run_id: [] for run_id in run_ids}
     with db.connection() as conn:
         rows = conn.execute(
             select(
+                in_run.run_id,
                 in_run.claim_id,
                 in_run.source_claim_id,
-                in_run.status,
+                in_run.status.label("run_status"),
                 in_run.note,
                 claims.decision,
+                claims.status,
                 claims.payout_cents,
                 claims.reason,
                 key.decision.label("key_decision"),
                 key.payout_cents.label("key_payout_cents"),
             )
             .join(tables.claims, claims.claim_id == in_run.claim_id)
+            .join(tables.runs, run.run_id == in_run.run_id)
             .join(
                 tables.answer_key,
-                (key.eval_set == run["eval_set"])
+                (key.eval_set == run.eval_set)
                 & (key.claim_id == in_run.source_claim_id),
             )
-            .where(in_run.run_id == run["run_id"])
-            .order_by(in_run.source_claim_id)
+            .where(in_run.run_id.in_(run_ids))
+            .order_by(in_run.run_id, in_run.position)
         )
-        found = [dict(row._mapping) for row in rows]
+        for row in rows:
+            found[row.run_id].append(dict(row._mapping))
+    return found
+
+
+def _claim_rows(
+    copies: list[dict[str, Any]],
+    totals: dict[str, dict[str, Any]],
+    graded: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Each claim of an evaluation: the agent's answer beside the handler's."""
     result = []
-    for row in found:
+    for row in sorted(copies, key=lambda copy: copy["source_claim_id"]):
         payout = (
             None
             if row["payout_cents"] is None
@@ -158,7 +171,7 @@ def _claim_rows(run: dict[str, Any]) -> list[dict[str, Any]]:
             {
                 "claim_id": row["claim_id"],
                 "source_claim_id": row["source_claim_id"],
-                "status": row["status"],
+                "status": row["run_status"],
                 "note": row["note"],
                 "handler_decision": scored["key_decision"],
                 "handler_payout": scored["key_payout"],
@@ -175,46 +188,68 @@ def _claim_rows(run: dict[str, Any]) -> list[dict[str, Any]]:
     return result
 
 
-def _evaluation(run: dict[str, Any]) -> dict[str, Any]:
-    """An evaluation's run record with its claims and its measures."""
-    claims = _claim_rows(run)
-    scored = [
-        {
-            "decision": claim["agent_decision"],
-            "payout": claim["agent_payout"],
-            "key_decision": claim["handler_decision"],
-            "key_payout": claim["handler_payout"],
-        }
-        for claim in claims
-    ]
-    return {
-        **run,
-        "claims": claims,
-        "measures": {
-            **scoring.measures(scored, run["cost"], run["work_ms"], _run_ms(run)),
-            **scoring.grade_measures(claims),
-        },
-    }
+def _evaluations(found: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Evaluation runs with their claims and measures, in a fixed number of queries."""
+    ids = [run["run_id"] for run in found]
+    copies, totals, graded = _copies(ids), usage.totals(ids), grading.grades(ids)
+    evaluations = []
+    for run in found:
+        run_id, total = run["run_id"], totals[run["run_id"]]
+        claims = _claim_rows(copies[run_id], total["claims"], graded[run_id])
+        scored = [
+            {
+                "decision": claim["agent_decision"],
+                "payout": claim["agent_payout"],
+                "key_decision": claim["handler_decision"],
+                "key_payout": claim["handler_payout"],
+            }
+            for claim in claims
+        ]
+        evaluations.append(
+            {
+                **run,
+                "claims": claims,
+                "model_calls": total["model_calls"],
+                "total_tokens": total["total_tokens"],
+                "cost": total["cost"],
+                "work_ms": total["work_ms"],
+                "summary": runs.summarize(copies[run_id]),
+                "measures": {
+                    **scoring.measures(
+                        scored, total["cost"], total["work_ms"], _run_ms(run)
+                    ),
+                    **scoring.grade_measures(claims),
+                },
+            }
+        )
+    return evaluations
+
+
+def _evaluation_runs(*conditions: Any) -> list[dict[str, Any]]:
+    """The evaluation runs that meet the conditions, newest first."""
+    columns = tables.runs.c
+    with db.connection() as conn:
+        rows = conn.execute(
+            select(tables.runs)
+            .where(columns.kind == RunKind.EVALUATION, *conditions)
+            .order_by(columns.run_id.desc())
+        )
+        return [dict(row._mapping) for row in rows]
 
 
 def get_evaluation(run_id: int) -> dict[str, Any]:
     """Return one evaluation with each claim's answers beside the handler's."""
-    run = runs.get_run(run_id)
-    if run["kind"] != RunKind.EVALUATION:
+    found = _evaluation_runs(tables.runs.c.run_id == run_id)
+    if not found:
         raise NotFound(f"No evaluation {run_id}")
-    return _evaluation(run)
+    return _evaluations(found)[0]
+
+
+def get_evaluations(run_ids: list[int]) -> list[dict[str, Any]]:
+    """Return the evaluations with these run ids, in a fixed number of queries."""
+    return _evaluations(_evaluation_runs(tables.runs.c.run_id.in_(run_ids)))
 
 
 def list_evaluations() -> list[dict[str, Any]]:
     """List the evaluations, newest first, with their measures."""
-    run_column = tables.runs.c.run_id
-    with db.connection() as conn:
-        ids = [
-            run_id
-            for (run_id,) in conn.execute(
-                select(run_column)
-                .where(tables.runs.c.kind == RunKind.EVALUATION)
-                .order_by(run_column.desc())
-            )
-        ]
-    return [get_evaluation(run_id) for run_id in ids]
+    return _evaluations(_evaluation_runs())

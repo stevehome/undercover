@@ -199,3 +199,20 @@ def test_a_dispatch_is_not_an_evaluation(client):
 
     assert client.get(f"/api/evaluations/{run['run_id']}").status_code == 404
     assert client.get("/api/evaluations").json() == []
+
+
+def test_the_evaluations_list_takes_the_same_queries_however_many_there_are(
+    client, statements_to_get
+):
+    def finished_evaluation():
+        run = start(client).json()
+        client.post(f"/api/runs/{run['run_id']}/finish")
+
+    finished_evaluation()
+    one = statements_to_get("/api/evaluations")
+
+    finished_evaluation()
+    finished_evaluation()
+
+    assert len(client.get("/api/evaluations").json()) == 3
+    assert statements_to_get("/api/evaluations") == one

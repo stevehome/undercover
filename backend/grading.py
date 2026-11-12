@@ -113,11 +113,13 @@ def grade_evaluation(run_id: int) -> None:
         )
 
 
-def grades(run_id: int) -> dict[str, dict[str, Any]]:
-    """Return a run's stored grades by claim id."""
+def grades(run_ids: list[int]) -> dict[int, dict[str, dict[str, Any]]]:
+    """Return the stored grades of runs by run id, then claim id."""
     columns = tables.claim_grades.c
+    found: dict[int, dict[str, dict[str, Any]]] = {run_id: {} for run_id in run_ids}
     with db.connection() as conn:
-        found = conn.execute(
-            select(tables.claim_grades).where(columns.run_id == run_id)
-        )
-        return {row.claim_id: dict(row._mapping) for row in found}
+        for row in conn.execute(
+            select(tables.claim_grades).where(columns.run_id.in_(run_ids))
+        ):
+            found[row.run_id][row.claim_id] = dict(row._mapping)
+    return found

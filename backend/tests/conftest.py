@@ -4,7 +4,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import event
 
+from backend import db
 from backend.main import app
 
 
@@ -13,6 +15,27 @@ def client(tmp_path, monkeypatch, as_handler):
     """A TestClient against a fresh, temporary claim database, signed in as Dana."""
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
     return TestClient(app, headers=as_handler())
+
+
+@pytest.fixture
+def statements_to_get(client):
+    """A function that counts the SQL statements one GET runs."""
+
+    def count(path):
+        seen = []
+
+        def record(*_):
+            seen.append(1)
+
+        engine = db.engine(db.database_url())
+        event.listen(engine, "before_cursor_execute", record)
+        try:
+            client.get(path)
+        finally:
+            event.remove(engine, "before_cursor_execute", record)
+        return len(seen)
+
+    return count
 
 
 class AgentStub(BaseHTTPRequestHandler):

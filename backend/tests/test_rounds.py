@@ -667,3 +667,37 @@ def test_the_configurations_list_carries_each_versions_held_out_scores(client, f
         client.get(f"/api/rounds/{flow.round_id}").json()["started_by_name"]
         == "Dana Whitfield"
     )
+
+
+def test_the_rounds_list_takes_the_same_queries_however_many_there_are(
+    client, statements_to_get
+):
+    def a_stopped_round_with_a_proposal_and_a_call():
+        flow = Flow(client)
+        flow.propose()
+        improver_call(client, flow)
+        flow.end_stretch()
+        client.post(f"/api/rounds/{flow.round_id}/stop")
+
+    a_stopped_round_with_a_proposal_and_a_call()
+    one = statements_to_get("/api/rounds")
+
+    a_stopped_round_with_a_proposal_and_a_call()
+    a_stopped_round_with_a_proposal_and_a_call()
+
+    assert len(client.get("/api/rounds").json()) == 3
+    assert statements_to_get("/api/rounds") == one
+
+
+def test_the_configurations_list_takes_the_same_queries_however_many_there_are(
+    client, flow, statements_to_get
+):
+    flow.first_evaluations()
+    one = statements_to_get("/api/configurations")
+
+    flow.decide(flow.propose().json()["proposal_id"])
+    flow.evaluate(2, "evaluation", correct=True)
+    flow.evaluate(2, "held_out", correct=True)
+
+    assert len(client.get("/api/configurations").json()) == 2
+    assert statements_to_get("/api/configurations") == one

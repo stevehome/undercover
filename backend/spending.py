@@ -14,29 +14,38 @@ from backend import db, evaluations, money, platform_settings, tables
 from backend.statuses import RunKind, RunStatus, Stage
 
 
-def _sum(column: Any, *conditions: Any) -> int:
+def spent_by(round_ids: list[int]) -> dict[int, Decimal]:
+    """Return what each round has spent, in dollars to the billionth."""
+    calls, model, grades, runs = (
+        tables.improver_calls.c,
+        tables.model_calls.c,
+        tables.claim_grades.c,
+        tables.runs.c,
+    )
+    queries = (
+        select(calls.round_id, func.sum(calls.cost_nanos))
+        .where(calls.round_id.in_(round_ids))
+        .group_by(calls.round_id),
+        select(runs.round_id, func.sum(model.cost_nanos))
+        .join_from(tables.runs, tables.model_calls, runs.run_id == model.run_id)
+        .where(runs.round_id.in_(round_ids))
+        .group_by(runs.round_id),
+        select(runs.round_id, func.sum(grades.cost_nanos))
+        .join_from(tables.runs, tables.claim_grades, runs.run_id == grades.run_id)
+        .where(runs.round_id.in_(round_ids))
+        .group_by(runs.round_id),
+    )
+    nanos = dict.fromkeys(round_ids, 0)
     with db.connection() as conn:
-        total = conn.execute(select(func.sum(column)).where(*conditions)).scalar()
-    return int(total or 0)
+        for query in queries:
+            for round_id, total in conn.execute(query):
+                nanos[round_id] += int(total)
+    return {round_id: money.from_nanos(total) for round_id, total in nanos.items()}
 
 
 def spent(round_id: int) -> Decimal:
     """Return what a round has spent, in dollars to the billionth."""
-    round_runs = select(tables.runs.c.run_id).where(tables.runs.c.round_id == round_id)
-    nanos = (
-        _sum(
-            tables.improver_calls.c.cost_nanos,
-            tables.improver_calls.c.round_id == round_id,
-        )
-        + _sum(
-            tables.model_calls.c.cost_nanos, tables.model_calls.c.run_id.in_(round_runs)
-        )
-        + _sum(
-            tables.claim_grades.c.cost_nanos,
-            tables.claim_grades.c.run_id.in_(round_runs),
-        )
-    )
-    return money.from_nanos(nanos)
+    return spent_by([round_id])[round_id]
 
 
 def limit(round_settings: dict[str, Any]) -> Decimal:
@@ -64,8 +73,7 @@ def _cost_per_claim(model: str) -> Decimal | None:
             )
         ]
     per_claim = []
-    for run_id in ids:
-        evaluation = evaluations.get_evaluation(run_id)
+    for evaluation in evaluations.get_evaluations(ids):
         measures, claims = evaluation["measures"], len(evaluation["claims"])
         if claims:
             per_claim.append(
