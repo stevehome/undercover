@@ -93,6 +93,7 @@ function Row({ evaluation }: Readonly<{ evaluation: Evaluation }>) {
           {formatTime(evaluation.started_on)}
         </Link>
       </td>
+      <td className="number">{evaluation.round_id ?? "–"}</td>
       <td>
         {SETS.find(([value]) => value === evaluation.eval_set)?.[1]}
         {evaluation.tiny ? ", tiny" : ""}
@@ -134,7 +135,7 @@ export function ScoreboardPage() {
   );
 
   return (
-    <main className="panel">
+    <main className="panel wide">
       <PageHeader title="The scoreboard">
         How the claim agent does on the two labelled sets, with the handlers'
         decisions as the answer key.
@@ -147,6 +148,7 @@ export function ScoreboardPage() {
         <thead>
           <tr>
             <th>Started</th>
+            <th className="number">Round</th>
             <th>Set</th>
             <th className="number">At once</th>
             <th>Model</th>

@@ -2,7 +2,9 @@
 
 LangGraph saves a claim's state here after every step, in the same Supabase
 database as the backend, in the `undercover` schema. Claims worked at once
-share the process's few connections and wait for one rather than fail.
+share the process's few connections and wait for one rather than fail. The
+database closes connections left idle, as while a round waits for a handler, so
+the pool tests a connection before handing it out.
 """
 
 import os
@@ -17,6 +19,7 @@ from psycopg_pool import ConnectionPool
 SCHEMA = "undercover"
 CONNECTIONS_PER_PROCESS = 4
 WAIT_FOR_CONNECTION_SECONDS = 600
+TEST_BEFORE_USE = ConnectionPool.check_connection
 
 
 _creating = Lock()
@@ -45,6 +48,7 @@ def _make_pool() -> ConnectionPool[Any]:
         min_size=CONNECTIONS_PER_PROCESS,
         max_size=CONNECTIONS_PER_PROCESS,
         timeout=WAIT_FOR_CONNECTION_SECONDS,
+        check=TEST_BEFORE_USE,
         kwargs={
             "autocommit": True,
             "prepare_threshold": 0,

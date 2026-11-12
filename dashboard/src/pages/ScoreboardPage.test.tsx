@@ -81,3 +81,28 @@ it("starts an evaluation with the chosen number, set and size", async () => {
     { concurrency: 25, eval_set: "held_out", tiny: true },
   ]);
 });
+
+it("shows the round that started an evaluation, or a dash for one started by hand", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify([
+            { ...wireEvaluation, run_id: 9, round_id: 3 },
+            wireEvaluation,
+          ]),
+        ),
+      ),
+    ),
+  );
+
+  renderPage();
+
+  await screen.findAllByText("The held-out set, tiny");
+  const roundCells = screen
+    .getAllByRole("row")
+    .slice(1)
+    .map((row) => row.querySelectorAll("td")[1].textContent);
+  expect(roundCells).toEqual(["3", "–"]);
+});

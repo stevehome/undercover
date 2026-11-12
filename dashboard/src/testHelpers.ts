@@ -35,6 +35,7 @@ export const wireEvaluation = {
   status: "finished",
   eval_set: "held_out",
   tiny: true,
+  round_id: null,
   concurrency: 5,
   model: "openai/gpt-6-luna",
   reasoning_effort: "low",

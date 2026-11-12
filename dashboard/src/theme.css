@@ -61,6 +61,10 @@ h3 {
   overflow-x: auto;
 }
 
+.panel.wide {
+  max-width: min(1600px, calc(100vw - 2rem));
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -402,11 +406,12 @@ textarea {
 table.data th,
 table.data td {
   vertical-align: top;
+  padding-inline: 0.5rem;
 }
 
 table.data thead th {
   font-size: 0.85rem;
-  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 table.data td.number,

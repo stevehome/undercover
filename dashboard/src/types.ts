@@ -182,6 +182,8 @@ export interface Evaluation {
   status: "running" | "finished" | "stopped";
   eval_set: EvalSet;
   tiny: boolean;
+  /** The round that started this evaluation; null for one started by hand. */
+  round_id: number | null;
   concurrency: number;
   model: string;
   reasoning_effort: string;

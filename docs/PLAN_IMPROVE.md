@@ -246,3 +246,130 @@ Success criteria:
 - Please check the design choices flagged above: a round's stretch of work as a run kind with `parent_run_id` on its evaluations (instead of the lock in the service that the brief's notes describe), the instructions and recipe moved to files in `data/`, and `NO_EFFORT` renamed from `none` to `default`.
 - The Supabase setup and the three `.env` lines from the lab, and a credit limit on your OpenRouter key, before Phase 1's live check.
 - Reseeding before the live runs in Phase 8, with `npm run dev` stopped.
+
+## Feedback
+
+The Scoreboard tab content doesn't fit completely the right side is truncated.
+
+This error occurred after approving an improver change
+discarding closed connection: <psycopg.Connection [BAD] at 0x1278a1700>
+[agent] Round 1 failed
+[agent] Traceback (most recent call last):
+[agent]   File "/Users/steve/projects/undercover/agent/rounds.py", line 127, in work_stretch
+[agent]     _improve(round_id, run_id, resume, llm, saver)
+[agent]   File "/Users/steve/projects/undercover/agent/rounds.py", line 100, in _improve
+[agent]     result = graph.invoke(start, config, context=context, durability="sync")
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 4000, in invoke
+[agent]     for chunk in self.stream(
+[agent]                  ^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2988, in stream
+[agent]     with SyncPregelLoop(
+[agent]          ^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/_loop.py", line 1870, in __enter__
+[agent]     saved = self.checkpointer.get_tuple(self.checkpoint_config)
+[agent]             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/checkpoint/postgres/__init__.py", line 238, in get_tuple
+[agent]     cur.execute(
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/psycopg/cursor.py", line 117, in execute
+[agent]     raise ex.with_traceback(None)
+[agent] psycopg.OperationalError: consuming input failed: server closed the connection unexpectedly
+[agent]         This probably means the server terminated abnormally
+[agent]         before or while processing the request.
+[agent] server closed the connection unexpectedly
+[agent]         This probably means the server terminated abnormally
+[agent]         before or while processing the request.
+[backend] INFO:     127.0.0.1:58996 - "POST /api/improver/rounds/1/stage HTTP/1.1" 200 OK
+[backend] INFO:     127.0.0.1:59028 - "GET /api/configurations HTTP/1.1" 200 OK
+[backend] INFO:     127.0.0.1:59095 - "GET /api/rounds HTTP/1.1" 200 OK
+[backend] INFO:     127.0.0.1:58996 - "POST /api/runs/7/finish HTTP/1.1" 200 OK
+[agent] ERROR:    Exception in ASGI application
+[agent] Traceback (most recent call last):
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 411, in run_asgi
+[agent]     result = await app(  # type: ignore[func-returns-value]
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+[agent]     return await self.app(scope, receive, send)
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1163, in __call__
+[agent]     await super().__call__(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+[agent]     await self.middleware_stack(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+[agent]     raise exc
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+[agent]     await self.app(scope, receive, _send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+[agent]     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+[agent]     raise exc
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+[agent]     await app(scope, receive, sender)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+[agent]     await self.app(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+[agent]     await self.middleware_stack(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+[agent]     await route.handle(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1281, in handle
+[agent]     await super().handle(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/routing.py", line 282, in handle
+[agent]     await self.app(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+[agent]     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+[agent]     raise exc
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+[agent]     await app(scope, receive, sender)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 145, in app
+[agent]     await response(scope, receive, send)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/responses.py", line 172, in __call__
+[agent]     await self.background()
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/background.py", line 36, in __call__
+[agent]     await task()
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/background.py", line 23, in __call__
+[agent]     await run_in_threadpool(self.func, *self.args, **self.kwargs)
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+[agent]     return await anyio.to_thread.run_sync(func)
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+[agent]     return await get_async_backend().run_sync_in_worker_thread(
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+[agent]     return await future
+[agent]            ^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+[agent]     result = context.run(func, *args)
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/agent/rounds.py", line 127, in work_stretch
+[agent]     _improve(round_id, run_id, resume, llm, saver)
+[agent]   File "/Users/steve/projects/undercover/agent/rounds.py", line 100, in _improve
+[agent]     result = graph.invoke(start, config, context=context, durability="sync")
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 4000, in invoke
+[agent]     for chunk in self.stream(
+[agent]                  ^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2988, in stream
+[agent]     with SyncPregelLoop(
+[agent]          ^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/pregel/_loop.py", line 1870, in __enter__
+[agent]     saved = self.checkpointer.get_tuple(self.checkpoint_config)
+[agent]             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/langgraph/checkpoint/postgres/__init__.py", line 238, in get_tuple
+[agent]     cur.execute(
+[agent]   File "/Users/steve/projects/undercover/.venv/lib/python3.12/site-packages/psycopg/cursor.py", line 117, in execute
+[agent]     raise ex.with_traceback(None)
+[agent] psycopg.OperationalError: consuming input failed: server closed the connection unexpectedly
+[agent]         This probably means the server terminated abnormally
+[agent]         before or while processing the request.
+[agent] server closed the connection unexpectedly
+[agent]         This probably means the server terminated abnormally
+[agent]         before or while processing the request.
+
+
+### What I changed for this feedback
+
+- **Scoreboard cut off on the right:** its 13 columns, with headings that never wrapped, came to 1,487 px inside a 1,136 px panel. Headings now wrap, the Scoreboard's panel is wider (up to 1,600 px, with a 1 rem gutter) and data tables use slightly tighter side padding. The table now fits with no sideways scroll at 1,280, 1,366 and 1,440 px.
+- **Round failed after approving a change (`server closed the connection unexpectedly` in `get_tuple`):** the improver waits for a handler with the database connection idle, the database closes idle connections, and the agent's pool in `agent/checkpoint.py` handed the resumed round a dead one. The pool now tests a connection before handing it out (`check=ConnectionPool.check_connection`), with a test that it is built that way. This is the agent's counterpart of the backend's `pool_pre_ping`. `npm run dev:agent` has no `--reload`, so the agent needs a restart to pick it up. A round that had already failed stays stopped; start a new one.
+
+The Scoreboard now has a **Round** column: the round that started an evaluation, or "–" for one started by hand. The backend already sent `round_id`. The extra column needed the table's side padding trimmed again (0.5rem); it still fits with no sideways scroll at 1,280, 1,366 and 1,440 px.
