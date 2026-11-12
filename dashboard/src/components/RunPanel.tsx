@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { formatCost, formatMoney } from "../money";
 import { formatDuration } from "../time";
 import type { Run } from "../types";
-import { RunClaimBadge } from "./RunClaimBadge";
+import { StatusPill } from "./StatusPill";
 
 function Summary({ run }: Readonly<{ run: Run }>) {
   const { summary } = run;
@@ -46,7 +46,7 @@ export function RunPanel({ run }: Readonly<{ run: Run }>) {
             <Link className="mono" to={`/claims/${claim.claim_id}`}>
               {claim.claim_id}
             </Link>{" "}
-            <RunClaimBadge status={claim.status} />
+            <StatusPill status={claim.status} />
             {claim.note ? ` — ${claim.note}` : ""}
           </li>
         ))}

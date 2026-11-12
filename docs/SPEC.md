@@ -23,6 +23,16 @@ When the agent approves a payout over $1,000, it stops and waits for a handler, 
 
 If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C, it carries on with that claim from where it got to the next time it runs, and that doesn't count as a new attempt. A claim that hits a rate limit or a timeout waits and carries on from where it got to, and if it is still hitting them it stays in progress for the next dispatch. A claim that fails with any other error goes back in the queue and the same dispatch tries it once more, and a claim that fails twice is left for a handler. One bad claim never stops a dispatch. A dispatch that was stopped is finished by the next one. No claim is ever decided or paid twice.
 
+## Signing in
+
+Handlers sign in to the dashboard with their email address and password, through Supabase Auth. There is no sign-up. Every page needs a signed-in handler, and the header shows who is signed in, with a way to sign out. The backend checks the handler on every action a handler takes: signing off a payout, starting a dispatch, an evaluation or a round, stopping a round, approving or rejecting a proposal and changing a setting. A sign-off records the signed-in handler. Dana Whitfield is the senior handler. Only a handler who can sign off payouts over the limit may start or stop a round, approve or reject the improver's proposals or change a setting. When anyone else looks at a held payout, a round or the settings, the page says what they can't do and why, and the backend refuses it as well.
+
+## The improver
+
+The claim agent's instructions, model and reasoning effort are one configuration, kept in versions; version 1 is the agent as it was. A dispatch and an evaluation record the version they used. An improver agent follows a recipe, itself kept in versions, to improve the configuration in rounds. It reads the claim agent's results, proposes a change, waits for a handler to approve it, has the new version evaluated, and proposes a new recipe, which a handler approves in the same way. Nothing it proposes takes effect until a handler approves it. The backend keeps or rolls back each new version by the business objectives, the noise and the tolerance. Only one round is open at a time, a round works to the settings as they stood when it started, and a round stopped before its verdict leaves the current version as it was. The improver cannot change the objectives, the noise and tolerance, the spending limit, the models allowed, the approval limit, the evaluation sets or the judge.
+
+A judge grades each explanation in an evaluation against the handler's reason, from F to A, and says whether it gave the same grounds and the same section. Each round has a spending limit that covers the improver's model calls, its evaluations and the judge.
+
 ## What the team needs to see
 
 - The queue, with where each claim stands: waiting, in progress, waiting for sign-off or decided.
@@ -30,13 +40,16 @@ If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C
 - What the agent is doing on a claim while it works, step by step.
 - What each claim cost to work, in model cost and time, and the totals for each dispatch.
 - How well the agent is doing: on a Scoreboard, evaluations on our two labelled sets, the evaluation set and the held-out set, each whole or just its five `tiny` claims. Each shows how often the agent agrees with our handlers, how much its mistakes would cost, how many claims go straight through, and what a claim costs and how long it takes, with each claim's decision beside the handler's.
-- The agent's instructions, read only.
+- The Improvement page: where a round has got to as it happens, the proposal waiting with what it changes, the rounds so far with their scores before and after, the verdict and the cost, a chart of each version's held-out accuracy and grade, and the recipe's versions.
+- The Configuration page: the current version and every version with its held-out scores, and what any version changed from the one before.
+- The Settings page: the approval limit, the business objectives, the noise and tolerance, the spending limit for each round, how many claim agents work at once in the improver's evaluations, and the models allowed. A senior handler can change each, and each change records who and when. The appearance, light, dark or the computer's, is kept by each browser.
+- The judge's grade for each claim of an evaluation, with the two checks, and the average grade on the Scoreboard.
 
 ## Rules
 
-- A payout over $1,000 needs a handler's sign-off. The agent can approve such a claim, but the payment waits until a handler signs off. The system must block the payment until then, even if the agent tries to pay.
+- A payout over the approval limit, $1,000 to start with and a setting, needs a handler's sign-off. The agent can approve such a claim, but the payment waits until a handler signs off. The system must block the payment until then, even if the agent tries to pay.
 - Decisions follow the policy wording.
-- Our handlers' own decisions on these claims are in `data/evals/`. We use them to check the agent's work in evaluations, which work copies of the claims that never show in the queue and can't be signed off. The agent must never see them.
+- Our handlers' own decisions on these claims are in `data/evals/`. We use them to check the agent's work in evaluations, which work copies of the claims that never show in the queue and can't be signed off. The claim agent must never see them. The improver reads the evaluation set's decisions and reasons, nothing in the agent reads the held-out set's, and the dashboard shows both sets' decisions as it does today.
 - Amounts are in US dollars.
 
 ## Our records
@@ -45,7 +58,6 @@ Everything starts in `data/`, described in `data/README.md`, and is then kept in
 
 ## Not for now
 
-- No sign-in. Everyone who uses the screens sees everything.
 - No real payments.
 - No messages to customers.
 - Rejecting a held payout. A handler can only sign off.

@@ -19,6 +19,7 @@
     "dev:agent": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn agent.service:app --port 8002"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router": "^8.5.0"

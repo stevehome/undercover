@@ -1,10 +1,13 @@
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import { fetchClaims, fetchCurrentRun } from "../api";
+import { DataTable } from "../components/DataTable";
+import { EmptyState } from "../components/EmptyState";
 import { LoadError } from "../components/LoadError";
+import { PageHeader } from "../components/PageHeader";
 import { RunPanel } from "../components/RunPanel";
 import { StartDispatch } from "../components/StartDispatch";
-import { StatusBadge } from "../components/StatusBadge";
+import { StatusPill } from "../components/StatusPill";
 import { formatMoney } from "../money";
 import type { ClaimSummary, Run } from "../types";
 import { usePolling } from "../usePolling";
@@ -40,7 +43,10 @@ export function QueuePage() {
 
   return (
     <main className="panel">
-      <h1>The claims queue</h1>
+      <PageHeader title="The claims queue">
+        Claims waiting to be decided, and the latest dispatch of the claim
+        agents.
+      </PageHeader>
       {failed && <LoadError />}
 
       <StartDispatch onStarted={() => void load()} />
@@ -56,13 +62,13 @@ export function QueuePage() {
 
       {run && <RunPanel run={run} />}
 
-      <table>
+      <DataTable>
         <thead>
           <tr>
             <th>Claim</th>
             <th>Type</th>
             <th>Summary</th>
-            <th>Amount claimed</th>
+            <th className="number">Amount claimed</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -74,14 +80,19 @@ export function QueuePage() {
               </td>
               <td>{claim.claim_type}</td>
               <td>{claim.summary}</td>
-              <td className="mono">{formatMoney(claim.amount_claimed)}</td>
+              <td className="number mono">
+                {formatMoney(claim.amount_claimed)}
+              </td>
               <td>
-                <StatusBadge status={claim.status} />
+                <StatusPill status={claim.status} />
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </DataTable>
+      {claims?.length === 0 && (
+        <EmptyState>The queue is empty. New claims appear here.</EmptyState>
+      )}
     </main>
   );
 }

@@ -18,6 +18,7 @@ MONEY_KEYS = {
     "amount_paid",
     "trip_cost",
     "payout_approval_limit",
+    "round_spending_limit",
     "baggage_delay_max",
     "baggage_max",
     "deductible",

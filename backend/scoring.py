@@ -69,3 +69,16 @@ def measures(
         if run_ms is None
         else (Decimal(run_ms) / 1000).quantize(SECONDS),
     }
+
+
+def grade_measures(claims: list[dict[str, Any]]) -> dict[str, Any]:
+    """Return the average grade, none if no claim was graded, and the judge's cost."""
+    scores = [c["grade"]["score"] for c in claims if c["grade"] is not None]
+    return {
+        "grade": (sum(scores, Decimal(0)) / len(scores)).quantize(Decimal("0.001"))
+        if scores
+        else None,
+        "judge_cost": sum((c["judge_cost"] for c in claims), Decimal(0)).quantize(
+            Decimal("0.000000001")
+        ),
+    }

@@ -48,6 +48,7 @@ it("lists an evaluation with every measure", async () => {
 
   const row = (await screen.findByText("The held-out set, tiny")).closest("tr");
   expect(row?.textContent).toContain("80.0%");
+  expect(row?.textContent).toContain("1.80");
   expect(row?.textContent).toContain("60.0%");
   expect(row?.textContent).toContain("$1,550.00");
   expect(row?.textContent).toContain("$0.0006");

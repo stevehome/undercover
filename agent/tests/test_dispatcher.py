@@ -7,6 +7,7 @@ from langchain_core.exceptions import ModelRateLimitError, ModelTimeoutError
 from langgraph.types import RetryPolicy
 
 from agent import agents, api, dispatcher, work
+from agent.tests.conftest import STUB_MODEL
 
 DECISION = {
     "decision": "approve",
@@ -18,7 +19,12 @@ FAST = RetryPolicy(initial_interval=0.01, max_attempts=3, retry_on=work.WAIT_AND
 
 
 def start(n=3):
-    return api.create_dispatch(n, "stub/model", "low")
+    return api.create_dispatch(
+        n,
+        api.ModelUsed(
+            model="stub/model", reasoning_effort="low", configuration_version=1
+        ),
+    )
 
 
 def run(run_id, decide, n=3):
@@ -48,7 +54,7 @@ def test_never_more_than_n_claims_are_worked_at_once(backend, n):
         with lock:
             inside += 1
             most = max(most, inside)
-        time.sleep(0.2 if n > 1 else 0)
+        time.sleep(0.5 if n > 1 else 0)
         approve(claim_id, run_id)
         with lock:
             inside -= 1
@@ -169,7 +175,7 @@ def test_no_claim_is_decided_twice(backend):
 def test_a_held_approval_in_an_evaluation_is_finished_and_its_progress_cleared(
     backend, script, saver
 ):
-    run_id = api.create_evaluation(1, "held_out", True, "stub/model", "low")
+    run_id = api.create_evaluation(1, "held_out", True, STUB_MODEL)
     copies = [c["claim_id"] for c in api.get_run(run_id)["claims"]]
     approve = (
         "decide_claim",

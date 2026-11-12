@@ -67,7 +67,7 @@ def test_list_handlers(client):
     response = client.get("/api/handlers")
     assert response.status_code == 200
     handlers = response.json()
-    assert len(handlers) == 3
+    assert [h["name"] for h in handlers] == ["Dana Whitfield"]
     assert all(h["can_approve_over_limit"] for h in handlers)
 
 

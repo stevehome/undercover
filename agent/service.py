@@ -11,7 +11,16 @@ from typing import Annotated
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
-from agent import agents, api, checkpoint, dispatcher, harness
+from agent import (
+    agents,
+    api,
+    backend_http,
+    checkpoint,
+    dispatcher,
+    harness,
+    improver_api,
+    rounds,
+)
 
 
 @asynccontextmanager
@@ -34,12 +43,38 @@ class StartEvaluation(BaseModel):
     tiny: bool
 
 
-def _create(create: Callable[..., int], *arguments: object) -> int:
+class StartRound(BaseModel):
+    handler_id: str
+
+
+class ProposalDecision(BaseModel):
+    decision: str
+    handler_id: str
+    reason: str
+
+
+def _create[T](create: Callable[..., T], *arguments: object) -> T:
     """Create a run through the backend, which refuses a second one running."""
     try:
         return create(*arguments)
-    except api.ApiRefusal as refusal:
+    except backend_http.ApiRefusal as refusal:
         raise HTTPException(refusal.status_code, refusal.detail) from refusal
+
+
+def _current_model() -> api.ModelUsed:
+    """The model, effort and version a run on the current configuration uses."""
+    configuration = api.current_configuration()
+    settings = harness.model_settings(configuration)
+    return api.ModelUsed(
+        model=settings.name,
+        reasoning_effort=settings.reasoning_effort,
+        configuration_version=configuration["version"],
+    )
+
+
+def round_worker() -> Callable[..., None]:
+    """Return what works a stretch of a round; tests swap in a stand-in."""
+    return rounds.work_stretch
 
 
 def claim_worker() -> Callable[[str], str]:
@@ -76,10 +111,7 @@ def start_dispatch(
     worker: Annotated[Callable[[int, int], object], Depends(dispatch_worker)],
 ) -> dict[str, int]:
     """Start a dispatch with N claim agents at once; refused while a run is going."""
-    model = harness.model_settings()
-    run_id = _create(
-        api.create_dispatch, start.concurrency, model.name, model.reasoning_effort
-    )
+    run_id = _create(api.create_dispatch, start.concurrency, _current_model())
     background.add_task(worker, run_id, start.concurrency)
     return {"run_id": run_id}
 
@@ -91,14 +123,61 @@ def start_evaluation(
     worker: Annotated[Callable[[int, int], object], Depends(dispatch_worker)],
 ) -> dict[str, int]:
     """Start an evaluation on a labelled set; refused while a run is going."""
-    model = harness.model_settings()
     run_id = _create(
         api.create_evaluation,
         start.concurrency,
         start.eval_set,
         start.tiny,
-        model.name,
-        model.reasoning_effort,
+        _current_model(),
     )
     background.add_task(worker, run_id, start.concurrency)
     return {"run_id": run_id}
+
+
+@app.post("/api/rounds", operation_id="start_round", status_code=202)
+def start_round(
+    start: StartRound,
+    background: BackgroundTasks,
+    worker: Annotated[Callable[..., None], Depends(round_worker)],
+) -> dict[str, int]:
+    """Start an improvement round; refused while a run is going."""
+    created = _create(rounds.new_round, start.handler_id)
+    background.add_task(worker, created["round_id"], created["run_id"], None)
+    return {"round_id": created["round_id"]}
+
+
+@app.post("/api/rounds/{round_id}/stop", operation_id="stop_round")
+def stop_round(round_id: int) -> dict[str, int]:
+    """Acknowledge a stopped round: the backend refuses what it records from now on."""
+    return {"round_id": round_id}
+
+
+@app.post(
+    "/api/proposals/{proposal_id}/decision",
+    operation_id="decide_proposal",
+    status_code=202,
+)
+def decide_proposal(
+    proposal_id: int,
+    decision: ProposalDecision,
+    background: BackgroundTasks,
+    worker: Annotated[Callable[..., None], Depends(round_worker)],
+) -> dict[str, int]:
+    """Record a handler's decision, then resume the improver with it."""
+    approved = decision.decision == "approve"
+    settings = harness.improver_settings()
+    recorded = _create(
+        improver_api.record_proposal_decision,
+        proposal_id,
+        approved,
+        decision.handler_id,
+        decision.reason,
+        (settings.name, settings.reasoning_effort),
+    )
+    background.add_task(
+        worker,
+        recorded["round_id"],
+        recorded["run_id"],
+        rounds.decision(approved, decision.reason),
+    )
+    return {"proposal_id": proposal_id}

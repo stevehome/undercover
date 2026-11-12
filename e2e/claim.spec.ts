@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./signIn";
 
 test("a decided claim's page shows its decision, payout and reason", async ({
   page,
@@ -23,15 +24,24 @@ test("a decided claim's page shows its decision, payout and reason", async ({
   await expect(page.getByText("Section 3")).toBeVisible();
 });
 
-test("the instructions page shows the agent's instructions", async ({
+test("the configuration page shows version 1 and what it changed", async ({
   page,
 }) => {
-  await page.goto("/instructions");
+  await page.goto("/configuration");
 
   await expect(
-    page.getByRole("heading", { name: "The agent's instructions" }),
+    page.getByRole("heading", { name: "Configuration" }),
   ).toBeVisible();
-  await expect(page.getByText("calling decide_claim once")).toBeVisible();
+  await expect(page.getByText("Current version: 1")).toBeVisible();
+  await expect(
+    page.getByText("calling decide_claim once").first(),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Show changes" }).click();
+
+  await expect(
+    page.getByRole("region", { name: "Version 1 changes" }),
+  ).toContainText("the starting instructions");
 });
 
 test("a sign-off reaches the agent, and the claim shows as paid once it pays", async ({
@@ -56,11 +66,14 @@ test("a sign-off reaches the agent, and the claim shows as paid once it pays", a
     .click();
 
   await expect(page.getByText("Payment in progress.")).toBeVisible();
-  const calls = await request.get("http://127.0.0.1:8003/calls");
-  const paths = (await calls.json()) as string[];
-  expect(paths.filter((path) => path.includes(claimId))).toEqual([
-    `/api/claims/${claimId}/resume`,
-  ]);
+  await expect
+    .poll(async () => {
+      const calls = await request.get("http://127.0.0.1:8003/calls");
+      return ((await calls.json()) as string[]).filter((path) =>
+        path.includes(claimId),
+      );
+    })
+    .toEqual([`/api/claims/${claimId}/resume`]);
 
   await request.post(`/api/claims/${claimId}/payment`, {
     data: { amount: "1200.00" },

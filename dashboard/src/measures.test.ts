@@ -1,8 +1,13 @@
 import { expect, it } from "vitest";
-import { describeAnswer, formatShare } from "./measures";
+import { describeAnswer, formatGrade, formatShare } from "./measures";
 
 it("formats a share as a percentage", () => {
   expect(formatShare(0.96)).toBe("96.0%");
+});
+
+it("formats a grade, or says there is none", () => {
+  expect(formatGrade(1.8)).toBe("1.80");
+  expect(formatGrade(null)).toBe("Not graded");
 });
 
 it("describes an answer with its payout only for an approval", () => {

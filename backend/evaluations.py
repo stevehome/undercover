@@ -4,14 +4,26 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 
-from backend import db, money, runs, scoring, tables, usage
+from backend import db, grading, money, runs, scoring, tables, usage, versions
 from backend.errors import NotFound
 from backend.statuses import ClaimStatus, RunKind
 
 EVALUATION_SET = "evaluation"
 HELD_OUT_SET = "held_out"
+MATCHED = Decimal("0.5")
+
+
+def set_size(eval_set: str) -> int:
+    """Return how many claims a labelled set has."""
+    key = tables.answer_key.c
+    with db.connection() as conn:
+        return conn.execute(
+            select(func.count())
+            .select_from(tables.answer_key)
+            .where(key.eval_set == eval_set)
+        ).scalar_one()
 
 
 def copy_id(run_id: int, source_claim_id: str) -> str:
@@ -20,13 +32,20 @@ def copy_id(run_id: int, source_claim_id: str) -> str:
 
 
 def start_evaluation(
-    eval_set: str, tiny: bool, concurrency: int, model: str, reasoning_effort: str
+    eval_set: str,
+    tiny: bool,
+    concurrency: int,
+    settings: runs.RunSettings,
+    in_round: tuple[int, int] | None = None,
 ) -> dict[str, Any]:
     """Start an evaluation on a set (all of it, or its `tiny` claims).
 
     The set's claims are copied under new ids, as waiting, so that the queue and
-    the agent's work on it never meet.
+    the agent's work on it never meet. An evaluation in a round is given the round
+    and the stretch of the improver's work it belongs to, as (round id, run id).
     """
+    round_id, parent_run_id = in_round or (None, None)
+    versions.get_configuration(settings.configuration_version)
     key = tables.answer_key.c
     source = tables.claims if eval_set == EVALUATION_SET else tables.held_out_claims
     with db.connection() as conn:
@@ -40,8 +59,9 @@ def start_evaluation(
             concurrency=concurrency,
             eval_set=eval_set,
             tiny=tiny,
-            model=model,
-            reasoning_effort=reasoning_effort,
+            round_id=round_id,
+            parent_run_id=parent_run_id,
+            **settings.columns(),
         )
         content = conn.execute(
             select(*[source.c[column.name] for column in tables.CONTENT_COLUMNS])
@@ -75,10 +95,28 @@ def _run_ms(run: dict[str, Any]) -> int | None:
     return span // timedelta(milliseconds=1)
 
 
+def _grade(row: dict[str, Any] | None) -> dict[str, Any]:
+    """A claim's grade from its stored row; none when the judge didn't grade it."""
+    if row is None or not row["graded"]:
+        return {"grade": None, "judge_cost": Decimal(0)}
+    return {
+        "grade": {
+            "score": Decimal(row["score"]),
+            "letter": row["letter"],
+            "same_grounds": Decimal(row["same_grounds"]),
+            "same_section": Decimal(row["same_section"]),
+            "same_grounds_matched": Decimal(row["same_grounds"]) > MATCHED,
+            "same_section_matched": Decimal(row["same_section"]) > MATCHED,
+        },
+        "judge_cost": money.from_nanos(row["cost_nanos"]),
+    }
+
+
 def _claim_rows(run: dict[str, Any]) -> list[dict[str, Any]]:
     """Each claim of an evaluation: the agent's answer beside the handler's."""
     in_run, claims, key = tables.run_claims.c, tables.claims.c, tables.answer_key.c
     totals = usage.claim_totals(run["run_id"])
+    graded = grading.grades(run["run_id"])
     with db.connection() as conn:
         rows = conn.execute(
             select(
@@ -131,6 +169,7 @@ def _claim_rows(run: dict[str, Any]) -> list[dict[str, Any]]:
                 "mistake_cost": scoring.mistake_cost(scored),
                 "cost": claim_total["cost"],
                 "work_ms": claim_total["work_ms"],
+                **_grade(graded.get(row["claim_id"])),
             }
         )
     return result
@@ -151,7 +190,10 @@ def _evaluation(run: dict[str, Any]) -> dict[str, Any]:
     return {
         **run,
         "claims": claims,
-        "measures": scoring.measures(scored, run["cost"], run["work_ms"], _run_ms(run)),
+        "measures": {
+            **scoring.measures(scored, run["cost"], run["work_ms"], _run_ms(run)),
+            **scoring.grade_measures(claims),
+        },
     }
 
 

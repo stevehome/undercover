@@ -1,9 +1,16 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { App } from "./App";
+import { setSignedIn } from "./testAuth";
 import { claimToWire, requestUrl, summaryToWire } from "./testHelpers";
 import type { FetchInput } from "./testHelpers";
-import type { Claim, ClaimSummary, Step } from "./types";
+import type { Claim, ClaimSummary, Handler, Step } from "./types";
+
+vi.mock("./auth", () => import("./testAuth"));
+
+beforeEach(() => {
+  setSignedIn(true);
+});
 
 afterEach(() => {
   cleanup();
@@ -63,7 +70,16 @@ const claim: Claim = {
   customer_previous_claims: [],
 };
 
+const dana: Handler = {
+  handler_id: "HND-01",
+  name: "Dana Whitfield",
+  role: "Senior Claims Handler",
+  email: "dana.whitfield@undercover.example",
+  can_approve_over_limit: true,
+};
+
 function bodyFor(url: string): unknown {
+  if (url === "/api/me") return dana;
   if (url === "/api/claims") return claims.map(summaryToWire);
   if (url.endsWith("/steps")) return [] as Step[];
   return claimToWire(claim);
@@ -89,4 +105,33 @@ it("shows the queue and navigates to a claim", async () => {
   fireEvent.click(screen.getByRole("link", { name: "CLM-1001" }));
 
   expect(await screen.findByText("The story")).toBeDefined();
+});
+
+it("shows who is signed in", async () => {
+  mockFetch();
+  render(<App />);
+
+  expect(await screen.findByText("Dana Whitfield")).toBeDefined();
+});
+
+it("sends a page without a session to sign in", async () => {
+  setSignedIn(false);
+  mockFetch();
+  render(<App />);
+
+  expect(
+    await screen.findByRole("heading", { name: "Sign in to UnderCover" }),
+  ).toBeDefined();
+  expect(screen.queryByText("CLM-1001")).toBeNull();
+});
+
+it("returns to sign-in when the handler signs out", async () => {
+  mockFetch();
+  render(<App />);
+
+  fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
+
+  expect(
+    await screen.findByRole("heading", { name: "Sign in to UnderCover" }),
+  ).toBeDefined();
 });

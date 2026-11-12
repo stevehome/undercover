@@ -1,9 +1,18 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { requestUrl } from "../testHelpers";
 import type { FetchInput } from "../testHelpers";
 import type { Claim, Handler } from "../types";
+import { MeContext } from "../useMe";
 import { PaymentPanel } from "./PaymentPanel";
+
+vi.mock("../auth", () => import("../testAuth"));
 
 afterEach(() => {
   cleanup();
@@ -79,14 +88,20 @@ it("lets a handler sign off an over-limit claim", async () => {
   vi.stubGlobal("fetch", vi.fn(impl));
 
   const claim = makeClaim({ status: "waiting for sign-off" });
-  render(<PaymentPanel claim={claim} onUpdated={() => undefined} />);
+  render(
+    <MeContext.Provider value={handlers[0]}>
+      <PaymentPanel claim={claim} onUpdated={() => undefined} />
+    </MeContext.Provider>,
+  );
 
   const button = await screen.findByRole("button", {
     name: "Sign off as Dana Whitfield",
   });
   fireEvent.click(button);
 
-  expect(calls).toContain("/api/claims/CLM-1003/sign-off");
+  await waitFor(() => {
+    expect(calls).toContain("/api/claims/CLM-1003/sign-off");
+  });
 });
 
 it("shows a signed-off claim as awaiting payment", async () => {
@@ -147,5 +162,24 @@ it("shows no sign-off buttons on an evaluation's copy", () => {
   );
 
   expect(screen.getByText(/never signed off/)).toBeDefined();
+  expect(screen.queryByRole("button")).toBeNull();
+});
+
+it("tells a handler who can't sign off why, and offers no button", () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("[]")));
+  const marcus: Handler = {
+    ...handlers[0],
+    handler_id: "HND-02",
+    name: "Marcus Oyelaran",
+    can_approve_over_limit: false,
+  };
+
+  render(
+    <MeContext.Provider value={marcus}>
+      <PaymentPanel claim={makeClaim({})} onUpdated={() => undefined} />
+    </MeContext.Provider>,
+  );
+
+  expect(screen.getByText(/Marcus Oyelaran can't sign off/)).toBeDefined();
   expect(screen.queryByRole("button")).toBeNull();
 });

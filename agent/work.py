@@ -6,6 +6,8 @@ A referred claim is left for a handler too.
 A claim that was stopped, not failed, carries on and it is not a new attempt.
 A rate limit or a timeout is neither: it is let through for the dispatcher to
 wait and try again, as the same attempt.
+A claim is not started once its run's round has spent its limit or stopped; it
+stays to do, and its evaluation ends stopped.
 """
 
 from decimal import Decimal
@@ -18,6 +20,7 @@ from agent.api import WAITING_FOR_SIGN_OFF
 
 MAX_ATTEMPTS = 2
 BUSY_NOTE = "Being worked by another agent"
+NOT_STARTED = "Not started: the round has spent its limit or is stopped"
 WAIT_AND_RETRY = (ModelRateLimitError, ModelTimeoutError)
 
 
@@ -75,6 +78,8 @@ def work_claim(run_id: int, claim_id: str, decide: Decide) -> str:
     """Decide one claim, keeping its row in the run current, and say what happened."""
     row = next(c for c in api.get_run(run_id)["claims"] if c["claim_id"] == claim_id)
     carrying_on = row["status"] == "in progress"
+    if not carrying_on and not api.may_start_claim(run_id):
+        return NOT_STARTED
     attempts_made = row["attempts"] - carrying_on
     error = row["note"] or ""
     for attempt in range(attempts_made + 1, MAX_ATTEMPTS + 1):

@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
 
 const standIn = "http://127.0.0.1:8003";
@@ -51,7 +52,12 @@ test("the queue page shows a dispatch's claims, cost, time and summary", async (
 }) => {
   const run = (await (
     await request.post("/api/runs/dispatch", {
-      data: { concurrency: 3, model: "stub/model", reasoning_effort: "low" },
+      data: {
+        concurrency: 3,
+        model: "stub/model",
+        reasoning_effort: "low",
+        configuration_version: 1,
+      },
     })
   ).json()) as { run_id: number; claims: { claim_id: string }[] };
   const [first, second] = run.claims.map((claim) => claim.claim_id);

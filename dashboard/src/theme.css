@@ -11,12 +11,19 @@
   --ink: var(--midnight);
 }
 
+/* Dark by the computer's choice, unless the page says light; or dark by the page's. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #04232e;
     --panel: #000000;
     --ink: var(--sea-mist);
   }
+}
+
+:root[data-theme="dark"] {
+  --background: #04232e;
+  --panel: #000000;
+  --ink: var(--sea-mist);
 }
 
 * {
@@ -37,7 +44,7 @@ h3 {
 }
 
 .top-nav {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 1.5rem auto 0;
   padding: 0 2rem;
   display: flex;
@@ -46,7 +53,7 @@ h3 {
 }
 
 .panel {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 2rem auto;
   background: var(--panel);
   border-radius: 16px;
@@ -91,14 +98,6 @@ a {
   font-weight: 600;
 }
 
-.status-badge {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 0.2rem 0.75rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
 button {
   font-family: inherit;
   font-weight: 600;
@@ -117,5 +116,429 @@ pre {
 }
 
 tr.miss td {
-  background: color-mix(in srgb, var(--raspberry) 15%, white);
+  background: color-mix(in srgb, var(--raspberry) 18%, transparent);
+}
+
+.app-header {
+  max-width: 1200px;
+  margin: 1.5rem auto 0;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.app-header .top-nav {
+  margin: 0;
+  padding: 0;
+}
+
+.signed-in {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  font-weight: 600;
+}
+
+.sign-in {
+  max-width: 28rem;
+}
+
+.sign-in form {
+  display: grid;
+  gap: 1rem;
+}
+
+.sign-in label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+th.number,
+td.number {
+  text-align: right;
+}
+
+input:not([type="checkbox"], [type="radio"]),
+select {
+  min-height: 2.25rem;
+  font: inherit;
+  color: inherit;
+  background: var(--background);
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+}
+
+input.number {
+  width: 7rem;
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+fieldset label {
+  display: block;
+  margin: 0.25rem 0;
+}
+
+dialog.confirm {
+  background: var(--panel);
+  color: var(--ink);
+  border: none;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  max-width: 32rem;
+}
+
+dialog.confirm::backdrop {
+  background: color-mix(in srgb, var(--midnight) 60%, transparent);
+}
+
+dialog.confirm .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.diff {
+  margin: 0;
+  padding: 0.5rem 0;
+  border-radius: 8px;
+  background: var(--background);
+  overflow-x: auto;
+}
+
+.diff div {
+  padding: 0 0.75rem;
+  white-space: pre-wrap;
+}
+
+.diff-added {
+  background: color-mix(in srgb, var(--sea-green) 22%, transparent);
+}
+
+.diff-removed {
+  background: color-mix(in srgb, var(--raspberry) 22%, transparent);
+}
+
+.diff-hunk {
+  color: var(--cerulean);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pill-good {
+  background: var(--sea-green);
+  color: var(--midnight);
+}
+
+.pill-wait {
+  background: var(--marigold);
+  color: var(--midnight);
+}
+
+.pill-bad {
+  background: var(--raspberry);
+  color: #ffffff;
+}
+
+.pill-info {
+  background: var(--cerulean);
+  color: #ffffff;
+}
+
+.progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.step {
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.9rem;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.step-done::before {
+  content: "✓ ";
+}
+
+.step-current {
+  background: var(--cerulean);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.step-to-do {
+  opacity: 0.6;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 4rem;
+  margin: 0.5rem 0 1rem;
+  font: inherit;
+  color: inherit;
+  background: var(--background);
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.chart svg {
+  width: 100%;
+  max-width: 640px;
+}
+
+.chart .axis {
+  font-size: 11px;
+  fill: var(--ink);
+}
+
+.chart .gridline {
+  stroke: color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.series-accuracy,
+.mark-accuracy {
+  stroke: var(--sea-green);
+  stroke-width: 2;
+  fill: var(--sea-green);
+}
+
+.series-grade,
+.mark-grade {
+  stroke: var(--cerulean);
+  stroke-width: 2;
+  fill: var(--cerulean);
+}
+
+.series-accuracy,
+.series-grade {
+  fill: none;
+}
+
+/* The same header, spacing and states on every page. */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+}
+
+.page-purpose {
+  margin: 0;
+  max-width: 60rem;
+  opacity: 0.85;
+}
+
+.panel h2 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.top-nav a {
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.top-nav a[aria-current="page"] {
+  border-bottom-color: var(--sea-green);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table.data th,
+table.data td {
+  vertical-align: top;
+}
+
+table.data thead th {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+table.data td.number,
+table.data th.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 12px;
+  background: var(--background);
+}
+
+.load-error {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: 22rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--raspberry);
+  color: #ffffff;
+  z-index: 10;
+}
+
+.pill-alert {
+  background: var(--coral);
+  color: var(--midnight);
+}
+
+/* Fits a laptop screen and narrower. */
+@media (max-width: 720px) {
+  .panel {
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+  }
+
+  .app-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Review fixes: controls, buttons, nav, tables, chart. */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+form label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+button {
+  white-space: nowrap;
+}
+
+button.secondary:disabled {
+  opacity: 0.6;
+}
+
+.signed-in button {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.top-nav a {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border-bottom: none;
+}
+
+.top-nav a[aria-current="page"] {
+  background: var(--midnight);
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .top-nav a:not([aria-current]),
+:root[data-theme="dark"] a {
+  color: #5cc3e4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) a {
+    color: #5cc3e4;
+  }
+
+  :root:not([data-theme="light"]) .top-nav a[aria-current="page"] {
+    background: var(--sea-mist);
+    color: var(--midnight);
+  }
+}
+
+:root[data-theme="dark"] .top-nav a[aria-current="page"] {
+  background: var(--sea-mist);
+  color: var(--midnight);
+}
+
+table.data td {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+table.data td:first-child,
+table.data td.mono,
+table.data td.number {
+  white-space: nowrap;
+}
+
+.diff {
+  margin-bottom: 1.25rem;
+}
+
+.chart {
+  margin: 0;
+}
+
+.chart svg {
+  max-width: 900px;
+}
+
+.sign-in {
+  margin-top: 12vh;
+}
+
+.panel section + section {
+  margin-top: 2rem;
 }

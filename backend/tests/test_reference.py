@@ -28,10 +28,10 @@ def test_policies_and_customers_match_their_files():
 
 def test_handlers_match_their_file():
     assert reference.handlers() == from_file("handlers.json")
-    marcus = reference.handler("HND-02")
+    marcus = reference.handler_by_email("MARCUS.Oyelaran@undercover.example")
     assert marcus
     assert marcus["name"] == "Marcus Oyelaran"
-    assert reference.handler("HND-99") is None
+    assert reference.handler_by_email("nobody@undercover.example") is None
 
 
 def test_plans_and_add_ons_match_their_file():
@@ -43,12 +43,6 @@ def test_plans_and_add_ons_match_their_file():
     assert sorted(reference.deductible_benefits()) == sorted(
         file["deductible_applies_to"]
     )
-
-
-def test_company_settings_match_their_file():
-    for key, value in from_file("company.json").items():
-        assert reference.company_setting(key) == value
-    assert reference.company_setting("payout_approval_limit") == Decimal("1000.00")
 
 
 def test_sections_come_in_the_order_of_the_document():
@@ -73,7 +67,6 @@ def test_sections_come_in_the_order_of_the_document():
         lambda: reference.customer("CUS-9999"),
         lambda: reference.plan("gold"),
         lambda: reference.add_on("jetpack"),
-        lambda: reference.company_setting("nothing"),
         lambda: reference.sections("diary"),
         lambda: reference.section("policy_wording", "Nothing"),
     ],

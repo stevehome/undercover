@@ -4,6 +4,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Column,
+    Float,
     Index,
     Integer,
     MetaData,
@@ -188,14 +189,19 @@ runs = Table(
     Column("reasoning_effort", String, nullable=False),
     Column("started_on", String, nullable=False),
     Column("finished_on", String),
+    Column("configuration_version", Integer),
+    Column("round_id", Integer),
+    Column("parent_run_id", Integer),
 )
 
+# Only one dispatch, evaluation or stretch of the improver's work runs at a time.
+# An evaluation inside a stretch has a parent and is never refused because of it.
 Index(
     "one_running_run",
     runs.c.status,
     unique=True,
-    sqlite_where=text("status = 'running'"),
-    postgresql_where=text("status = 'running'"),
+    sqlite_where=text("status = 'running' AND parent_run_id IS NULL"),
+    postgresql_where=text("status = 'running' AND parent_run_id IS NULL"),
 )
 
 run_claims = Table(
@@ -250,4 +256,120 @@ answer_key = Table(
     Column("tiny", Boolean, nullable=False),
     Column("decision", String, nullable=False),
     Column("payout_cents", Integer, nullable=False),
+    Column("reason", String, nullable=False),
+    Column("reference", String, nullable=False),
+)
+
+claim_grades = Table(
+    "claim_grades",
+    metadata,
+    Column("run_id", Integer, primary_key=True),
+    Column("claim_id", String, primary_key=True),
+    Column("graded", Boolean, nullable=False),
+    Column("score", String),
+    Column("letter", String),
+    Column("same_grounds", String),
+    Column("same_section", String),
+    Column("cost_nanos", Integer, nullable=False),
+)
+
+setting_changes = Table(
+    "setting_changes",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("key", String, nullable=False),
+    Column("old_value", String, nullable=False),
+    Column("new_value", String, nullable=False),
+    Column("changed_by", String, nullable=False),
+    Column("changed_on", String, nullable=False),
+)
+
+models = Table(
+    "models",
+    metadata,
+    Column("model", String, primary_key=True),
+    Column("position", Integer, nullable=False),
+    Column("reasoning_efforts", JSON, nullable=False),
+    Column("input_price_per_million", Float, nullable=False),
+    Column("output_price_per_million", Float, nullable=False),
+)
+
+
+def _version_columns() -> list[Column]:
+    """The columns every version of a configuration or a recipe has."""
+    return [
+        Column("version", Integer, primary_key=True),
+        Column("reason", String, nullable=False),
+        Column("proposed_by", String, nullable=False),
+        Column("approved_by", String),
+        Column("approved_on", String),
+        Column("round_id", Integer),
+        Column("verdict", String),
+        Column("verdict_reason", String),
+        Column("created_on", String, nullable=False),
+    ]
+
+
+configurations = Table(
+    "configurations",
+    metadata,
+    Column("instructions", String, nullable=False),
+    Column("model", String, nullable=False),
+    Column("reasoning_effort", String, nullable=False),
+    *_version_columns(),
+)
+
+recipes = Table(
+    "recipes",
+    metadata,
+    Column("text", String, nullable=False),
+    *_version_columns(),
+)
+
+rounds = Table(
+    "rounds",
+    metadata,
+    Column("round_id", Integer, primary_key=True, autoincrement=True),
+    Column("stage", String, nullable=False),
+    Column("progress", Integer, nullable=False),
+    Column("thread_id", String, nullable=False),
+    Column("recipe_version", Integer, nullable=False),
+    Column("settings", JSON, nullable=False),
+    Column("started_by", String, nullable=False),
+    Column("started_on", String, nullable=False),
+    Column("finished_on", String),
+    Column("configuration_version", Integer),
+    Column("improver_reason", String),
+    Column("held_out_before", JSON),
+    Column("held_out_after", JSON),
+    Column("verdict", String),
+    Column("verdict_reason", String),
+)
+
+proposals = Table(
+    "proposals",
+    metadata,
+    Column("proposal_id", Integer, primary_key=True, autoincrement=True),
+    Column("round_id", Integer, nullable=False),
+    Column("kind", String, nullable=False),
+    Column("content", JSON, nullable=False),
+    Column("reason", String, nullable=False),
+    Column("status", String, nullable=False),
+    Column("created_on", String, nullable=False),
+    Column("decided_by", String),
+    Column("decided_on", String),
+    Column("rejection_reason", String),
+    Column("version", Integer),
+)
+
+improver_calls = Table(
+    "improver_calls",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("round_id", Integer, nullable=False),
+    Column("model", String, nullable=False),
+    Column("input_tokens", Integer, nullable=False),
+    Column("output_tokens", Integer, nullable=False),
+    Column("total_tokens", Integer, nullable=False),
+    Column("cost_nanos", Integer, nullable=False),
 )

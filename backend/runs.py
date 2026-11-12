@@ -2,12 +2,29 @@
 
 from typing import Any
 
+from pydantic import BaseModel
 from sqlalchemy import Connection, and_, func, insert, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
-from backend import db, money, tables, usage
+from backend import db, grading, money, tables, usage, versions
 from backend.errors import Conflict, NotFound
-from backend.statuses import ClaimStatus, ItemStatus, RunKind, RunStatus
+from backend.statuses import ClaimStatus, ItemStatus, RunKind, RunStatus, Stage
+
+
+class RunSettings(BaseModel):
+    """What a run works to: the model, its reasoning effort and the version."""
+
+    model: str
+    reasoning_effort: str
+    configuration_version: int
+
+    def columns(self) -> dict[str, Any]:
+        """Return the run's columns for these settings."""
+        return {
+            "model": self.model,
+            "reasoning_effort": self.reasoning_effort,
+            "configuration_version": self.configuration_version,
+        }
 
 
 class RunAlreadyGoing(Conflict):
@@ -155,18 +172,16 @@ def insert_run_claims(
         )
 
 
-def create_dispatch(
-    concurrency: int, model: str, reasoning_effort: str
-) -> dict[str, Any]:
+def create_dispatch(concurrency: int, settings: RunSettings) -> dict[str, Any]:
     """Start a dispatch of every claim in progress and every waiting claim."""
+    versions.get_configuration(settings.configuration_version)
     claim_ids = _claims_to_dispatch()
     with db.connection() as conn:
         run_id = insert_run(
             conn,
             kind=RunKind.DISPATCH,
             concurrency=concurrency,
-            model=model,
-            reasoning_effort=reasoning_effort,
+            **settings.columns(),
         )
         insert_run_claims(conn, run_id, [(claim_id, None) for claim_id in claim_ids])
     return get_run(run_id)
@@ -191,20 +206,48 @@ def update_run_claim(
 
 
 def finish_run(run_id: int) -> dict[str, Any]:
-    """Finish a run."""
-    get_run(run_id)
+    """Finish a run; an evaluation's claims are graded first.
+
+    A run with claims never started, because its round spent its limit or stopped,
+    ends as stopped, and is not graded.
+    """
+    run = get_run(run_id)
+    cut_short = run["round_id"] is not None and any(
+        claim["status"] == ItemStatus.TO_DO for claim in run["claims"]
+    )
+    if run["kind"] == RunKind.EVALUATION and not cut_short:
+        grading.grade_evaluation(run_id)
     with db.connection() as conn:
         conn.execute(
             update(tables.runs)
             .where(tables.runs.c.run_id == run_id)
-            .values(status=RunStatus.FINISHED, finished_on=db.now())
+            .values(
+                status=RunStatus.STOPPED if cut_short else RunStatus.FINISHED,
+                finished_on=db.now(),
+            )
         )
     return get_run(run_id)
 
 
 def stop_unfinished_runs() -> int:
-    """Mark every run still running as stopped, and say how many there were."""
+    """Mark every run still running as stopped, and say how many there were.
+
+    A round whose stretch of work was running is stopped with it. One waiting for a
+    handler is not: it carries on from its saved progress.
+    """
     with db.connection() as conn:
+        conn.execute(
+            update(tables.rounds)
+            .where(
+                tables.rounds.c.round_id.in_(
+                    select(tables.runs.c.round_id).where(
+                        tables.runs.c.status == RunStatus.RUNNING,
+                        tables.runs.c.kind == RunKind.IMPROVER,
+                    )
+                )
+            )
+            .values(stage=Stage.STOPPED, finished_on=db.now())
+        )
         stopped = conn.execute(
             update(tables.runs)
             .where(tables.runs.c.status == RunStatus.RUNNING)

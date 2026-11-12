@@ -30,8 +30,8 @@ def notify_sign_off(claim_id: str) -> None:
         )
 
 
-def _start(path: str, body: dict[str, Any]) -> int:
-    """Ask the agent to start a run; return its id.
+def _start(path: str, body: dict[str, Any], key: str = "run_id") -> int:
+    """Ask the agent to start a run, a round or a decision; return the id it names.
 
     Raises Conflict while a run is going and ServiceUnavailable if the agent is down.
     """
@@ -42,7 +42,7 @@ def _start(path: str, body: dict[str, Any]) -> int:
     if response.status_code == httpx.codes.CONFLICT:
         raise Conflict(response.json()["detail"])
     response.raise_for_status()
-    return response.json()["run_id"]
+    return response.json()[key]
 
 
 def start_dispatch(concurrency: int) -> int:
@@ -54,3 +54,24 @@ def start_evaluation(concurrency: int, eval_set: str, tiny: bool) -> int:
     """Ask the agent to start an evaluation on a labelled set."""
     body = {"concurrency": concurrency, "eval_set": eval_set, "tiny": tiny}
     return _start("/api/evaluations", body)
+
+
+def start_round(handler_id: str) -> int:
+    """Ask the agent to start an improvement round; return the round's id."""
+    return _start("/api/rounds", {"handler_id": handler_id}, "round_id")
+
+
+def decide_proposal(
+    proposal_id: int, decision: str, handler_id: str, reason: str
+) -> int:
+    """Ask the agent to record a handler's decision on a proposal and carry on."""
+    body = {"decision": decision, "handler_id": handler_id, "reason": reason}
+    return _start(f"/api/proposals/{proposal_id}/decision", body, "proposal_id")
+
+
+def stop_round(round_id: int) -> None:
+    """Tell the agent a round is stopped, so it starts no more claims or calls."""
+    try:
+        _post(f"/api/rounds/{round_id}/stop")
+    except httpx.HTTPError:
+        logger.warning("The agent could not be told round %s is stopped", round_id)

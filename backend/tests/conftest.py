@@ -9,10 +9,10 @@ from backend.main import app
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
-    """A TestClient against a fresh, temporary claim database."""
+def client(tmp_path, monkeypatch, as_handler):
+    """A TestClient against a fresh, temporary claim database, signed in as Dana."""
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
-    return TestClient(app)
+    return TestClient(app, headers=as_handler())
 
 
 class AgentStub(BaseHTTPRequestHandler):
@@ -29,7 +29,7 @@ class AgentStub(BaseHTTPRequestHandler):
         status, body = (
             (409, {"detail": "A run is already going"})
             if self.refuse
-            else (202, {"run_id": 5})
+            else (202, {"run_id": 5, "round_id": 5, "proposal_id": 5})
         )
         self.send_response(status)
         self.send_header("Content-Type", "application/json")

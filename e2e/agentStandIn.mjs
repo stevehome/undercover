@@ -22,6 +22,6 @@ createServer((request, response) => {
     calls.push(request.url);
     bodies.push(text ? JSON.parse(text) : null);
     response.statusCode = 202;
-    response.end(JSON.stringify({ run_id: 1 }));
+    response.end(JSON.stringify({ run_id: 1, round_id: 1, proposal_id: 1 }));
   });
 }).listen(8003, "127.0.0.1");

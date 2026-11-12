@@ -36,7 +36,7 @@ def test_a_section_is_the_wording_in_the_file(client):
 
 def test_only_handlers_who_can_sign_off_are_listed(client):
     handlers = client.get("/api/handlers").json()
-    assert [h["handler_id"] for h in handlers] == ["HND-01", "HND-02", "HND-03"]
+    assert [h["handler_id"] for h in handlers] == ["HND-01"]
 
 
 def test_a_claim_comes_with_its_policy_and_the_customers_history(client):

@@ -17,6 +17,7 @@ class RunKind(StrEnum):
 
     DISPATCH = "dispatch"
     EVALUATION = "evaluation"
+    IMPROVER = "improver"
 
 
 class RunStatus(StrEnum):
@@ -35,3 +36,38 @@ class ItemStatus(StrEnum):
     DONE = "done"
     LEFT_FOR_A_HANDLER = "left for a handler"
     STILL_IN_PROGRESS = "still in progress"
+
+
+class Verdict(StrEnum):
+    """What a round decided about the version it tried."""
+
+    KEPT = "kept"
+    ROLLED_BACK = "rolled back"
+
+
+class Stage(StrEnum):
+    """Where an improvement round has got to."""
+
+    FIRST_EVALUATIONS = "first evaluations"
+    IMPROVER_WORKING = "improver working"
+    CHANGE_WAITING = "change waiting"
+    EVALUATIONS = "evaluations"
+    VERDICT = "verdict"
+    RECIPE_WAITING = "recipe waiting"
+    FINISHED = "finished"
+    STOPPED = "stopped"
+
+
+class ProposalKind(StrEnum):
+    """What the improver proposes: a new configuration or a new recipe."""
+
+    CHANGE = "change"
+    RECIPE = "recipe"
+
+
+class ProposalStatus(StrEnum):
+    """Where a proposal stands; nothing it proposes counts until it is approved."""
+
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"

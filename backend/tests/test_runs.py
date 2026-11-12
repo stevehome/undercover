@@ -1,6 +1,11 @@
 import pytest
 
-DISPATCH = {"concurrency": 3, "model": "stub/model", "reasoning_effort": "low"}
+DISPATCH = {
+    "concurrency": 3,
+    "model": "stub/model",
+    "reasoning_effort": "low",
+    "configuration_version": 1,
+}
 
 
 def dispatch(client, **changes):
@@ -39,7 +44,7 @@ def test_a_dispatch_takes_an_approval_a_restart_left_unpaid(client):
     decide(client, "CLM-1001", "420.00")
     decide(client, "CLM-1002", "1200.00")
     decide(client, "CLM-1003", "1200.00")
-    client.post("/api/claims/CLM-1003/sign-off", json={"handler_id": "HND-01"})
+    client.post("/api/claims/CLM-1003/sign-off")
 
     claims = [c["claim_id"] for c in dispatch(client).json()["claims"]]
 

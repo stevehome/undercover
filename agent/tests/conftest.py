@@ -4,7 +4,7 @@ from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import api
+from agent import api, backend_http
 from backend.main import app
 
 REPLY_USAGE = {
@@ -30,8 +30,20 @@ def backend(tmp_path, monkeypatch):
     """Point the agent at the backend in-process, on a throwaway database."""
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
     client = TestClient(app)
-    monkeypatch.setattr(api, "client", client)
+    monkeypatch.setattr(backend_http, "client", client)
     return client
+
+
+STUB_MODEL = api.ModelUsed(
+    model="stub/model", reasoning_effort="low", configuration_version=1
+)
+
+
+def new_run() -> int:
+    """Create a dispatch with no claims to work, and finish it, so a claim has a run."""
+    run_id = api.create_dispatch(1, STUB_MODEL)
+    api.finish_run(run_id)
+    return run_id
 
 
 @pytest.fixture

@@ -73,9 +73,7 @@ def test_sign_off_then_pay(client):
             "policy_reference": "Section 7",
         },
     )
-    sign_off = client.post(
-        "/api/claims/CLM-1001/sign-off", json={"handler_id": "HND-01"}
-    )
+    sign_off = client.post("/api/claims/CLM-1001/sign-off")
     assert sign_off.status_code == 200
     signed = sign_off.json()
     assert signed["status"] == "in progress"
@@ -90,9 +88,7 @@ def test_sign_off_then_pay(client):
 
 
 def test_sign_off_when_not_waiting_is_blocked(client):
-    response = client.post(
-        "/api/claims/CLM-1001/sign-off", json={"handler_id": "HND-01"}
-    )
+    response = client.post("/api/claims/CLM-1001/sign-off")
     assert response.status_code == 409
 
 
@@ -156,7 +152,7 @@ def test_the_same_decision_twice_is_done_once(client):
 
 def test_a_signed_off_claim_cannot_be_decided_differently(client):
     decide(client, "1200.00")
-    client.post("/api/claims/CLM-1001/sign-off", json={"handler_id": "HND-01"})
+    client.post("/api/claims/CLM-1001/sign-off")
 
     assert decide(client, "1100.00").status_code == 409
     assert decide(client, "0.00", decision="decline").status_code == 409
@@ -164,10 +160,9 @@ def test_a_signed_off_claim_cannot_be_decided_differently(client):
 
 def test_the_same_sign_off_twice_is_done_once(client):
     decide(client, "1200.00")
-    body = {"handler_id": "HND-01"}
-    first = client.post("/api/claims/CLM-1001/sign-off", json=body).json()
+    first = client.post("/api/claims/CLM-1001/sign-off").json()
 
-    second = client.post("/api/claims/CLM-1001/sign-off", json=body)
+    second = client.post("/api/claims/CLM-1001/sign-off")
 
     assert second.status_code == 200
     assert second.json()["signed_off_on"] == first["signed_off_on"]
@@ -212,7 +207,7 @@ def test_record_step_moves_claim_in_progress_and_lists_in_order(client):
 def test_a_sign_off_tells_the_agent_once_after_it_is_saved(client, agent_stub):
     decide(client, "1200.00")
 
-    client.post("/api/claims/CLM-1001/sign-off", json={"handler_id": "HND-01"})
+    client.post("/api/claims/CLM-1001/sign-off")
 
     assert agent_stub.calls == ["/api/claims/CLM-1001/resume"]
 
@@ -220,9 +215,7 @@ def test_a_sign_off_tells_the_agent_once_after_it_is_saved(client, agent_stub):
 def test_the_sign_off_stands_when_the_agent_is_unreachable(client):
     decide(client, "1200.00")
 
-    response = client.post(
-        "/api/claims/CLM-1001/sign-off", json={"handler_id": "HND-01"}
-    )
+    response = client.post("/api/claims/CLM-1001/sign-off")
 
     assert response.status_code == 200
     assert client.get("/api/claims/CLM-1001").json()["signed_off_by"] == "HND-01"

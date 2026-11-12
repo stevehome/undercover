@@ -2,8 +2,10 @@ import { useCallback, useState } from "react";
 import { useParams } from "react-router";
 import { fetchClaim, fetchSteps, runAgent } from "../api";
 import { LoadError } from "../components/LoadError";
+import { Loading } from "../components/Loading";
+import { PageHeader } from "../components/PageHeader";
 import { PaymentPanel } from "../components/PaymentPanel";
-import { StatusBadge } from "../components/StatusBadge";
+import { StatusPill } from "../components/StatusPill";
 import { formatMoney } from "../money";
 import type { Claim, Step } from "../types";
 import { usePolling } from "../usePolling";
@@ -24,15 +26,23 @@ export function ClaimPage() {
   const failed = usePolling(load, claim?.status !== "decided");
 
   if (!claim) {
-    return <main className="panel">{failed ? <LoadError /> : "Loading…"}</main>;
+    return (
+      <main className="panel">{failed ? <LoadError /> : <Loading />}</main>
+    );
   }
 
   return (
     <main className="panel">
-      <h1>
-        <span className="mono">{claim.claim_id}</span>{" "}
-        <StatusBadge status={claim.status} />
-      </h1>
+      <PageHeader
+        title={
+          <>
+            <span className="mono">{claim.claim_id}</span>{" "}
+            <StatusPill status={claim.status} />
+          </>
+        }
+      >
+        {claim.summary}
+      </PageHeader>
       {failed && <LoadError />}
 
       {claim.status === "waiting" && (

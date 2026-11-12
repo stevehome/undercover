@@ -146,9 +146,6 @@ def sign_off(claim_id: str, handler_id: str) -> dict[str, Any]:
         return row
     if row["status"] != ClaimStatus.WAITING_FOR_SIGN_OFF:
         raise Conflict("Claim is not waiting for sign-off")
-    handler = reference.handler(handler_id)
-    if handler is None or not handler["can_approve_over_limit"]:
-        raise Conflict("This handler cannot sign off this claim")
     with db.connection() as conn:
         conn.execute(
             update(tables.claims)

@@ -8,11 +8,10 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 
-from agent import api, checkpoint, lease, timing, tracing
+from agent import api, checkpoint, harness, lease, timing, tracing
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
-from agent.harness import model
 
 
 def decide_claim(
@@ -23,7 +22,9 @@ def decide_claim(
 ) -> str:
     """Work a claim through its graph: from the start, or from where it stopped.
 
-    `run_id` is the run the work and its cost are recorded with, if any.
+    `run_id` is the run the work and its cost are recorded with, if any. The
+    claim agent is built from the run's version of the configuration, or from the
+    current version when there is no run.
 
     It runs in a fresh context, so a claim worked in a dispatch has a trace of
     its own, tagged with the run.
@@ -40,18 +41,34 @@ def decide_claim(
         claim = api.get_claim(claim_id)
         thread_id = f"{claim_id}-{claim['thread']}"
         saver = checkpointer or checkpoint.saver()
-        graph = build_graph(saver, llm or model(), api.claim_instructions())
-        outcome = Context().run(_work_traced, graph, claim, thread_id, run_id)
+        configuration = (
+            api.current_configuration()
+            if run_id is None
+            else api.run_configuration(run_id)
+        )
+        llm = llm or harness.model(harness.model_settings(configuration))
+        graph = build_graph(saver, llm, configuration["instructions"])
+        tags = _tags(run_id, configuration["round_id"])
+        outcome = Context().run(_work_traced, graph, claim, thread_id, run_id, tags)
         if claim["evaluation_run_id"] is not None:
             saver.delete_thread(thread_id)
         return outcome
 
 
+def _tags(run_id: int | None, round_id: int | None) -> list[str]:
+    """The tags that find a run's claims together, and a round's as well."""
+    run_tags = [] if run_id is None else [f"run-{run_id}"]
+    return [*run_tags, *([] if round_id is None else [f"round-{round_id}"])]
+
+
 def _work_traced(
-    graph: Any, claim: dict[str, Any], thread_id: str, run_id: int | None
+    graph: Any,
+    claim: dict[str, Any],
+    thread_id: str,
+    run_id: int | None,
+    tags: list[str],
 ) -> str:
     """Work a claim in a trace of its own, in one Langfuse session."""
-    tags = [] if run_id is None else [f"run-{run_id}"]
     with tracing.trace(thread_id, tags) as traced:
         config: RunnableConfig = {**traced, "configurable": {"thread_id": thread_id}}
         return _work(graph, config, claim, run_id)

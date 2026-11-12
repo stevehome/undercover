@@ -34,3 +34,25 @@ it("shows each claim with the handler's answer beside the agent's, and the misse
     screen.getByRole("link", { name: "CLM-1102" }).getAttribute("href"),
   ).toBe("/claims/EVAL-7-CLM-1102");
 });
+
+it("shows each claim's grade and the two checks, and the judge's cost", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => Promise.resolve(new Response(JSON.stringify(wireEvaluation)))),
+  );
+
+  render(
+    <MemoryRouter initialEntries={["/evaluations/7"]}>
+      <Routes>
+        <Route path="/evaluations/:runId" element={<EvaluationPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+
+  const graded = (await screen.findByText("CLM-1101")).closest("tr");
+  const notGraded = screen.getByText("CLM-1102").closest("tr");
+  expect(graded?.textContent).toContain("B (2.10)YesNo");
+  expect(notGraded?.textContent).toContain("Not graded");
+  expect(screen.getByText("1.80")).toBeDefined();
+  expect(screen.getByText("$0.0001")).toBeDefined();
+});

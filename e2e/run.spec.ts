@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
 
 const standIn = "http://127.0.0.1:8003";
@@ -27,6 +28,7 @@ test("the scoreboard shows an evaluation played out through the API", async ({
         tiny: true,
         model: "stub/model",
         reasoning_effort: "low",
+        configuration_version: 1,
       },
     })
   ).json()) as { run_id: number; claims: { claim_id: string }[] };
@@ -48,9 +50,11 @@ test("the scoreboard shows an evaluation played out through the API", async ({
   const row = page.getByRole("row", { name: /The held-out set, tiny/ });
   await expect(row).toContainText("finished");
   await expect(row).toContainText("%");
+  await expect(row).toContainText("2.10");
   for (const heading of [
     "Decision accuracy",
     "Accuracy",
+    "Grade",
     "Cost of mistakes",
     "Straight through",
     "Model cost per claim",
@@ -65,6 +69,9 @@ test("the scoreboard shows an evaluation played out through the API", async ({
   await row.getByRole("link").click();
   await expect(page.getByRole("heading", { name: /Evaluation/ })).toBeVisible();
   await expect(page.getByRole("row", { name: /decline/ })).toHaveCount(5);
+  await expect(
+    page.getByRole("row", { name: /decline/ }).first(),
+  ).toContainText("B (2.10)YesYes");
   const copy = run.claims[0].claim_id;
   await page.goto(`/claims/${copy}`);
   await expect(page.getByRole("button", { name: /Sign off/ })).toHaveCount(0);
@@ -75,6 +82,7 @@ test("the queue is as it was after an evaluation", async ({
   request,
 }) => {
   await page.goto("/");
+  await expect(page.getByRole("link", { name: "CLM-1001" })).toBeVisible();
   const before = await page.getByRole("row").count();
 
   const run = (await (
@@ -85,6 +93,7 @@ test("the queue is as it was after an evaluation", async ({
         tiny: false,
         model: "stub/model",
         reasoning_effort: "low",
+        configuration_version: 1,
       },
     })
   ).json()) as { run_id: number };

@@ -1,17 +1,16 @@
-"""The agent's only way to the UnderCover backend.
+"""The claim agent's way to the UnderCover backend: one function for each operation.
 
-One client, and one function for each operation the agents use.
+It has no operation for the scores, the handlers' decisions or the rounds.
 """
 
-import os
 from decimal import Decimal
 from http import HTTPStatus
 from typing import Annotated, Any, Literal
 
-import httpx
 from pydantic import BaseModel, Field
 
-BACKEND_URL = os.environ.get("UNDERCOVER_BACKEND", "http://localhost:8000")
+from agent import backend_http
+from agent.backend_http import call as _call
 
 Document = Literal["policy_wording", "claims_manual"]
 Decision = Literal["approve", "decline", "refer"]
@@ -65,30 +64,22 @@ class Line(BaseModel):
     )
 
 
-client = httpx.Client(base_url=BACKEND_URL, timeout=10)
+class ModelUsed(BaseModel):
+    """What a run works to: the model, its reasoning effort and the version."""
+
+    model: str
+    reasoning_effort: str
+    configuration_version: int
 
 
-class ApiRefusal(Exception):  # noqa: N818 - a refusal, not a failure
-    """The backend refused a request; the message says why, for the model to read."""
-
-    def __init__(self, status_code: int, detail: str) -> None:
-        super().__init__(f"{status_code}: {detail}")
-        self.status_code = status_code
-        self.detail = detail
+def current_configuration() -> dict[str, Any]:
+    """Return the current version: its instructions, model and reasoning effort."""
+    return _call("GET", "/api/configuration/current")
 
 
-def _call(method: str, path: str, **kwargs: Any) -> Any:
-    response = client.request(method, path, **kwargs)
-    if response.is_client_error:
-        detail = response.json().get("detail", response.text)
-        raise ApiRefusal(response.status_code, str(detail))
-    response.raise_for_status()
-    return response.json()
-
-
-def claim_instructions() -> str:
-    """Return the instructions for deciding one claim."""
-    return _call("GET", "/api/claim-instructions")["instructions"]
+def run_configuration(run_id: int) -> dict[str, Any]:
+    """Return the version a run works to: its instructions, model and effort."""
+    return _call("GET", f"/api/runs/{run_id}/configuration")
 
 
 def list_claims() -> list[dict[str, Any]]:
@@ -165,7 +156,9 @@ def record_work_segment(
 
 def acquire_lease(claim_id: str, owner: str) -> int | None:
     """Lease a claim, or renew the lease: its length in seconds, or None if held."""
-    response = client.post(f"/api/claims/{claim_id}/lease", json={"owner": owner})
+    response = backend_http.client.post(
+        f"/api/claims/{claim_id}/lease", json={"owner": owner}
+    )
     if response.status_code == HTTPStatus.CONFLICT:
         return None
     response.raise_for_status()
@@ -195,28 +188,28 @@ def requeue_claim(claim_id: str) -> None:
     _call("POST", f"/api/claims/{claim_id}/requeue")
 
 
-def create_dispatch(concurrency: int, model: str, reasoning_effort: str) -> int:
+def create_dispatch(concurrency: int, model: ModelUsed) -> int:
     """Start a dispatch of the claims to work; return the run's id."""
-    body = {
-        "concurrency": concurrency,
-        "model": model,
-        "reasoning_effort": reasoning_effort,
-    }
+    body = {"concurrency": concurrency, **model.model_dump()}
     return _call("POST", "/api/runs/dispatch", json=body)["run_id"]
 
 
 def create_evaluation(
-    concurrency: int, eval_set: str, tiny: bool, model: str, reasoning_effort: str
+    concurrency: int, eval_set: str, tiny: bool, model: ModelUsed
 ) -> int:
     """Start an evaluation on a labelled set; return the run's id."""
     body = {
         "concurrency": concurrency,
         "eval_set": eval_set,
         "tiny": tiny,
-        "model": model,
-        "reasoning_effort": reasoning_effort,
+        **model.model_dump(),
     }
     return _call("POST", "/api/runs/evaluation", json=body)["run_id"]
+
+
+def may_start_claim(run_id: int) -> bool:
+    """Say whether a run may start another claim; a round's limit can say no."""
+    return _call("GET", f"/api/runs/{run_id}/may-start-claim")["may_start"]
 
 
 def get_run(run_id: int) -> dict[str, Any]:

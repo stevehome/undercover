@@ -1,6 +1,7 @@
 """The starting records: reads `data/` into rows for the tables."""
 
 import json
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -8,7 +9,7 @@ from typing import Any
 from sqlalchemy import Table
 
 from backend import money, tables
-from backend.statuses import ClaimStatus
+from backend.statuses import ClaimStatus, Verdict
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DOCUMENTS = {"policy_wording": "policy_wording.md", "claims_manual": "claims_manual.md"}
@@ -68,10 +69,31 @@ def _answer_key_rows() -> list[dict[str, Any]]:
             "tiny": answer["tiny"],
             "decision": answer["decision"],
             "payout_cents": money.to_cents(answer["payout"]),
+            "reason": answer["reason"],
+            "reference": answer["reference"],
         }
         for eval_set, filename in files.items()
         for answer in _load_json(filename)
     ]
+
+
+def _model_rows() -> list[dict[str, Any]]:
+    """The models allowed, in file order, with prices as plain numbers."""
+    models = json.loads((DATA_DIR / "models.json").read_text())
+    return [{**model, "position": position} for position, model in enumerate(models)]
+
+
+def _first_version(**content: str) -> dict[str, Any]:
+    """Version 1 of the configuration or the recipe: kept, from the starting files."""
+    return {
+        "version": 1,
+        "reason": "The starting version",
+        "proposed_by": "seed",
+        "verdict": Verdict.KEPT,
+        "verdict_reason": "The starting version",
+        "created_on": datetime.now(UTC).isoformat(),
+        **content,
+    }
 
 
 def records() -> dict[Table, list[dict[str, Any]]]:
@@ -80,7 +102,19 @@ def records() -> dict[Table, list[dict[str, Any]]]:
     return {
         tables.settings: [
             {"key": key, "value": value}
-            for key, value in _load_json("company.json").items()
+            for name in ("company.json", "improvement.json")
+            for key, value in _load_json(name).items()
+        ],
+        tables.models: _model_rows(),
+        tables.configurations: [
+            _first_version(
+                instructions=(DATA_DIR / "claim_instructions.md").read_text(),
+                model="openai/gpt-6-luna",
+                reasoning_effort="low",
+            )
+        ],
+        tables.recipes: [
+            _first_version(text=(DATA_DIR / "improver_recipe.md").read_text())
         ],
         tables.plans: [money.cents_columns(plan) for plan in plan_data["plans"]],
         tables.add_ons: [

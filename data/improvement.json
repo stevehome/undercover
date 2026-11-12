@@ -1,0 +1,14 @@
+{
+  "objective_accuracy": 0.6,
+  "objective_grade": 1.0,
+  "noise_accuracy": 0.1,
+  "noise_grade": 0.15,
+  "noise_cost_per_claim": 0.15,
+  "noise_seconds_per_claim": 0.15,
+  "tolerance_accuracy": 0.1,
+  "tolerance_grade": 0.15,
+  "tolerance_cost_per_claim": 1.0,
+  "tolerance_seconds_per_claim": 0.25,
+  "round_spending_limit": 0.5,
+  "improver_agents_at_once": 25
+}

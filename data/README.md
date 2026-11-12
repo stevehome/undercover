@@ -6,11 +6,14 @@ The data behind UnderCover Travel Insurance, a fictional insurer. Everything her
 
 The backend loads these files into its database the first time it starts, and `npm run seed` loads them again from scratch. After that the database is the source: a change to a file shows only after a reseed, which also resets every claim.
 
-- `company.json`: company settings, including the $1,000 payout approval limit.
+- `company.json`: company settings, including the $1,000 payout approval limit (the starting value of a setting a handler can change).
+- `improvement.json`: the starting values of the improvement settings: the business objectives, the noise and tolerance, the spending limit for each round and how many claim agents work at once in a round's evaluations.
+- `models.json`: the models the claim agent may use, with their reasoning efforts and prices per million tokens. It is read only on the Settings page.
+- `claim_instructions.md` and `improver_recipe.md`: version 1 of the claim agent's configuration and of the improver's recipe.
 - `plans.json`: the three plans (Economy, Premium, First) with their limits, waiting periods and deductibles, and the three add-ons.
 - `policies.json`: one policy per trip, with the plan, the add-ons, the purchase date, the trip and the travelers.
 - `customers.json`: contact details and claim history, with the date and a one line summary of each earlier claim. This is personal data.
-- `handlers.json`: the claims handlers.
+- `handlers.json`: the claims handlers and their email addresses, which are their sign-ins. Only Dana Whitfield can sign off payouts over the limit, start or stop a round, approve or reject the improver's proposals and change a setting.
 - `claims.json`: the claims queue, twenty-five claims. Each has the customer's story, the items claimed and the supporting documents as text.
 
 ## The documents

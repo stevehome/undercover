@@ -48,6 +48,8 @@ export const wireEvaluation = {
     model_cost_per_claim: "0.000624000",
     seconds_per_claim: "27.900",
     run_seconds: "30.000",
+    grade: "1.800",
+    judge_cost: "0.000080000",
   },
   claims: [
     {
@@ -64,6 +66,15 @@ export const wireEvaluation = {
       mistake_cost: "0.00",
       cost: "0.000624000",
       work_ms: 27900,
+      grade: {
+        score: "2.100",
+        letter: "B",
+        same_grounds: "0.9300",
+        same_section: "0.1200",
+        same_grounds_matched: true,
+        same_section_matched: false,
+      },
+      judge_cost: "0.000040000",
     },
     {
       claim_id: "EVAL-7-CLM-1102",
@@ -79,6 +90,8 @@ export const wireEvaluation = {
       mistake_cost: "1500.00",
       cost: "0.000624000",
       work_ms: 10000,
+      grade: null,
+      judge_cost: "0.000000000",
     },
   ],
 };

@@ -20,11 +20,13 @@ def decision(kind="approve", payout="420.00"):
     )
 
 
-def sign_off(backend):
-    return backend.post(f"/api/claims/{CLAIM}/sign-off", json={"handler_id": "HND-01"})
+def sign_off(backend, as_handler):
+    return backend.post(f"/api/claims/{CLAIM}/sign-off", headers=as_handler())
 
 
-def test_an_approval_over_the_limit_waits_then_is_paid_once(backend, script, saver):
+def test_an_approval_over_the_limit_waits_then_is_paid_once(
+    backend, script, saver, as_handler
+):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Approved."), saver)
 
     waiting = api.get_claim(CLAIM)
@@ -32,7 +34,7 @@ def test_an_approval_over_the_limit_waits_then_is_paid_once(backend, script, sav
     assert waiting["paid_amount"] is None
     assert "waiting for a handler" in agents.decide_claim(CLAIM, script(), saver)
 
-    sign_off(backend)
+    sign_off(backend, as_handler)
     assert api.get_claim(CLAIM)["paid_amount"] is None
     agents.decide_claim(CLAIM, script(), saver)
 

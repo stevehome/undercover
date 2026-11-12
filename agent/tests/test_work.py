@@ -19,7 +19,12 @@ def item(backend):
 
 @pytest.fixture
 def run_id():
-    return api.create_dispatch(1, "stub/model", "low")
+    return api.create_dispatch(
+        1,
+        api.ModelUsed(
+            model="stub/model", reasoning_effort="low", configuration_version=1
+        ),
+    )
 
 
 def test_retries_once_then_succeeds(backend, run_id):
@@ -121,3 +126,25 @@ def test_a_held_approval_is_done_and_says_it_waits(backend, run_id):
 
     assert item(backend)["status"] == "done"
     assert item(backend)["note"] == "Approved $2,000.00, waiting for sign-off"
+
+
+def test_a_claim_is_not_started_once_the_rounds_limit_is_spent(
+    backend, run_id, monkeypatch
+):
+    monkeypatch.setattr(api, "may_start_claim", lambda run_id: False)
+    started = []
+
+    def decide(claim_id, *, run_id):
+        started.append(claim_id)
+        return "Decided."
+
+    note = work.work_claim(run_id, "CLM-1001", decide)
+
+    assert note == work.NOT_STARTED
+    assert started == []
+    assert item(backend)["status"] == "to do"
+    assert item(backend)["attempts"] == 0
+
+
+def test_a_claim_in_a_run_with_no_round_may_start(backend, run_id):
+    assert api.may_start_claim(run_id) is True

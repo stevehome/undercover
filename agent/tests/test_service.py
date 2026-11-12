@@ -5,9 +5,11 @@ from agent import agents, api, checkpoint, service
 from agent.tests.test_claim_graph import CLAIM, decision, sign_off
 
 
-def test_the_service_carries_on_with_a_signed_off_claim(backend, script, saver):
+def test_the_service_carries_on_with_a_signed_off_claim(
+    backend, script, saver, as_handler
+):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
-    sign_off(backend)
+    sign_off(backend, as_handler)
     service.app.dependency_overrides[service.claim_worker] = lambda: (
         lambda claim_id: agents.decide_claim(claim_id, script(), saver)
     )
@@ -69,7 +71,12 @@ def test_a_second_start_is_refused_while_a_run_is_going(backend, started):
 
 def test_starting_the_service_stops_runs_that_were_going(backend, started, monkeypatch):
     monkeypatch.setattr(checkpoint, "saver", lambda: None)
-    run_id = api.create_dispatch(1, "stub/model", "low")
+    run_id = api.create_dispatch(
+        1,
+        api.ModelUsed(
+            model="stub/model", reasoning_effort="low", configuration_version=1
+        ),
+    )
 
     with TestClient(service.app):
         pass
@@ -94,3 +101,103 @@ def test_an_evaluation_starts_on_its_set_and_is_refused_while_a_run_is_going(
     )
     assert started == [(run["run_id"], 5)]
     assert client.post("/api/evaluations", json=body).status_code == 409
+
+
+@pytest.fixture
+def stretches():
+    """Replace a round's work with a stand-in that records the stretches it is given."""
+    given = []
+    service.app.dependency_overrides[service.round_worker] = lambda: (
+        lambda round_id, run_id, resume: given.append((round_id, run_id, resume))
+    )
+    yield given
+    service.app.dependency_overrides.clear()
+
+
+def test_starting_a_round_answers_at_once_and_works_it_in_the_background(
+    backend, stretches
+):
+    response = TestClient(service.app).post(
+        "/api/rounds", json={"handler_id": "HND-01"}
+    )
+
+    assert response.status_code == 202
+    [(round_id, run_id, resume)] = stretches
+    assert response.json() == {"round_id": round_id}
+    assert resume is None
+    stretch = api.get_run(run_id)
+    assert (stretch["kind"], stretch["status"], stretch["round_id"]) == (
+        "improver",
+        "running",
+        round_id,
+    )
+
+
+def test_a_second_round_is_refused_while_a_run_is_going(backend, stretches):
+    client = TestClient(service.app)
+    client.post("/api/rounds", json={"handler_id": "HND-01"})
+
+    second = client.post("/api/rounds", json={"handler_id": "HND-01"})
+
+    assert second.status_code == 409
+    assert len(stretches) == 1
+
+
+def propose(backend, stretches):
+    """Start a round and have it propose a change, as the improver's stretch does."""
+    client = TestClient(service.app)
+    client.post("/api/rounds", json={"handler_id": "HND-01"})
+    round_id, run_id, _ = stretches[0]
+    backend.post(f"/api/runs/{run_id}/finish")
+    change = {
+        "instructions": "New.\n",
+        "model": "openai/gpt-6-luna",
+        "reasoning_effort": "low",
+    }
+    proposal = backend.post(
+        f"/api/improver/rounds/{round_id}/proposals",
+        json={"kind": "change", "content": change, "reason": "A rule."},
+    ).json()
+    return client, proposal["proposal_id"]
+
+
+def test_a_decision_is_recorded_before_the_improver_is_resumed(backend, stretches):
+    client, proposal_id = propose(backend, stretches)
+
+    response = client.post(
+        f"/api/proposals/{proposal_id}/decision",
+        json={"decision": "reject", "handler_id": "HND-01", "reason": "Too long."},
+    )
+
+    assert response.status_code == 202
+    proposal = backend.get(f"/api/proposals/{proposal_id}").json()
+    assert (proposal["status"], proposal["rejection_reason"]) == (
+        "rejected",
+        "Too long.",
+    )
+    [_, (round_id, run_id, resume)] = stretches
+    assert resume["decisions"][0]["type"] == "reject"
+    assert "Too long." in resume["decisions"][0]["message"]
+    assert api.get_run(run_id)["round_id"] == round_id
+
+
+def test_a_decision_while_a_run_is_going_is_refused_and_records_nothing(
+    backend, stretches
+):
+    client, proposal_id = propose(backend, stretches)
+    api.create_dispatch(
+        1,
+        api.ModelUsed(
+            model="stub/model", reasoning_effort="low", configuration_version=1
+        ),
+    )
+
+    response = client.post(
+        f"/api/proposals/{proposal_id}/decision",
+        json={"decision": "approve", "handler_id": "HND-01", "reason": ""},
+    )
+
+    assert response.status_code == 409
+    assert backend.get(f"/api/proposals/{proposal_id}").json()["status"] == "pending"
+    assert len(backend.get("/api/configurations").json()) == 1
+    assert len(stretches) == 1

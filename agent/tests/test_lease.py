@@ -46,7 +46,12 @@ def test_an_agent_leaves_a_claim_another_agent_is_working(backend):
 
 
 def test_a_run_item_for_a_claim_worked_elsewhere_is_done(backend):
-    run_id = api.create_dispatch(1, "stub/model", "low")
+    run_id = api.create_dispatch(
+        1,
+        api.ModelUsed(
+            model="stub/model", reasoning_effort="low", configuration_version=1
+        ),
+    )
     api.acquire_lease("CLM-1001", "someone-else")
 
     outcome = work.work_claim(run_id, "CLM-1001", agents.decide_claim)

@@ -142,6 +142,20 @@ export interface Measures {
   model_cost_per_claim_nanos: number;
   seconds_per_claim: number;
   run_seconds: number | null;
+  /** The judge's average grade from 0 to 3; null when no claim was graded. */
+  grade: number | null;
+  /** The judge's cost, in whole billionths of a dollar. */
+  judge_cost_nanos: number;
+}
+
+export interface ClaimGrade {
+  score: number;
+  letter: "A" | "B" | "C" | "F";
+  /** The two checks as probabilities from 0 to 1, and whether each matched. */
+  same_grounds: number;
+  same_section: number;
+  same_grounds_matched: boolean;
+  same_section_matched: boolean;
 }
 
 export interface EvaluationClaim {
@@ -158,6 +172,9 @@ export interface EvaluationClaim {
   mistake_cost: number;
   cost_nanos: number;
   work_ms: number;
+  /** The judge's grade of the agent's explanation; null when not graded. */
+  grade: ClaimGrade | null;
+  judge_cost_nanos: number;
 }
 
 export interface Evaluation {
@@ -172,4 +189,132 @@ export interface Evaluation {
   finished_on: string | null;
   measures: Measures;
   claims: EvaluationClaim[];
+}
+
+export interface Setting {
+  key: string;
+  label: string;
+  group: string;
+  unit: string;
+  value: string;
+  maximum: string;
+  changed_by: string | null;
+  changed_on: string | null;
+}
+
+export interface AllowedModel {
+  model: string;
+  reasoning_efforts: string[];
+  input_price_per_million: number;
+  output_price_per_million: number;
+}
+
+export type Verdict = "kept" | "rolled back";
+
+/** Averages of a version's whole-set evaluations that rounds ran on it. */
+export interface Scores {
+  runs: number;
+  /** A share from 0 to 1; null when there is no run. */
+  accuracy: number | null;
+  /** From 0 to 3; null when no claim was graded. */
+  grade: number | null;
+  /** Whole billionths of a dollar. */
+  cost_per_claim_nanos: number | null;
+  seconds_per_claim: number | null;
+}
+
+export interface Configuration {
+  version: number;
+  instructions: string;
+  model: string;
+  reasoning_effort: string;
+  reason: string;
+  proposed_by: string;
+  approved_by: string | null;
+  approved_on: string | null;
+  round_id: number | null;
+  verdict: Verdict | null;
+  verdict_reason: string | null;
+  created_on: string;
+  held_out: Scores;
+}
+
+export interface Recipe {
+  version: number;
+  text: string;
+  reason: string;
+  proposed_by: string;
+  approved_by: string | null;
+  verdict: Verdict | null;
+  created_on: string;
+}
+
+export interface DiffLine {
+  kind: "added" | "removed" | "context" | "hunk";
+  text: string;
+}
+
+export interface ConfigurationDiff {
+  version: number;
+  from_version: number | null;
+  lines: DiffLine[];
+  model_before: string | null;
+  model_after: string;
+  reasoning_effort_before: string | null;
+  reasoning_effort_after: string;
+}
+
+export type Stage =
+  | "first evaluations"
+  | "improver working"
+  | "change waiting"
+  | "evaluations"
+  | "verdict"
+  | "recipe waiting"
+  | "finished"
+  | "stopped";
+
+export type ProposalStatus = "pending" | "approved" | "rejected";
+
+export interface Proposal {
+  proposal_id: number;
+  round_id: number;
+  kind: "change" | "recipe";
+  status: ProposalStatus;
+  reason: string;
+  created_on: string;
+  decided_by: string | null;
+  decided_on: string | null;
+  rejection_reason: string | null;
+  version: number | null;
+  from_version: number;
+  lines: DiffLine[];
+  /** Only a change has the model and effort before and after. */
+  model_before?: string;
+  model_after?: string;
+  reasoning_effort_before?: string;
+  reasoning_effort_after?: string;
+}
+
+export interface Round {
+  round_id: number;
+  stage: Stage;
+  /** 1, 2 or 3 of 3 in the stages that count evaluations. */
+  progress: number;
+  recipe_version: number;
+  settings: Record<string, string>;
+  started_by_name: string;
+  started_on: string;
+  finished_on: string | null;
+  configuration_version: number | null;
+  improver_reason: string | null;
+  held_out_before: Scores | null;
+  held_out_after: Scores | null;
+  verdict: Verdict | null;
+  verdict_reason: string | null;
+  /** Whole billionths of a dollar. */
+  cost_nanos: number;
+  /** Whole cents. */
+  spending_limit: number;
+  proposals: Proposal[];
 }

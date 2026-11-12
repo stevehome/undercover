@@ -4,10 +4,13 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-AGENT_MODULES = [p for p in (ROOT / "agent").glob("*.py") if p.name != "api.py"]
+BACKEND_CLIENTS = {"api.py", "backend_http.py", "improver_api.py"}
+AGENT_MODULES = [
+    p for p in (ROOT / "agent").glob("*.py") if p.name not in BACKEND_CLIENTS
+]
 
 
-def test_only_api_module_talks_http():
+def test_only_the_clients_talk_http():
     """service.py is the agent's own web entry point: its routes are not calls."""
     for path in AGENT_MODULES:
         tree = ast.parse(path.read_text())
@@ -91,7 +94,14 @@ def test_only_seed_data_reads_the_data_folder():
             assert '"data"' not in path.read_text(), path.name
 
 
-ANSWER_KEY_READERS = {"tables.py", "seed_data.py", "evaluations.py", "scoring.py"}
+ANSWER_KEY_READERS = {
+    "tables.py",
+    "seed_data.py",
+    "evaluations.py",
+    "scoring.py",
+    "grading.py",
+    "improver_view.py",
+}
 
 
 def test_only_seeding_opens_the_evals_folder():
@@ -123,3 +133,32 @@ def test_only_agents_builds_the_claim_graph():
         if path.name not in ("agents.py", "claim_graph.py"):
             assert "claim_graph" not in _imported_modules(path), path.name
             assert "build_graph" not in path.read_text(), path.name
+
+
+def _paths(path):
+    return [
+        node.value
+        for node in ast.walk(ast.parse(path.read_text()))
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and node.value.startswith("/api/")
+    ]
+
+
+def test_the_claim_agents_client_cant_reach_the_scores_or_the_rounds():
+    """The scores, the handlers' reasons and the rounds are the improver's client's."""
+    forbidden = ("/api/improver", "/api/rounds", "/api/proposals", "/api/settings")
+    for path in _paths(ROOT / "agent" / "api.py"):
+        assert not path.startswith(forbidden), path
+        assert not path.startswith("/api/evaluations"), path
+    names = ast.parse((ROOT / "agent" / "api.py").read_text())
+    functions = {n.name for n in ast.walk(names) if isinstance(n, ast.FunctionDef)}
+    assert not {f for f in functions if "score" in f or "view" in f or "round" in f}
+
+
+def test_only_the_improvers_client_calls_the_improvers_operations():
+    for client in BACKEND_CLIENTS - {"improver_api.py"}:
+        assert not any(
+            p.startswith("/api/improver") for p in _paths(ROOT / "agent" / client)
+        ), client
+    assert _paths(ROOT / "agent" / "improver_api.py")

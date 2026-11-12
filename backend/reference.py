@@ -17,12 +17,6 @@ def _one(table: Table, key: Column[Any], value: str) -> dict[str, Any]:
     return dict(row._mapping)
 
 
-def company_setting(key: str) -> Any:
-    """Return a company setting, with any money in it as `Decimal` dollars."""
-    value = _one(tables.settings, tables.settings.c.key, key)["value"]
-    return money.convert({key: value})[key]
-
-
 def plan(name: str) -> dict[str, Any]:
     """Return a plan with its limits as `Decimal` dollars."""
     return money.dollar_fields(_one(tables.plans, tables.plans.c.plan, name))
@@ -65,9 +59,9 @@ def approvers() -> list[dict[str, Any]]:
     return [h for h in handlers() if h["can_approve_over_limit"]]
 
 
-def handler(handler_id: str) -> dict[str, Any] | None:
-    """Return the handler with this id, or None."""
-    return next((h for h in handlers() if h["handler_id"] == handler_id), None)
+def handler_by_email(email: str) -> dict[str, Any] | None:
+    """Return the handler with this email address, or None."""
+    return next((h for h in handlers() if h["email"].lower() == email.lower()), None)
 
 
 def sections(document: str) -> dict[str, str]:

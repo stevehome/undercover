@@ -14,7 +14,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 
 from agent import claim_nodes
-from agent.api import ApiRefusal
+from agent.backend_http import ApiRefusal
 from agent.claim_state import ClaimState
 from agent.contexts import ClaimContext
 from agent.tools import CLAIM_TOOLS

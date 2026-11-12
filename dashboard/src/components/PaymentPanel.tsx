@@ -3,6 +3,32 @@ import { fetchHandlers, signOffClaim } from "../api";
 import { formatMoney } from "../money";
 import { formatTime } from "../time";
 import type { Claim, Handler } from "../types";
+import { useMe } from "../useMe";
+
+function SignOff({
+  claimId,
+  onUpdated,
+}: Readonly<{ claimId: string; onUpdated: () => void }>) {
+  const me = useMe();
+  if (me?.can_approve_over_limit) {
+    return (
+      <button
+        onClick={() => {
+          void signOffClaim(claimId).then(onUpdated);
+        }}
+        type="button"
+      >
+        Sign off as {me.name}
+      </button>
+    );
+  }
+  return (
+    <p>
+      {me?.name ?? "You"} can't sign off this payout: only a handler who can
+      sign off payouts over the limit can.
+    </p>
+  );
+}
 
 export function PaymentPanel({
   claim,
@@ -28,20 +54,8 @@ export function PaymentPanel({
     return (
       <section>
         <h2>Sign off</h2>
-        <p>This payout is over the $1,000 approval limit.</p>
-        {handlers.map((handler) => (
-          <button
-            key={handler.handler_id}
-            onClick={() => {
-              void signOffClaim(claim.claim_id, handler.handler_id).then(
-                onUpdated,
-              );
-            }}
-            type="button"
-          >
-            Sign off as {handler.name}
-          </button>
-        ))}
+        <p>This payout is over the approval limit.</p>
+        <SignOff claimId={claim.claim_id} onUpdated={onUpdated} />
       </section>
     );
   }

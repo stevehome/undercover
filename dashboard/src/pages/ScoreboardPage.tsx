@@ -1,8 +1,12 @@
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import { fetchEvaluations, startEvaluation } from "../api";
+import { DataTable } from "../components/DataTable";
+import { EmptyState } from "../components/EmptyState";
 import { LoadError } from "../components/LoadError";
-import { formatShare } from "../measures";
+import { StatusPill } from "../components/StatusPill";
+import { PageHeader } from "../components/PageHeader";
+import { formatGrade, formatShare } from "../measures";
 import { formatCost, formatMoney } from "../money";
 import { formatDuration, formatTime } from "../time";
 import type { EvalSet, Evaluation } from "../types";
@@ -93,20 +97,25 @@ function Row({ evaluation }: Readonly<{ evaluation: Evaluation }>) {
         {SETS.find(([value]) => value === evaluation.eval_set)?.[1]}
         {evaluation.tiny ? ", tiny" : ""}
       </td>
-      <td>{evaluation.concurrency}</td>
+      <td className="number">{evaluation.concurrency}</td>
       <td>
         {evaluation.model}, effort {evaluation.reasoning_effort}
       </td>
-      <td>{evaluation.status}</td>
-      <td>{formatShare(measures.decision_accuracy)}</td>
-      <td>{formatShare(measures.accuracy)}</td>
-      <td className="mono">{formatMoney(measures.cost_of_mistakes)}</td>
-      <td>{formatShare(measures.straight_through)}</td>
-      <td className="mono">
+      <td>
+        <StatusPill status={evaluation.status} />
+      </td>
+      <td className="number">{formatShare(measures.decision_accuracy)}</td>
+      <td className="number">{formatShare(measures.accuracy)}</td>
+      <td className="number">{formatGrade(measures.grade)}</td>
+      <td className="number mono">{formatMoney(measures.cost_of_mistakes)}</td>
+      <td className="number">{formatShare(measures.straight_through)}</td>
+      <td className="number mono">
         {formatCost(measures.model_cost_per_claim_nanos)}
       </td>
-      <td>{formatDuration(measures.seconds_per_claim * 1000)}</td>
-      <td>
+      <td className="number">
+        {formatDuration(measures.seconds_per_claim * 1000)}
+      </td>
+      <td className="number">
         {measures.run_seconds === null
           ? "–"
           : formatDuration(measures.run_seconds * 1000)}
@@ -126,26 +135,30 @@ export function ScoreboardPage() {
 
   return (
     <main className="panel">
-      <h1>The scoreboard</h1>
+      <PageHeader title="The scoreboard">
+        How the claim agent does on the two labelled sets, with the handlers'
+        decisions as the answer key.
+      </PageHeader>
       {failed && <LoadError />}
 
       <StartEvaluation onStarted={() => void load()} />
 
-      <table>
+      <DataTable>
         <thead>
           <tr>
             <th>Started</th>
             <th>Set</th>
-            <th>At once</th>
+            <th className="number">At once</th>
             <th>Model</th>
             <th>Status</th>
-            <th>Decision accuracy</th>
-            <th>Accuracy</th>
-            <th>Cost of mistakes</th>
-            <th>Straight through</th>
-            <th>Model cost per claim</th>
-            <th>Time per claim</th>
-            <th>Run time</th>
+            <th className="number">Decision accuracy</th>
+            <th className="number">Accuracy</th>
+            <th className="number">Grade</th>
+            <th className="number">Cost of mistakes</th>
+            <th className="number">Straight through</th>
+            <th className="number">Model cost per claim</th>
+            <th className="number">Time per claim</th>
+            <th className="number">Run time</th>
           </tr>
         </thead>
         <tbody>
@@ -153,7 +166,12 @@ export function ScoreboardPage() {
             <Row key={evaluation.run_id} evaluation={evaluation} />
           ))}
         </tbody>
-      </table>
+      </DataTable>
+      {evaluations?.length === 0 && (
+        <EmptyState>
+          No evaluations yet. Choose a set above and start one.
+        </EmptyState>
+      )}
     </main>
   );
 }

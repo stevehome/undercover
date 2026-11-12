@@ -11,6 +11,7 @@ EVALUATION = {
     "tiny": True,
     "model": "stub/model",
     "reasoning_effort": "low",
+    "configuration_version": 1,
 }
 
 
@@ -66,7 +67,12 @@ def test_a_dispatch_never_carries_on_a_copy(client):
 
     dispatch = client.post(
         "/api/runs/dispatch",
-        json={"concurrency": 1, "model": "m", "reasoning_effort": "low"},
+        json={
+            "concurrency": 1,
+            "model": "m",
+            "reasoning_effort": "low",
+            "configuration_version": 1,
+        },
     ).json()
 
     assert all(not c["claim_id"].startswith("EVAL-") for c in dispatch["claims"])
@@ -83,9 +89,7 @@ def test_a_copy_cannot_be_signed_off(client):
     }
     client.post(f"/api/claims/{copy}/decision", json=body)
 
-    response = client.post(
-        f"/api/claims/{copy}/sign-off", json={"handler_id": "HND-01"}
-    )
+    response = client.post(f"/api/claims/{copy}/sign-off")
 
     assert response.status_code == 409
 
@@ -185,7 +189,12 @@ def test_the_evaluations_list_newest_first(client):
 def test_a_dispatch_is_not_an_evaluation(client):
     run = client.post(
         "/api/runs/dispatch",
-        json={"concurrency": 1, "model": "m", "reasoning_effort": "low"},
+        json={
+            "concurrency": 1,
+            "model": "m",
+            "reasoning_effort": "low",
+            "configuration_version": 1,
+        },
     ).json()
 
     assert client.get(f"/api/evaluations/{run['run_id']}").status_code == 404
