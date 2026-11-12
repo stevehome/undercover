@@ -46,6 +46,19 @@ def test_retries_once_then_succeeds(backend, run_id):
     assert item(backend)["attempts"] == 2
 
 
+def test_a_failed_attempts_reason_stays_on_the_claim(backend, run_id):
+    def decide(claim_id, run_id):
+        if api.get_claim(claim_id)["thread"] == 1:
+            raise RuntimeError("the model stalled")
+        api.decide_claim(claim_id, **DECISION)
+        return "Approved for $100.00."
+
+    work.work_claim(run_id, "CLM-1001", decide)
+
+    steps = backend.get("/api/claims/CLM-1001/steps").json()
+    assert "The attempt failed: the model stalled" in [step["text"] for step in steps]
+
+
 def test_leaves_for_a_handler_after_two_failures(backend, run_id):
     def decide(claim_id, run_id):
         api.record_step(claim_id, "started")

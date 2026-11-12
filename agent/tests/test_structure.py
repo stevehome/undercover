@@ -4,10 +4,8 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-BACKEND_CLIENTS = {"api.py", "backend_http.py", "improver_api.py"}
-AGENT_MODULES = [
-    p for p in (ROOT / "agent").glob("*.py") if p.name not in BACKEND_CLIENTS
-]
+HTTP_CLIENTS = {"api.py", "backend_http.py", "deadline.py", "improver_api.py"}
+AGENT_MODULES = [p for p in (ROOT / "agent").glob("*.py") if p.name not in HTTP_CLIENTS]
 
 
 def test_only_the_clients_talk_http():
@@ -157,7 +155,7 @@ def test_the_claim_agents_client_cant_reach_the_scores_or_the_rounds():
 
 
 def test_only_the_improvers_client_calls_the_improvers_operations():
-    for client in BACKEND_CLIENTS - {"improver_api.py"}:
+    for client in HTTP_CLIENTS - {"improver_api.py"}:
         assert not any(
             p.startswith("/api/improver") for p in _paths(ROOT / "agent" / client)
         ), client

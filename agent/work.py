@@ -46,8 +46,10 @@ def _attempt(
     except Exception as error:  # noqa: BLE001 - any failure sends the claim back
         if api.get_claim(claim_id)["decision"] is not None:
             return None
+        reason = " ".join(str(error).split())
+        api.record_step(claim_id, f"The attempt failed: {reason}")
         api.requeue_claim(claim_id)
-        return " ".join(str(error).split())
+        return reason
     return None
 
 

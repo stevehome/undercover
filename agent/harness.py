@@ -10,9 +10,13 @@ from typing import Any
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
+from agent import deadline
+
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 NO_EFFORT = "default"
 MODEL_TIMEOUT_SECONDS = 120
+MODEL_DEADLINE_SECONDS = 120
+MODEL_RETRIES = 1
 IMPROVER_MODEL = "openai/gpt-6-luna"
 IMPROVER_EFFORT = "medium"
 IMPROVER_TIMEOUT_SECONDS = 300
@@ -47,6 +51,8 @@ def model(settings: ModelSettings) -> ChatOpenAI:
             else settings.reasoning_effort
         ),
         timeout=MODEL_TIMEOUT_SECONDS,
+        max_retries=MODEL_RETRIES,
+        http_client=deadline.client(MODEL_DEADLINE_SECONDS),
     )
 
 
