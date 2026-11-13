@@ -148,26 +148,39 @@ The margin is about ±3.4 points, so none of the gaps between the first three ro
 
 ### What it showed
 
-1. **The model does the task reasonably well without help.** It reaches the ombudsman's outcome about 76% of the time from the full complaint and 72% with the firm's concessions removed, against 51% for guessing.
+1. **The model does the task reasonably well without help.** It reaches the ombudsman's outcome about 75% of the time from the full complaint and 72% with the firm's concessions removed, against 51% for guessing.
 2. **The firm's own concessions are a small part of it.** Stripping them cost about 4 points.
 3. **Nothing we added helped.** Rules distilled from past decisions and similar past cases both matched the plain model to within 2 points. A hand-written rules file, tried only on the first pass, looked worse there, but that gap is not trustworthy and it was not rerun on the larger set.
 4. **Similar-looking complaints barely share outcomes.** A majority vote of the five nearest training outcomes scored 56.8% (stripped) and 54.5% (full text), a few points above guessing.
 5. **Upheld cases are the weak spot.** With no rules the model caught 199 of 337 upheld cases and 319 of 346 not-upheld ones (full text). About 40% of upheld complaints are missed, and only about 8% of not-upheld ones are wrongly upheld. Rules and similar cases did not fix that.
 6. **The big insurers do not skew the result.** Two sister firms make up 37% of the cases. Full-text accuracy was 76% for them and 76% for all other firms.
 
+### The improver loop on the plain outcome
+
+The loop (`data/ombudsman/improve_loop.py`) learned only from the 207 training decisions and scored the 683 held-out cases once, at the end.
+
+- **Sweep.** Six model and effort pairs from `data/models.json`, scored on the training set. GPT-6 Luna at low effort scored highest (76.7%, upheld recall 61%), with Luna medium (76.2%) and DeepSeek V4.1 Flash low (75.2%) close behind and Gemini Flash Lite at 70%. Differences among the top three are within noise.
+- **Prompt rounds.** Five times, GPT-6 Luna at medium effort read a sample of the missed cases (mostly upheld ones) and rewrote the instructions. A rewrite was kept only if its mean over two runs beat the incumbent's by at least 3 points. The incumbent scored 75.2%. The rewrites scored 74.3%, 73.5%, 76.7%, 73.5% and 76.0%, so **none was kept**.
+- **Held-out comparison.** The winner was the starting setup, so the comparison is two runs of the same prompt: 74.5% and 75.0%, with upheld recall 56% and 57%. They disagreed on 65 of 683 cases (34 against 31), a sign test p of 0.80.
+- **Noise.** One run of the same setup varies by about 4 points on the 207 training cases, and about 1 case in 10 flips between two runs on the held-out set. The first loop attempt used a 2-point bar on single runs, which was below this noise, and was replaced before any result was kept.
+- **Cost.** About $2 of model spend for the full run.
+
+**Reading.** Changing the model, the effort and the instructions did not move accuracy off about 75%, and neither did rules or similar cases. One possible reason, which is untested, is that the outcome depends on evidence the complaint text does not hold, such as the policy wording or the insurer's correspondence, so about three in four may be close to what the text alone supports. The loop's reach was also narrow: three models, instruction rewrites only, and no policy documents given to the agent.
+
 ### Limits
 
 - **Memorisation is only partly tested.** These decisions are public, so the model may have seen some. A probe on the first 296 decisions gave the model only a reference number, firm and date and asked for the outcome. It scored 48.3% (chance on a balanced set), answering "not upheld" 88% of the time, while the firm's usual outcome alone scored 64.2%. So the model does not recall outcomes by reference. The probe does not rule out recognising a complaint from its full text, and only one model was probed. On the 683 cases, full-text accuracy was lowest for 2024 decisions (70%) and higher for 2025 (78%) and 2026 (80%), the opposite of what memorising older decisions would give. The model was released a week after the newest decision, so no case is clearly newer than its training.
 - **Margin.** At 683 cases a gain of less than about 4 points cannot be told from noise.
-- **One model, one prompt.** No other models, efforts or prompt wordings were tried.
+- **Narrow search.** Three models and instruction rewrites were tried. A larger model, giving the agent the policy documents, and changes to how it reads the complaint were not.
+- **Run-to-run variation.** Identical runs differ by 0.5 to 1.5 points on the held-out set (74.5%, 75.0% and 75.8% for the same no-rules setup), so quote about 75% and not a decimal.
 - **Complaint wording.** The cases are reconstructed from the decision's own account of the facts, written by the ombudsman after the event, so they are cleaner than a real inbound complaint.
 - **One sector.** Only travel insurance was tested.
 
 ### What it means for the product
 
-The plain outcome is not solved: about a quarter of decisions are wrong and 40% of upheld complaints are missed. But the obvious ways to improve it, more rules text and similar past cases, did not move the number. Two things follow.
+The plain outcome is not solved: about a quarter of decisions are wrong and about 40% of upheld complaints are missed. But rules text, similar past cases and an improver loop over the model, effort and prompt all left it at about 75%. Two things follow.
 
-- **It is a usable target for the improver loop.** There is headroom, and 683 cases can show a gain of about 4 points. What the improver should vary is not "add rules" but the prompt, the model and its reasoning effort, and how the agent reads the complaint.
+- **The plain outcome is a weak target for the improver.** On this text it did not find a gain, and a result that cannot be improved cannot show the loop working. A task whose answer is in the text, or where the agent is given more evidence, would be a better test.
 - **The outcome alone is probably not the product.** The value would be in what a decision needs around it:
   - the redress amount and interest,
   - which rule or term decides the case,
@@ -178,17 +191,17 @@ These need richer labels than upheld or not, and the decisions contain them (the
 
 ### Next steps, in order
 
-1. **Try the improver loop on the plain outcome.** Use the 207 training decisions as the working set and the 683 as the held-out set, and see whether any change to the prompt, model or effort beats about 76% by more than the margin. Start with the missed upheld cases.
-2. **A harder target.** Predict the redress amount or the deciding rule from the decision text.
+1. **Test whether the evidence is the limit.** Give the model the policy wording for the case, which the complaint text lacks, and see whether accuracy moves above 75%. If it does, the product is about assembling evidence and not about the model.
+2. **A harder target.** Predict the redress amount or the deciding rule from the decision text, and run the improver loop on that.
 3. **Content memorisation check.** The reference-number probe found no recall. The remaining test is to rerun on decisions published well after a model's training cutoff, which needs a model released before a batch of new decisions.
-4. **Another sector.** Repeat on a second product type to see whether 76% is specific to travel.
+4. **Another sector.** Repeat on a second product type to see whether 75% is specific to travel.
 
-Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py` and `memorisation.py`. `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
+Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py`, `memorisation.py` and `improve_loop.py`. `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
 
 ## Recommendation
 
-1. **Build idea 1 (financial complaints) as the second product, aimed at more than the plain outcome.** It has the strongest public labels, the closest decision shape, and a buyer who already pays people to do this by hand. A plain model gets about three in four outcomes right, so there is room to improve, and richer targets such as redress and the deciding rule are where the product value lies.
+1. **Build idea 1 (financial complaints) as the second product, aimed at more than the plain outcome.** It has the strongest public labels, the closest decision shape, and a buyer who already pays people to do this by hand. A plain model gets about three in four outcomes right, but nothing we tried moved it, so the product value is more likely in the evidence given to the model and in richer targets such as redress and the deciding rule.
 2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up**, since it shares the travel domain and gives a clear weather-linked story.
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
-The first step for idea 1 has been done (see above): a plain model reaches about 76% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. The next step is the improver loop on this task, and then a plan in `docs/PLAN_<NAME>.md` if it beats the baseline.
+The first step for idea 1 has been done (see above): a plain model reaches about 75% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. An improver loop over the model, effort and prompt did not beat it. The next steps are to test whether giving the model the policy wording lifts accuracy, and to aim at redress and the deciding rule, and then to write a plan in `docs/PLAN_<NAME>.md` if either shows a gain.
