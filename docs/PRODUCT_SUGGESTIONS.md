@@ -155,7 +155,7 @@ With 87 cases the margin is about ±8 points, so differences of a few points mea
 
 ### Limits
 
-- **Memorisation is untested.** These decisions are public, so the model may have seen some. Accuracy on 2026 cases matched older ones (88% against 84% to 91%), which is only mildly reassuring because we don't know the model's training cutoff.
+- **Memorisation is only partly tested.** These decisions are public, so the model may have seen some. A probe gave the model only a decision's reference number, firm and date, and asked for the outcome. It scored 48.3% on all 296 decisions (chance on a balanced set), answering "not upheld" 88% of the time, while the firm's usual outcome alone scored 64.2%. So the model does not recall outcomes by reference, and the 83% to 87% is not explained by the firm's name. The probe does not rule out recognising a complaint from its full text, and only one model was probed. Accuracy on 2026 cases matched older ones (88% against 84% to 91%), and the model was released a week after the newest decision, so no case is clearly newer than its training.
 - **Small held-out set.** 87 cases cannot show a gain of less than about 8 points.
 - **One model, one prompt.** No other models, efforts or prompt wordings were tried.
 - **Dominant firms.** One insurer is in 64 of the 300 decisions, and scores by firm are too small to read.
@@ -174,11 +174,11 @@ Those need richer labels than upheld or not, and the decisions contain them (the
 
 ### Next steps, in order
 
-1. **Memorisation check.** Rerun on decisions published after a model's known training cutoff, or on a model with an earlier cutoff. If accuracy falls on newer cases, the 83% is flattered.
+1. **Content memorisation check.** The reference-number probe found no recall (see Limits). The remaining test is to rerun on decisions published well after a model's training cutoff, which needs a model released before a batch of new decisions. If accuracy falls on those, the 83% is flattered.
 2. **A larger held-out set.** Pull more decisions across sectors, so a gain of a few points can be told from noise.
 3. **A harder target.** Predict the redress amount or the deciding rule from the decision text, and use it to give the improver rounds something to improve on. The improver loop needs a task where the plain model leaves room.
 
-Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py` and `similar.py` (each takes `--strip`, and the first takes `--rules FILE`).
+Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py` and `memorisation.py`. `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
 
 ## Recommendation
 
@@ -186,4 +186,4 @@ Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rule
 2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up**, since it shares the travel domain and gives a clear weather-linked story.
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
-The first step for idea 1 has been done (see above): a baseline from complaint text alone reaches about 83% against 55% for guessing. The next step is the memorisation check and a harder target, and then a plan in `docs/PLAN_<NAME>.md` if those hold up.
+The first step for idea 1 has been done (see above): a baseline from complaint text alone reaches about 83% against 55% for guessing. The reference-number memorisation probe found nothing. The next steps are a larger held-out set and a harder target, and then a plan in `docs/PLAN_<NAME>.md` if those hold up.
