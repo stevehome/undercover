@@ -167,6 +167,23 @@ The loop (`data/ombudsman/improve_loop.py`) learned only from the 207 training d
 
 **Reading.** Changing the model, the effort and the instructions did not move accuracy off about 75%, and neither did rules or similar cases. One possible reason, which is untested, is that the outcome depends on evidence the complaint text does not hold, such as the policy wording or the insurer's correspondence, so about three in four may be close to what the text alone supports. The loop's reach was also narrow: three models, instruction rewrites only, and no policy documents given to the agent.
 
+### The oracle test: does the policy wording matter?
+
+The improver loop left accuracy at about 75%. One untested explanation was that the complaint text lacks the evidence a decision turns on, such as the policy wording. We tested it with the best case for that explanation (`data/ombudsman/oracle.py`).
+
+- **Method.** For each held-out decision, an extraction step copied the policy passages that the ombudsman's reasoning quotes, word for word. Each piece was checked to appear verbatim in the decision, and any piece with verdict wording was dropped. The model then scored each case twice without the clause and twice with it.
+- **Coverage.** 231 of the 683 held-out cases quote policy wording (149 not upheld, 82 upheld). In a 30-case check before filtering, the model found no quoted policy wording in 15 decisions, and some passages it returned were not word for word and were trimmed or dropped. The median clause is about 180 characters.
+- **The clause is a hint.** The ombudsman quotes the term that decides the case, so this is an upper bound for what policy wording could add, and not a fair test of a product.
+
+| | Without the clause | With the clause |
+|---|---|---|
+| Accuracy (mean of two runs) | 74.9% | 71.9% |
+| Upheld cases caught | 42.7% | 45.1% |
+
+The clause made 20 cases better and 30 worse (sign test p = 0.20), so there was **no gain**, and the dip is not statistically real either. **Missing policy wording does not explain the plateau.** Caveats: the clauses are fragments and not whole policies, the subset leans towards not upheld (65%), a quoted clause is often an exclusion and may push the model towards "not upheld", and only one model and two runs per condition were used.
+
+**Reading so far.** Rules, similar cases, prompt and model changes, and the decisive clause all leave accuracy at about 75%. The most likely remaining explanation is that the outcome turns on judgement calls and on facts the complaint text does not show, such as medical evidence and what the insurer actually did. Treat about 75% as close to the ceiling for predicting the plain outcome from the complaint text on this data. This is an inference from four negative results, not a proven limit.
+
 ### Limits
 
 - **Memorisation is only partly tested.** These decisions are public, so the model may have seen some. A probe on the first 296 decisions gave the model only a reference number, firm and date and asked for the outcome. It scored 48.3% (chance on a balanced set), answering "not upheld" 88% of the time, while the firm's usual outcome alone scored 64.2%. So the model does not recall outcomes by reference. The probe does not rule out recognising a complaint from its full text, and only one model was probed. On the 683 cases, full-text accuracy was lowest for 2024 decisions (70%) and higher for 2025 (78%) and 2026 (80%), the opposite of what memorising older decisions would give. The model was released a week after the newest decision, so no case is clearly newer than its training.
@@ -180,7 +197,7 @@ The loop (`data/ombudsman/improve_loop.py`) learned only from the 207 training d
 
 The plain outcome is not solved: about a quarter of decisions are wrong and about 40% of upheld complaints are missed. But rules text, similar past cases and an improver loop over the model, effort and prompt all left it at about 75%. Two things follow.
 
-- **The plain outcome is a weak target for the improver.** On this text it did not find a gain, and a result that cannot be improved cannot show the loop working. A task whose answer is in the text, or where the agent is given more evidence, would be a better test.
+- **The plain outcome is a weak target for the improver.** On this text it did not find a gain, and even the decisive policy clause did not help, so more evidence of that kind is not the answer. A result that cannot be improved cannot show the loop working, so the loop needs a task with room to move.
 - **The outcome alone is probably not the product.** The value would be in what a decision needs around it:
   - the redress amount and interest,
   - which rule or term decides the case,
@@ -191,12 +208,12 @@ These need richer labels than upheld or not, and the decisions contain them (the
 
 ### Next steps, in order
 
-1. **Test whether the evidence is the limit.** Give the model the policy wording for the case, which the complaint text lacks, and see whether accuracy moves above 75%. If it does, the product is about assembling evidence and not about the model.
-2. **A harder target.** Predict the redress amount or the deciding rule from the decision text, and run the improver loop on that.
+1. **A different target.** Stop working on the plain outcome. Predict the redress amount or the deciding rule from the complaint text, and run the improver loop on that, where the labels are richer and the plateau may not apply.
+2. **Check the evidence idea differently.** The oracle test used only quoted fragments. A fuller test would give the model the whole policy booklet, which means collecting real booklets and matching the version in force. Do it only if the redress work suggests wording matters.
 3. **Content memorisation check.** The reference-number probe found no recall. The remaining test is to rerun on decisions published well after a model's training cutoff, which needs a model released before a batch of new decisions.
 4. **Another sector.** Repeat on a second product type to see whether 75% is specific to travel.
 
-Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py`, `memorisation.py` and `improve_loop.py`. `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
+Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py`, `memorisation.py`, `improve_loop.py` and `oracle.py` (`extract`, then `test`). `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
 
 ## Recommendation
 
@@ -204,4 +221,4 @@ Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rule
 2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up**, since it shares the travel domain and gives a clear weather-linked story.
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
-The first step for idea 1 has been done (see above): a plain model reaches about 75% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. An improver loop over the model, effort and prompt did not beat it. The next steps are to test whether giving the model the policy wording lifts accuracy, and to aim at redress and the deciding rule, and then to write a plan in `docs/PLAN_<NAME>.md` if either shows a gain.
+The first step for idea 1 has been done (see above): a plain model reaches about 75% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. An improver loop over the model, effort and prompt did not beat it. Giving the model the policy clause the ombudsman relied on did not help either. The next step is to aim at redress and the deciding rule instead of the plain outcome, and then to write a plan in `docs/PLAN_<NAME>.md` if that shows a gain.
