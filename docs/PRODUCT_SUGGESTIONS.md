@@ -120,70 +120,75 @@ Most of the build does not change: the claim agent graph, the dispatcher and swa
 - the answer key and the grading rubric (for example "outcome correct" plus "cited the right rule"),
 - the review screen's wording.
 
-## First experiment: financial complaints (idea 1), run 12 November 2026
+## First experiment: financial complaints (idea 1), run 12 to 13 November 2026
 
-We tested the idea on travel-insurance decisions from the UK Financial Ombudsman Service before planning anything.
+We tested the idea on travel-insurance decisions from the UK Financial Ombudsman Service before planning anything. A first pass on 87 held-out cases gave flattering numbers, so it was repeated on 683. **The 683-case results are the ones to use.**
 
 ### Method
 
-- **Data.** 300 published decisions, 150 upheld and 150 not upheld, found with the Ombudsman's own search form. Four were dropped for lacking the standard "What I've decided" heading, leaving 296. They date from Nov 2019 to Sep 2026. Each record holds the complaint text, the ombudsman's reasoning, the outcome and the business. The data is in `data/ombudsman/travel_cases.json`, untracked.
+- **Data.** 896 published decisions found with the Ombudsman's own search form: 300 (150 upheld, 150 not) for the first pass, then 606 more dated on or after the cut, of which 600 were usable. Ten were dropped for lacking the standard "What I've decided" heading. They date from Nov 2019 to Sep 2026. Each record holds the complaint text, the ombudsman's reasoning, the outcome and the business. The data is in `data/ombudsman/travel_cases.json`, which is git-ignored.
 - **Source terms.** The robots.txt blocked only a few form PDFs, and requests were one every 1.5 seconds. **The Ombudsman's reuse terms have not been checked**, so the data stays out of git until they are.
-- **Leakage removed.** The investigator's view ("our investigator thought the complaint should be upheld") sat in the complaint text and usually matched the final outcome. 861 sentences mentioning investigators, upholds or final decisions were removed.
-- **Split by date.** Decisions before 4 Jan 2024 are training (207); the rest are held out (89, of which 87 were long enough to use).
-- **The task.** Given the complaint text, decide upheld or not upheld. Model: GPT-6 Luna at low effort. Always guessing "not upheld" scores 55.2%.
-- **Hints test.** Complaints often state what the firm offered, paid or apologised for, which concedes something. A second run removed every sentence with offer, payment, amount, apology or admission wording. That halves the median text (2,278 to 1,203 characters), so it is a harsh test.
+- **Leakage removed.** The investigator's view ("our investigator thought the complaint should be upheld") sat in the complaint text and usually matched the final outcome. Every sentence mentioning investigators, upholds or final decisions was removed.
+- **Split by date.** Decisions before 4 Jan 2024 are training (207). Decisions from that date on are held out: 683 usable cases (346 not upheld, 337 upheld). Always guessing "not upheld" scores 50.7%.
+- **The task.** Given the complaint text, decide upheld or not upheld. Model: GPT-6 Luna at low effort.
+- **Hints test.** Complaints often state what the firm offered, paid or apologised for, which concedes something. A second run removed every sentence with offer, payment, amount, apology or admission wording. That roughly halves the text, so it is a harsh test.
 
-### Results
+### Results (683 held-out cases)
 
 | Setup | Hints stripped | Full text |
 |---|---|---|
-| No rules | **82.8%** | **87.4%** |
-| Hand-written rules (a paraphrase from memory, unchecked) | 73.6% | 85.1% |
-| Rules distilled from the 207 training decisions | 77.0% | 81.6% |
-| Five most similar training cases, with outcomes | 81.6% | 79.3% |
-| Always guess "not upheld" | 55.2% | 55.2% |
+| No rules | 71.6% | 75.8% |
+| Rules distilled from the 207 training decisions | 72.0% | 75.7% |
+| Five most similar training cases, with outcomes | 73.4% | 75.8% |
+| Always guess "not upheld" | 50.7% | 50.7% |
 
-With 87 cases the margin is about ±8 points, so differences of a few points mean nothing.
+The margin is about ±3.4 points, so none of the gaps between the first three rows is meaningful. No model call failed in these runs.
+
+**The first pass, on 87 cases, was misleading.** It showed 82.8% (stripped) and 87.4% (full text) with no rules, and the rules and similar-cases rows scoring up to 9 points lower. Those 87 were an easier sample, and the margin of ±8 points was too wide to read the gaps between setups. Treat those numbers as superseded.
 
 ### What it showed
 
-1. **The model already does the task well.** It reaches the ombudsman's outcome about 83% of the time from the complaint alone (87% with the full text), against 55% for guessing.
-2. **The firm's own concessions are not the main driver.** Stripping them cost about 5 points, and 83% is far above guessing.
-3. **Nothing we added helped.** Rules, whether written by hand or distilled from past decisions, and similar past cases were all level with no rules or lower. On stripped text the hand-written rules scored 9 points lower and the distilled ones about 6 lower. Each gap is inside the margin, but all the rules runs pointed the same way.
-4. **Similar-looking complaints do not share outcomes.** A majority vote of the five nearest training outcomes scored 58.6% (stripped) and 55.2% (full text), close to guessing.
-5. **Upheld cases are the weak spot.** The model caught 28 of 39 upheld cases and 44 of 48 not-upheld ones (stripped, no rules). Every version with added context missed more upheld cases.
+1. **The model does the task reasonably well without help.** It reaches the ombudsman's outcome about 76% of the time from the full complaint and 72% with the firm's concessions removed, against 51% for guessing.
+2. **The firm's own concessions are a small part of it.** Stripping them cost about 4 points.
+3. **Nothing we added helped.** Rules distilled from past decisions and similar past cases both matched the plain model to within 2 points. A hand-written rules file, tried only on the first pass, looked worse there, but that gap is not trustworthy and it was not rerun on the larger set.
+4. **Similar-looking complaints barely share outcomes.** A majority vote of the five nearest training outcomes scored 56.8% (stripped) and 54.5% (full text), a few points above guessing.
+5. **Upheld cases are the weak spot.** With no rules the model caught 199 of 337 upheld cases and 319 of 346 not-upheld ones (full text). About 40% of upheld complaints are missed, and only about 8% of not-upheld ones are wrongly upheld. Rules and similar cases did not fix that.
+6. **The big insurers do not skew the result.** Two sister firms make up 37% of the cases. Full-text accuracy was 76% for them and 76% for all other firms.
 
 ### Limits
 
-- **Memorisation is only partly tested.** These decisions are public, so the model may have seen some. A probe gave the model only a decision's reference number, firm and date, and asked for the outcome. It scored 48.3% on all 296 decisions (chance on a balanced set), answering "not upheld" 88% of the time, while the firm's usual outcome alone scored 64.2%. So the model does not recall outcomes by reference, and the 83% to 87% is not explained by the firm's name. The probe does not rule out recognising a complaint from its full text, and only one model was probed. Accuracy on 2026 cases matched older ones (88% against 84% to 91%), and the model was released a week after the newest decision, so no case is clearly newer than its training.
-- **Small held-out set.** 87 cases cannot show a gain of less than about 8 points.
+- **Memorisation is only partly tested.** These decisions are public, so the model may have seen some. A probe on the first 296 decisions gave the model only a reference number, firm and date and asked for the outcome. It scored 48.3% (chance on a balanced set), answering "not upheld" 88% of the time, while the firm's usual outcome alone scored 64.2%. So the model does not recall outcomes by reference. The probe does not rule out recognising a complaint from its full text, and only one model was probed. On the 683 cases, full-text accuracy was lowest for 2024 decisions (70%) and higher for 2025 (78%) and 2026 (80%), the opposite of what memorising older decisions would give. The model was released a week after the newest decision, so no case is clearly newer than its training.
+- **Margin.** At 683 cases a gain of less than about 4 points cannot be told from noise.
 - **One model, one prompt.** No other models, efforts or prompt wordings were tried.
-- **Dominant firms.** One insurer is in 64 of the 300 decisions, and scores by firm are too small to read.
 - **Complaint wording.** The cases are reconstructed from the decision's own account of the facts, written by the ombudsman after the event, so they are cleaner than a real inbound complaint.
+- **One sector.** Only travel insurance was tested.
 
 ### What it means for the product
 
-Deciding upheld or not upheld is probably not the product, since a model does it well unprompted. The value would have to be in what a decision needs around the outcome:
+The plain outcome is not solved: about a quarter of decisions are wrong and 40% of upheld complaints are missed. But the obvious ways to improve it, more rules text and similar past cases, did not move the number. Two things follow.
 
-- the redress amount and interest,
-- which rule or term decides the case,
-- spotting the firm's own errors and settling before a complaint escalates,
-- a reason a complaints handler can check.
+- **It is a usable target for the improver loop.** There is headroom, and 683 cases can show a gain of about 4 points. What the improver should vary is not "add rules" but the prompt, the model and its reasoning effort, and how the agent reads the complaint.
+- **The outcome alone is probably not the product.** The value would be in what a decision needs around it:
+  - the redress amount and interest,
+  - which rule or term decides the case,
+  - spotting the firm's own errors and settling before a complaint escalates,
+  - a reason a complaints handler can check.
 
-Those need richer labels than upheld or not, and the decisions contain them (the "putting things right" sections).
+These need richer labels than upheld or not, and the decisions contain them (the "putting things right" sections).
 
 ### Next steps, in order
 
-1. **Content memorisation check.** The reference-number probe found no recall (see Limits). The remaining test is to rerun on decisions published well after a model's training cutoff, which needs a model released before a batch of new decisions. If accuracy falls on those, the 83% is flattered.
-2. **A larger held-out set.** Pull more decisions across sectors, so a gain of a few points can be told from noise.
-3. **A harder target.** Predict the redress amount or the deciding rule from the decision text, and use it to give the improver rounds something to improve on. The improver loop needs a task where the plain model leaves room.
+1. **Try the improver loop on the plain outcome.** Use the 207 training decisions as the working set and the 683 as the held-out set, and see whether any change to the prompt, model or effort beats about 76% by more than the margin. Start with the missed upheld cases.
+2. **A harder target.** Predict the redress amount or the deciding rule from the decision text.
+3. **Content memorisation check.** The reference-number probe found no recall. The remaining test is to rerun on decisions published well after a model's training cutoff, which needs a model released before a batch of new decisions.
+4. **Another sector.** Repeat on a second product type to see whether 76% is specific to travel.
 
 Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rules.py`, `similar.py` and `memorisation.py`. `baseline.py` and `similar.py` take `--strip`, and `baseline.py` takes `--rules FILE`. The scripts and data are in the ignored `data/ombudsman/` folder, so they are not in the repo.
 
 ## Recommendation
 
-1. **Build idea 1 (financial complaints) as the second product, but with a harder target than upheld or not.** It has the strongest public labels, the closest decision shape, and a buyer who already pays people to do this by hand. The first experiment showed that the plain outcome is already easy for a model, so aim at redress, the deciding rule and the reasoning.
+1. **Build idea 1 (financial complaints) as the second product, aimed at more than the plain outcome.** It has the strongest public labels, the closest decision shape, and a buyer who already pays people to do this by hand. A plain model gets about three in four outcomes right, so there is room to improve, and richer targets such as redress and the deciding rule are where the product value lies.
 2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up**, since it shares the travel domain and gives a clear weather-linked story.
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
-The first step for idea 1 has been done (see above): a baseline from complaint text alone reaches about 83% against 55% for guessing. The reference-number memorisation probe found nothing. The next steps are a larger held-out set and a harder target, and then a plan in `docs/PLAN_<NAME>.md` if those hold up.
+The first step for idea 1 has been done (see above): a plain model reaches about 76% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. The next step is the improver loop on this task, and then a plan in `docs/PLAN_<NAME>.md` if it beats the baseline.
