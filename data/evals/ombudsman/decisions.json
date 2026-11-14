@@ -1,0 +1,150 @@
+[
+  {
+    "claim_id": "CLM-1401",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-07-20",
+    "reason": "The theft was reported to the police the same afternoon, but the bag was on a sunbed at a public pool while Tomas swam, out of his sight and reach in a place the public can get to. That is unattended, and section 5 does not pay for belongings left unattended.",
+    "reference": "Policy wording, section 5; claims manual, unattended belongings",
+    "calculation": [],
+    "tests": "A theft with a police report in time, but the bag was left unattended at a public pool while the customer swam",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1402",
+    "decision": "approve",
+    "payout": 750.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-08-10",
+    "reason": "A phone taken from the customer's hand is theft from the person, never unattended belongings, and the police report is in time. Electronics Plus raises the electronics limit to $1,200, so the phone counts in full. The items come to $1,114.99, less the $100 deductible is $1,014.99, and the payout stops at the $750 maximum for Baggage and Personal Effects on Economy.",
+    "reference": "Policy wording, sections 5, 8 and 10; claims manual, unattended belongings",
+    "calculation": [
+      {
+        "step": "Smartphone, within the $1,200 Electronics Plus limit",
+        "amount": 1090.0
+      },
+      {
+        "step": "Phone case",
+        "amount": 24.99
+      },
+      {
+        "step": "Less the deductible",
+        "amount": -100.0
+      },
+      {
+        "step": "Capped at the Economy maximum",
+        "amount": 750.0
+      }
+    ],
+    "tests": "A snatch is theft from the person, not unattended belongings, and the payout stops at the plan maximum",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1403",
+    "decision": "approve",
+    "payout": 2646.5,
+    "over_approval_limit": true,
+    "handler_id": "HND-01",
+    "decided_on": "2026-08-30",
+    "reason": "The policy was bought on June 20, so the 60 days before it start on April 21. The one visit for back strain was on April 10, before the window, with no treatment, visits or medication change since, so the condition is not pre-existing. The five treatment lines abroad come to $2,696.50. The physiotherapy at home is follow-up care and is not covered. The $50 deductible comes off, leaving $2,646.50. The payout needs sign-off.",
+    "reference": "Policy wording, section 7; claims manual, pre-existing conditions and treatment that can wait",
+    "calculation": [
+      {
+        "step": "Emergency department assessment",
+        "amount": 540.0
+      },
+      {
+        "step": "MRI scan",
+        "amount": 1180.0
+      },
+      {
+        "step": "Orthopedic consultation",
+        "amount": 320.0
+      },
+      {
+        "step": "Medication",
+        "amount": 46.5
+      },
+      {
+        "step": "Overnight observation",
+        "amount": 610.0
+      },
+      {
+        "step": "Less the deductible",
+        "amount": -50.0
+      }
+    ],
+    "tests": "An earlier visit for back trouble that falls just outside the 60-day window, and follow-up care at home to leave out",
+    "difficulty": "hard",
+    "tempts": "decline",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1404",
+    "decision": "approve",
+    "payout": 279.7,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-09-22",
+    "reason": "The carrier confirms a delay of 13 hours caused by a strike, past the 6 hour waiting period on Premium. The hotel, the meals and the taxis are covered and come to $279.70, inside the $800 maximum with no deductible. The paid night in Bologna is a consequential loss under section 9 and is left out.",
+    "reference": "Policy wording, sections 3 and 9",
+    "calculation": [
+      {
+        "step": "Hotel in Split",
+        "amount": 168.0
+      },
+      {
+        "step": "Dinner for two",
+        "amount": 54.3
+      },
+      {
+        "step": "Breakfast for two",
+        "amount": 21.4
+      },
+      {
+        "step": "Taxi to the hotel",
+        "amount": 18.0
+      },
+      {
+        "step": "Taxi back",
+        "amount": 18.0
+      }
+    ],
+    "tests": "A covered strike delay with a consequential loss to leave out",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1405",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-08-29",
+    "reason": "Section 2 pays for a cancellation only for the reasons it lists, and a visa that did not arrive in time is not one of them. The claim is declined under section 2.",
+    "reference": "Policy wording, section 2",
+    "calculation": [],
+    "tests": "A well-documented non-refundable loss, but the visa delay is not a covered reason to cancel",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  }
+]

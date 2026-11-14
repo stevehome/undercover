@@ -1,0 +1,37 @@
+[
+  {
+    "claim_id": "CLM-1401",
+    "fos": "DRN-4676116",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same outcome"
+  },
+  {
+    "claim_id": "CLM-1402",
+    "fos": "DRN-5955540",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "facts changed: snatched from the hand, so outcome differs"
+  },
+  {
+    "claim_id": "CLM-1403",
+    "fos": "DRN-2594397",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "facts changed: earlier visit outside the 60-day window"
+  },
+  {
+    "claim_id": "CLM-1404",
+    "fos": "DRN-1769801",
+    "fos_outcome": "Upheld",
+    "ours": "approve",
+    "relation": "same direction; ferry strike replaces the FOS mis-selling point"
+  },
+  {
+    "claim_id": "CLM-1405",
+    "fos": "DRN-2875228",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same outcome"
+  }
+]

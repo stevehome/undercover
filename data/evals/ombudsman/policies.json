@@ -1,0 +1,95 @@
+[
+  {
+    "policy_id": "POL-2401",
+    "customer_id": "CUS-3401",
+    "plan": "economy",
+    "add_ons": [],
+    "purchased_on": "2026-06-02",
+    "sold_through": "TripNest checkout",
+    "trip": {
+      "destination": "Barcelona, Spain",
+      "departs_on": "2026-07-10",
+      "returns_on": "2026-07-20",
+      "trip_cost": 2600.0
+    },
+    "travelers": [
+      "Tomas Brandt"
+    ],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2402",
+    "customer_id": "CUS-3402",
+    "plan": "economy",
+    "add_ons": [
+      "electronics_plus"
+    ],
+    "purchased_on": "2026-06-15",
+    "sold_through": "Skylark Airways checkout",
+    "trip": {
+      "destination": "Lisbon, Portugal",
+      "departs_on": "2026-08-01",
+      "returns_on": "2026-08-09",
+      "trip_cost": 2150.0
+    },
+    "travelers": [
+      "Priya Nair"
+    ],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2403",
+    "customer_id": "CUS-3403",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-06-20",
+    "sold_through": "TripNest checkout",
+    "trip": {
+      "destination": "Santiago, Chile",
+      "departs_on": "2026-08-01",
+      "returns_on": "2026-08-15",
+      "trip_cost": 4100.0
+    },
+    "travelers": [
+      "Helen Park"
+    ],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2404",
+    "customer_id": "CUS-3404",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-05-12",
+    "sold_through": "TripNest checkout",
+    "trip": {
+      "destination": "Split, Croatia",
+      "departs_on": "2026-09-01",
+      "returns_on": "2026-09-14",
+      "trip_cost": 5200.0
+    },
+    "travelers": [
+      "Owen Castell",
+      "Mara Castell"
+    ],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2405",
+    "customer_id": "CUS-3405",
+    "plan": "economy",
+    "add_ons": [],
+    "purchased_on": "2026-07-01",
+    "sold_through": "Skylark Airways checkout",
+    "trip": {
+      "destination": "Hanoi, Vietnam",
+      "departs_on": "2026-08-20",
+      "returns_on": "2026-09-03",
+      "trip_cost": 2300.0
+    },
+    "travelers": [
+      "Rafael Ortiz"
+    ],
+    "status": "active"
+  }
+]

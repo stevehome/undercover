@@ -1,0 +1,77 @@
+[
+  {
+    "customer_id": "CUS-3401",
+    "name": "Tomas Brandt",
+    "email": "tomas.brandt@example.com",
+    "phone": "+1 303 555 0142",
+    "date_of_birth": "1984-05-19",
+    "address": {
+      "street": "418 Larimer Street",
+      "city": "Denver",
+      "state": "CO",
+      "zip": "80202"
+    },
+    "customer_since": "2024-02-11",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3402",
+    "name": "Priya Nair",
+    "email": "priya.nair@example.com",
+    "phone": "+1 617 555 0178",
+    "date_of_birth": "1990-09-03",
+    "address": {
+      "street": "77 Harvard Avenue, Apt 5",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02134"
+    },
+    "customer_since": "2025-01-27",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3403",
+    "name": "Helen Park",
+    "email": "helen.park@example.com",
+    "phone": "+1 206 555 0119",
+    "date_of_birth": "1976-12-14",
+    "address": {
+      "street": "2210 Fremont Avenue North",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98103"
+    },
+    "customer_since": "2023-08-30",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3404",
+    "name": "Owen Castell",
+    "email": "owen.castell@example.com",
+    "phone": "+1 512 555 0163",
+    "date_of_birth": "1969-03-22",
+    "address": {
+      "street": "905 West 34th Street",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78705"
+    },
+    "customer_since": "2022-05-16",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3405",
+    "name": "Rafael Ortiz",
+    "email": "rafael.ortiz@example.com",
+    "phone": "+1 305 555 0127",
+    "date_of_birth": "1988-07-08",
+    "address": {
+      "street": "1450 Brickell Avenue, Unit 9",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33131"
+    },
+    "customer_since": "2025-04-02",
+    "previous_claims": []
+  }
+]

@@ -1,0 +1,237 @@
+[
+  {
+    "claim_id": "CLM-1401",
+    "policy_id": "POL-2401",
+    "customer_id": "CUS-3401",
+    "claim_type": "baggage",
+    "submitted_on": "2026-07-16",
+    "incident_date": "2026-07-14",
+    "incident_location": "Barcelona, Spain",
+    "summary": "Bag with watch, phone and cash stolen from a sunbed at the public pool",
+    "story": "On July 14 I went swimming at the public pool at Montjuic. I left my bag on a sunbed and swam lengths for about forty minutes. When I got out the bag was gone, with my watch, my phone and some cash. I went to the police station that afternoon and they gave me a report. I have listed what was in it.",
+    "items": [
+      {
+        "description": "Wrist watch",
+        "category": "jewelry",
+        "amount": 380.0
+      },
+      {
+        "description": "Smartphone",
+        "category": "electronics",
+        "amount": 310.0
+      },
+      {
+        "description": "Cash",
+        "category": "cash",
+        "amount": 240.0
+      }
+    ],
+    "amount_claimed": 930.0,
+    "documents": [
+      {
+        "name": "Police report",
+        "type": "police_report",
+        "content": "Mossos d'Esquadra, Barcelona. Report made July 14, 2026 at 17:20 by Tomas Brandt. He left a bag on a sunbed at the Montjuic municipal pool at about 13:00 and swam until about 13:45. On return the bag was missing, with a watch, a phone and about EUR 220 in cash."
+      },
+      {
+        "name": "Receipts",
+        "type": "receipt",
+        "content": "Watch, bought 2023: $380.00. Smartphone, bought 2025: $310.00. Cash withdrawn at an ATM on July 13: $240.00."
+      }
+    ],
+    "status": "open"
+  },
+  {
+    "claim_id": "CLM-1402",
+    "policy_id": "POL-2402",
+    "customer_id": "CUS-3402",
+    "claim_type": "baggage",
+    "submitted_on": "2026-08-06",
+    "incident_date": "2026-08-03",
+    "incident_location": "Cascais, Portugal",
+    "summary": "Phone snatched from my hand on the promenade",
+    "story": "On August 3 I was walking on the promenade at Cascais and checking directions on my phone when a man on a scooter grabbed it out of my hand and rode off. I reported it to the police within the hour. I had been swimming earlier but my bag was with me the whole time. The phone was bought fourteen months ago and I added Electronics Plus when I bought the policy.",
+    "items": [
+      {
+        "description": "Smartphone",
+        "category": "electronics",
+        "amount": 1090.0
+      },
+      {
+        "description": "Phone case",
+        "category": "accessories",
+        "amount": 24.99
+      }
+    ],
+    "amount_claimed": 1114.99,
+    "documents": [
+      {
+        "name": "Police report",
+        "type": "police_report",
+        "content": "Policia de Seguranca Publica, Cascais. Report made August 3, 2026 at 18:05 by Priya Nair. At about 17:30 on the Marginal promenade a man on a scooter took her phone from her hand."
+      },
+      {
+        "name": "Receipts",
+        "type": "receipt",
+        "content": "Smartphone, bought June 2025: $1,090.00. Phone case: $24.99."
+      }
+    ],
+    "status": "open"
+  },
+  {
+    "claim_id": "CLM-1403",
+    "policy_id": "POL-2403",
+    "customer_id": "CUS-3403",
+    "claim_type": "emergency_medical",
+    "submitted_on": "2026-08-24",
+    "incident_date": "2026-08-06",
+    "incident_location": "Santiago, Chile",
+    "summary": "Disc pain and sciatica needing an emergency admission in Santiago",
+    "story": "On August 6 I woke with severe pain down my left leg and could not stand. I was admitted overnight in Santiago and had an MRI. I did have some back trouble last spring, which I mention in case it matters. Once I got home I had four physiotherapy sessions, which I have also listed.",
+    "items": [
+      {
+        "description": "Emergency department assessment",
+        "category": "medical",
+        "amount": 540.0
+      },
+      {
+        "description": "MRI scan",
+        "category": "medical",
+        "amount": 1180.0
+      },
+      {
+        "description": "Orthopedic consultation",
+        "category": "medical",
+        "amount": 320.0
+      },
+      {
+        "description": "Medication dispensed",
+        "category": "medical",
+        "amount": 46.5
+      },
+      {
+        "description": "Overnight observation",
+        "category": "medical",
+        "amount": 610.0
+      },
+      {
+        "description": "Four physiotherapy sessions at home after the trip",
+        "category": "medical",
+        "amount": 180.0
+      }
+    ],
+    "amount_claimed": 2876.5,
+    "documents": [
+      {
+        "name": "Hospital bill and records",
+        "type": "medical_records",
+        "content": "Clinica Santa Maria, Santiago, August 6 to 7, 2026. Diagnosis: lumbar disc herniation with left sciatica. History: one visit to a physician for a lower back strain on April 10, 2026, treated with rest and stretching; no medication prescribed; no further visits."
+      },
+      {
+        "name": "Itemized bill",
+        "type": "receipt",
+        "content": "Emergency assessment $540.00; MRI $1,180.00; orthopedic consultation $320.00; medication $46.50; overnight observation $610.00."
+      },
+      {
+        "name": "Home physiotherapy receipts",
+        "type": "receipt",
+        "content": "Four sessions, August 17 to 23, 2026: $180.00."
+      }
+    ],
+    "status": "open"
+  },
+  {
+    "claim_id": "CLM-1404",
+    "policy_id": "POL-2404",
+    "customer_id": "CUS-3404",
+    "claim_type": "trip_delay",
+    "submitted_on": "2026-09-18",
+    "incident_date": "2026-09-13",
+    "incident_location": "Split, Croatia",
+    "summary": "Held overnight in Split by a ferry crew strike on the way home",
+    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. We had a hotel room in Split for the night and paid for meals and taxis. We also lost our first night's hotel in Bologna, which we had already paid for. Receipts are attached.",
+    "items": [
+      {
+        "description": "Hotel in Split, one room, one night",
+        "category": "accommodation",
+        "amount": 168.0
+      },
+      {
+        "description": "Dinner for two",
+        "category": "meals",
+        "amount": 54.3
+      },
+      {
+        "description": "Breakfast for two",
+        "category": "meals",
+        "amount": 21.4
+      },
+      {
+        "description": "Taxi to the hotel",
+        "category": "transport",
+        "amount": 18.0
+      },
+      {
+        "description": "Taxi back to the port",
+        "category": "transport",
+        "amount": 18.0
+      },
+      {
+        "description": "First night's prepaid hotel in Bologna, missed",
+        "category": "other",
+        "amount": 140.0
+      }
+    ],
+    "amount_claimed": 419.7,
+    "documents": [
+      {
+        "name": "Ferry delay confirmation",
+        "type": "carrier_report",
+        "content": "Adria Lines. Sailing AL 212 Split to Ancona, scheduled September 13, 2026 at 20:00, departed September 14 at 09:00 because of a strike by the crew. Passengers: Owen Castell and Mara Castell."
+      },
+      {
+        "name": "Receipts",
+        "type": "receipt",
+        "content": "Hotel Marjan, September 13 to 14: $168.00. Restaurant Fish Door, dinner: $54.30. Cafe Riva, breakfast: $21.40. Taxis: $18.00 and $18.00. Hotel Torre, Bologna, no-show September 14: $140.00."
+      }
+    ],
+    "status": "open"
+  },
+  {
+    "claim_id": "CLM-1405",
+    "policy_id": "POL-2405",
+    "customer_id": "CUS-3405",
+    "claim_type": "trip_cancellation",
+    "submitted_on": "2026-08-25",
+    "incident_date": "2026-08-12",
+    "incident_location": "Miami, Florida",
+    "summary": "Trip to Vietnam cancelled because my visa did not arrive",
+    "story": "I applied for my Vietnam visa five weeks before the trip. The visa office was closed for several days and the visa had not arrived by August 12, so I could not travel on August 20. The airline and the hotel will not refund me. I would like my costs back.",
+    "items": [
+      {
+        "description": "Flights, not refundable",
+        "category": "flights",
+        "amount": 1480.0
+      },
+      {
+        "description": "Prepaid hotel, not refundable",
+        "category": "accommodation",
+        "amount": 820.0
+      }
+    ],
+    "amount_claimed": 2300.0,
+    "documents": [
+      {
+        "name": "Visa office email",
+        "type": "other",
+        "content": "Your application is still being processed. The office was closed from August 5 to August 11 and applications are taking longer than usual."
+      },
+      {
+        "name": "Supplier confirmations",
+        "type": "receipt",
+        "content": "Skylark Airways: ticket not refundable, $1,480.00. Hotel Lotus: prepaid stay not refundable, $820.00."
+      }
+    ],
+    "status": "open"
+  }
+]

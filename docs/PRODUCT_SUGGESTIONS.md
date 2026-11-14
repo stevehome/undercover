@@ -241,3 +241,39 @@ Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rule
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
 The first step for idea 1 has been done (see above): a plain model reaches about 75% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. An improver loop over the model, effort and prompt did not beat it. Giving the model the policy clause the ombudsman relied on did not help either. The next step is to aim at redress and the deciding rule instead of the plain outcome, and then to write a plan in `docs/PLAN_<NAME>.md` if that shows a gain.
+
+## Using the ombudsman cases to enlarge the course data (proposal, 14 November 2026)
+
+Ed made the course's test claims by describing what he wanted to Claude, giving it the existing code with Luna, and asking it to keep making the claims more nuanced until Luna got only X% right. The result is harder and harder sets (`data/evals/harder/`, `even_harder/`). The proposal is to do the same, starting each claim from a real Financial Ombudsman (FOS) case.
+
+### What the course sets look like
+
+Each set is four files: claims, customers, policies and decisions. A decision holds the payout, a step-by-step calculation, a reason and a policy reference. The README tags each claim with `difficulty`, `failure_class` and `tone`.
+
+### Why the FOS outcome can't be copied across
+
+FOS decides under UK law and each insurer's own terms. UnderCover has its own wording, a $750 maximum and per-item limits, so "complaint upheld" does not carry over. The **situation** does: an undisclosed condition, a delay without receipts, a bag left unattended, a cancellation after a waiting period.
+
+### Method
+
+1. **Pick cases.** From the 683 FOS cases, take those whose situation maps cleanly onto a section of UnderCover's wording or manual. Skip those that hinge on UK rules.
+2. **Rewrite each as an UnderCover claim.** Fictional customer, policy and items, with a story in the course's style. Facts are paraphrased, with no names or copied text.
+3. **Write the handler decision under UnderCover's rules.** A strong model writes it, with the payout built from the course's calculation steps. Where our wording points the same way as FOS, the FOS outcome is kept as a cross-check and the claim is tagged `source: FOS <reference>`. Some claims therefore have a matching ombudsman outcome and some do not.
+4. **Check the labels.** A second, different model decides each claim independently, and claims where the two disagree are dropped. The deterministic calculator rechecks the payouts. A person spot-checks about 10 claims.
+5. **Tune the difficulty.** Run Luna on the draft set and rewrite claims that are too easy or too hard until it gets the target share right (Ed's loop). Do not keep claims that are hard only because the answer is a coin-flip: the FOS runs showed about 75% as the ceiling for a plain model, and such claims make poor test cases.
+
+### Where it goes
+
+`data/evals/ombudsman/`, in the same four-file shape. Before promising it runs from the dashboard, check how the eval code selects a set.
+
+### Risks
+
+- **Label errors.** A strong model writing the answer key can be confidently wrong. The second model and the spot-check are the guard.
+- **Copying.** The FOS text must be paraphrased so the set is safe to commit. Check for overlap before committing.
+- **Over-fitting to Luna.** Difficulty tuned on one model may not hold for others, as with Ed's sets.
+
+### Decisions needed before starting
+
+1. Set size: 25 claims to match the others, or another number.
+2. Luna accuracy to tune towards. Ed's held-out sets give a reference; about 60 to 70% is a suggestion.
+3. Start with a pilot of 5 claims, reviewed before scaling to 25.
