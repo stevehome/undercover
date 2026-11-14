@@ -33,5 +33,145 @@
     "fos_outcome": "Not upheld",
     "ours": "decline",
     "relation": "same outcome; the reason for cancelling is a different listed-reason test"
+  },
+  {
+    "claim_id": "CLM-1406",
+    "fos": "DRN-3036106",
+    "fos_outcome": "Upheld",
+    "ours": "approve",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1407",
+    "fos": "DRN-5535197",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1408",
+    "fos": "DRN-4748785",
+    "fos_outcome": "Upheld",
+    "ours": "decline",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1409",
+    "fos": "DRN-5130263",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1410",
+    "fos": "DRN-5849384",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1411",
+    "fos": "DRN-4615026",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1412",
+    "fos": "DRN-4573642",
+    "fos_outcome": "Upheld",
+    "ours": "approve",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1413",
+    "fos": "DRN-4657820",
+    "fos_outcome": "Upheld",
+    "ours": "decline",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1414",
+    "fos": "DRN-5633884",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1415",
+    "fos": "DRN-5762519",
+    "fos_outcome": "Upheld",
+    "ours": "refer",
+    "relation": "no FOS equivalent for a referral; the situation is taken from the FOS case"
+  },
+  {
+    "claim_id": "CLM-1416",
+    "fos": "DRN-6096204",
+    "fos_outcome": "Not upheld",
+    "ours": "refer",
+    "relation": "no FOS equivalent for a referral; the situation is taken from the FOS case"
+  },
+  {
+    "claim_id": "CLM-1417",
+    "fos": "DRN-1988167",
+    "fos_outcome": "Upheld",
+    "ours": "approve",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1418",
+    "fos": "DRN-4672720",
+    "fos_outcome": "Upheld",
+    "ours": "refer",
+    "relation": "no FOS equivalent for a referral; the situation is taken from the FOS case"
+  },
+  {
+    "claim_id": "CLM-1419",
+    "fos": "DRN-4504426",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1420",
+    "fos": "DRN-4617569",
+    "fos_outcome": "Upheld",
+    "ours": "decline",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1421",
+    "fos": "DRN-4667223",
+    "fos_outcome": "Not upheld",
+    "ours": "approve",
+    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+  },
+  {
+    "claim_id": "CLM-1422",
+    "fos": "DRN-1801596",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1423",
+    "fos": "DRN-2538052",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1424",
+    "fos": "DRN-5031208",
+    "fos_outcome": "Upheld",
+    "ours": "approve",
+    "relation": "same direction as the FOS outcome"
+  },
+  {
+    "claim_id": "CLM-1425",
+    "fos": "DRN-5546213",
+    "fos_outcome": "Not upheld",
+    "ours": "decline",
+    "relation": "same direction as the FOS outcome"
   }
 ]

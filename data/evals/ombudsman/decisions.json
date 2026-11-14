@@ -130,5 +130,585 @@
     "needs": [],
     "tone": "plain",
     "tiny": false
+  },
+  {
+    "claim_id": "CLM-1406",
+    "decision": "approve",
+    "payout": 100.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-01",
+    "decided_on": "2026-08-26",
+    "reason": "The carrier's report shows the flight arrived at 14:10 on August 3 and the suitcase was handed over at 20:10 on August 4, a 30-hour delay that meets the 24-hour Economy waiting period. Baggage Delay pays for essential clothing and toiletries, so the $132.40 of clothes and toiletries is eligible, but the $45.00 taxi to collect the bag is transport and is not covered by this benefit. The eligible $132.40 is capped at the $100 Baggage Delay maximum on Economy, and no deductible applies to this benefit, so the payout is $100.00.",
+    "reference": "Policy wording, sections 1, 4 and 10; claims manual, sections 6 and 7 (waiting periods)",
+    "calculation": [
+      {
+        "step": "Two T-shirts",
+        "amount": 38.5
+      },
+      {
+        "step": "Underwear and socks",
+        "amount": 29.9
+      },
+      {
+        "step": "Lightweight trousers",
+        "amount": 41.0
+      },
+      {
+        "step": "Toiletries",
+        "amount": 23.0
+      },
+      {
+        "step": "Capped at the $100 Baggage Delay maximum on Economy",
+        "amount": -32.4
+      }
+    ],
+    "tests": "A 30-hour baggage delay on Economy: the clothes and toiletries are covered but capped at the $100 maximum, and the taxi to collect the bag is not an essential purchase under Baggage Delay",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1407",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-03-04",
+    "reason": "Baggage Delay pays only when the carrier delivers the bag at least the plan's waiting period after arrival, and on Premium that is 12 hours. The airline's report shows arrival at 09:35 and delivery to the hotel at 19:35 on February 14, a delay of 10 hours, and the manual says to use the carrier's times. The waiting period was not met, so the clothes are not covered even though the receipts are in order.",
+    "reference": "Policy wording, sections 1 and 4; claims manual, section 7 (waiting periods)",
+    "calculation": [
+      {
+        "step": "No eligible amount: the 10-hour delay is under the 12-hour Premium waiting period",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A well-receipted baggage delay spend where the carrier's report shows the bag arrived inside the Premium 12-hour waiting period",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1408",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-09-15",
+    "reason": "Section 6 pays for a passport lost during the covered trip, and the covered trip on the policy runs from August 20 to August 30, 2026. The passports were lost at home on August 15, five days before the trip began, and section 9 excludes anything that happens outside the dates of the covered trip. The receipts are all in order, but the loss itself falls outside cover, so nothing is payable.",
+    "reference": "Policy wording, sections 6, 9 and 12 (covered trip); claims manual, section 4 step 3",
+    "calculation": [
+      {
+        "step": "Emergency passport fees, loss before the covered trip began",
+        "amount": 0.0
+      },
+      {
+        "step": "Passport photos, loss before the covered trip began",
+        "amount": 0.0
+      },
+      {
+        "step": "Courier, loss before the covered trip began",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A fully documented passport claim where the loss happened at home before the covered trip's departure date, so it falls outside the trip dates.",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1409",
+    "decision": "approve",
+    "payout": 145.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-01",
+    "decided_on": "2026-08-28",
+    "reason": "The passport was lost during the covered trip, and the consulate fee ($95.00), the photos ($12.00) and the taxi to the consulate ($38.00) are receipted and are exactly what the passport benefit pays, with no deductible. The missed Montserrat excursion is a loss that followed indirectly from the lost passport, so it is a consequential loss and is excluded. The eligible total of $145.00 is inside the $150 Economy maximum for passport and travel documents, so $145.00 is paid.",
+    "reference": "Policy wording, sections 1, 6, 9 and 10; claims manual, consequential losses and section 6",
+    "calculation": [
+      {
+        "step": "Consulate fee for the emergency passport",
+        "amount": 95.0
+      },
+      {
+        "step": "Passport photos",
+        "amount": 12.0
+      },
+      {
+        "step": "Taxi to the consulate",
+        "amount": 38.0
+      },
+      {
+        "step": "Total within the $150 Economy passport maximum",
+        "amount": 145.0
+      }
+    ],
+    "tests": "A lost passport: the replacement costs are paid up to the Economy passport maximum with no deductible, and the missed prepaid excursion is an excluded consequential loss",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1410",
+    "decision": "approve",
+    "payout": 219.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-09-28",
+    "reason": "Belongings in a vehicle are covered only when locked in the trunk or the glove compartment and out of sight, so the backpack on the front seat was unattended and the laptop, cash and clothes are left out under section 5 and the manual's vehicles note, even though the car was locked. The stolen passport falls under Passport and Travel Documents in section 6, which pays the replacement fee, photos and local travel to the consulate with receipts and an account of what happened. The fee of $160.00, photos of $15.00 and taxi of $44.00 total $219.00, inside the $250 Premium maximum, and no deductible applies to this benefit.",
+    "reference": "Policy wording, sections 1, 5, 6 and 10; claims manual, vehicles",
+    "calculation": [
+      {
+        "step": "Emergency passport fee",
+        "amount": 160.0
+      },
+      {
+        "step": "Passport photos",
+        "amount": 15.0
+      },
+      {
+        "step": "Taxi to the consulate",
+        "amount": 44.0
+      }
+    ],
+    "tests": "A bag stolen from a car seat is unattended and its contents are excluded, but the stolen passport is still covered separately under Passport and Travel Documents with no deductible",
+    "difficulty": "hard",
+    "tempts": "decline",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1411",
+    "decision": "approve",
+    "payout": 1920.0,
+    "over_approval_limit": true,
+    "handler_id": "HND-03",
+    "decided_on": "2026-03-09",
+    "reason": "The fall happened on a marked piste inside the resort, and ordinary skiing is not one of the adventure sports listed in section 8, where only heli-skiing appears, so the injury is covered without the add-on. The emergency department bill of $880.00 and the emergency dental treatment of $1,140.00 abroad were needed at the time. The permanent crown fitted at home is follow-up care that the dentist said could wait until she was home, so it is not covered under section 7. The eligible $2,020.00 less the $100 Economy deductible leaves $1,920.00, inside the $25,000 maximum, and the payment needs a handler's sign-off because it is above $1,000.",
+    "reference": "Policy wording, sections 7, 8 and 10; claims manual, sections 3 and 7 (adventure sports, treatment that can wait)",
+    "calculation": [
+      {
+        "step": "Emergency department visit, Landesklinik Sankt Felden",
+        "amount": 880.0
+      },
+      {
+        "step": "Emergency dental treatment and temporary crown in Austria",
+        "amount": 1140.0
+      },
+      {
+        "step": "Less the Economy deductible",
+        "amount": -100.0
+      },
+      {
+        "step": "Payout, inside the $25,000 Emergency Medical maximum",
+        "amount": 1920.0
+      }
+    ],
+    "tests": "An ordinary skiing fall is covered with no Adventure Sports add-on because only heli-skiing is listed, while the crown fitted at home is follow-up care that is left out.",
+    "difficulty": "hard",
+    "tempts": "decline",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1412",
+    "decision": "approve",
+    "payout": 2105.5,
+    "over_approval_limit": true,
+    "handler_id": "HND-01",
+    "decided_on": "2026-08-25",
+    "reason": "The adventure sports exclusion in section 7 covers only the sports listed in section 8, and jet skiing is not on that list, so the injury is covered without the Adventure Sports add-on, whatever the rental shop said. The medical records show a sudden injury needing treatment at the time, with no earlier shoulder problems and no sign of alcohol. The four bills total $2,155.50, and the $50 Premium deductible comes off, leaving $2,105.50, well inside the $100,000 maximum. The payout is above $1,000, so the payment needs a handler's sign-off under manual section 3.",
+    "reference": "Policy wording, sections 7, 8 and 10; claims manual, sections 3 and 6",
+    "calculation": [
+      {
+        "step": "Emergency department treatment",
+        "amount": 1150.0
+      },
+      {
+        "step": "Orthopedic consultation",
+        "amount": 300.0
+      },
+      {
+        "step": "Sling and medication",
+        "amount": 85.5
+      },
+      {
+        "step": "Overnight hospital stay",
+        "amount": 620.0
+      },
+      {
+        "step": "Less the Premium deductible",
+        "amount": -50.0
+      }
+    ],
+    "tests": "Whether the handler applies the wording's closed list of adventure sports instead of a rental shop's remark that jet skiing needs extreme sports cover",
+    "difficulty": "hard",
+    "tempts": "decline",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1413",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-03-09",
+    "reason": "The hospital's records say the leg was broken while heli-skiing after a helicopter drop, and heli-skiing is one of the adventure sports listed in section 8. Section 7 excludes injuries from adventure sports unless the Adventure Sports add-on was bought, and this policy has no add-ons. The manual's adventure sports note says that without the add-on the injury is excluded, so none of the $7,420 hospital bill can be paid.",
+    "reference": "Policy wording, sections 7 and 8; claims manual, section 7, adventure sports",
+    "calculation": [
+      {
+        "step": "Hospital treatment for a heli-skiing injury, excluded without the Adventure Sports add-on",
+        "amount": 0.0
+      }
+    ],
+    "tests": "The story says only a guided skiing day trip, and the medical records show it was heli-skiing, an adventure sport that is excluded without the add-on.",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1414",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-08-26",
+    "reason": "If the bag was stolen, section 5 of the wording requires the theft to be reported to the local police within 24 hours. The customer states that he never reported it, so the condition of the benefit was not met. Under section 5 of the claims manual, this claim is declined rather than referred for a missing document. If the bag was instead left on the pavement outside the hotel, it was out of his sight and reach in a public place, which makes it unattended and excluded under section 5 either way.",
+    "reference": "Policy wording, section 5; claims manual, sections 5 and 7 (unattended belongings)",
+    "calculation": [
+      {
+        "step": "Phone, laptop and cash: not payable, theft never reported to the police (or belongings left unattended)",
+        "amount": 0.0
+      }
+    ],
+    "tests": "Whether the handler declines when the customer says the theft was never reported to the police, instead of referring the claim to request a police report that cannot exist.",
+    "difficulty": "hard",
+    "tempts": "refer",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1415",
+    "decision": "refer",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-01",
+    "decided_on": "2026-07-27",
+    "reason": "The customer's story and claim form say Corvalis Air has paid nothing, but the carrier's settlement letter for the same file, BGO-CV-48213, says $450.00 was paid to her on July 8, 2026 for the same lost bag. Under claims manual section 8, a carrier's document that contradicts the customer is referred to the Special Investigations Unit with the difference listed, and the claim is not declined for it. The $450.00 should not simply be taken off under wording section 10 and the rest paid while the conflict is open. The customer is told only that the claim is being reviewed.",
+    "reference": "Policy wording, sections 5 and 10; claims manual, section 8",
+    "calculation": [
+      {
+        "step": "No payment while the claim is with Special Investigations",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A lost-bag claim where the carrier's settlement letter shows a $450 payment that the customer says was never made, which calls for a referral to Special Investigations, not a deduction or a decline",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1416",
+    "decision": "refer",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-09-15",
+    "reason": "This is the customer's third claim filed within 12 months, after claims filed on 2025-11-18 and 2026-03-04, so under manual section 9 it goes to the Special Investigations Unit for review before payment, whatever its merits. On its own the claim looks payable. The phone was taken from the counter while the customer stood at it, so it was attended, and the theft was reported to the police within 24 hours with a receipt on file. Economy has no Electronics Plus, so the $640 phone counts at the $150 per-item limit, and after the $100 deductible the claim appears payable at $50.00 once the review is done.",
+    "reference": "Claims manual, sections 9 and 6; policy wording, sections 1, 5 and 10",
+    "calculation": [
+      {
+        "step": "Smartphone, capped at the $150 Economy per-item limit",
+        "amount": 150.0
+      },
+      {
+        "step": "Less the Economy deductible",
+        "amount": -100.0
+      },
+      {
+        "step": "Appears payable at $50.00, held pending Special Investigations review of the third claim in 12 months",
+        "amount": -50.0
+      }
+    ],
+    "tests": "A clean theft claim that must still be referred because it is the customer's third claim in 12 months, with the appears-payable amount limited by the Economy per-item limit",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1417",
+    "decision": "approve",
+    "payout": 1500.0,
+    "over_approval_limit": true,
+    "handler_id": "HND-03",
+    "decided_on": "2026-05-14",
+    "reason": "The death of a parent, confirmed by a physician's letter and the death certificate, is a covered reason for cancellation, and the supplier letters and card statement prove the non-refundable costs of $1,900.00 for flights and $900.00 for the hotel. The airline's $210.00 credit voucher is taken off first, leaving $2,590.00 unrefunded. Cancellation pays up to the trip cost of $3,100.00 or the Economy maximum of $1,500.00, whichever is lower, so the payout is $1,500.00, which needs a handler's sign-off before payment.",
+    "reference": "Policy wording, sections 1, 2 and 10; claims manual, sections 3 and 6",
+    "calculation": [
+      {
+        "step": "Non-refundable flights",
+        "amount": 1900.0
+      },
+      {
+        "step": "Non-refundable hotel",
+        "amount": 900.0
+      },
+      {
+        "step": "Less the airline's travel credit voucher",
+        "amount": -210.0
+      },
+      {
+        "step": "Capped at the Economy maximum of $1,500, lower than the $3,100 trip cost",
+        "amount": -1090.0
+      }
+    ],
+    "tests": "A covered cancellation where the supplier credit must be taken off and the Economy maximum, lower than the trip cost, caps the payout, which then needs sign-off",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1418",
+    "decision": "refer",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-01",
+    "decided_on": "2026-07-01",
+    "reason": "Cancellation for a family member's sickness must be confirmed in writing by a physician (wording section 2), and a physician cannot be a traveling companion or a family member (section 12). The only medical letter is signed by Dr. Laura Whitman, who signs as the patient's mother and is a traveler on the policy, so the required physician's statement is not on file. Under manual section 5 a missing document means referring, not declining or approving. We are asking for a written statement from an independent treating physician confirming Owen's admission and the advice not to travel; once it arrives the claim appears payable at $3,240.00.",
+    "reference": "Policy wording, sections 2 and 12; claims manual, sections 2 and 5",
+    "calculation": [
+      {
+        "step": "No payment until a statement from an independent physician is received",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A doctor's letter that looks valid but is signed by the patient's mother, a traveler on the policy, so it is not a physician's statement under the wording and the claim must wait for an independent one",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1419",
+    "decision": "approve",
+    "payout": 1360.0,
+    "over_approval_limit": true,
+    "handler_id": "HND-02",
+    "decided_on": "2026-05-19",
+    "reason": "A sibling is a family member, and her terminal diagnosis is confirmed in writing by her consultant, so the cancellation is for a covered reason under section 2. We pay the prepaid costs the suppliers will not refund: the $1,150.00 non-refundable flights and the $210.00 the hotel kept, since the hotel's $150.00 refund is already out of the amount claimed and is not taken off a second time. The $1,360.00 total is below both the $1,900 trip cost and the $1,500 Economy maximum, and there is no deductible on this benefit. The payout is above $1,000, so the payment needs a handler's sign-off.",
+    "reference": "Policy wording, sections 2 and 10; claims manual, sections 3, 5 and 6",
+    "calculation": [
+      {
+        "step": "Non-refundable flights",
+        "amount": 1150.0
+      },
+      {
+        "step": "Hotel prepayment not refunded ($360.00 paid less the $150.00 the hotel refunded)",
+        "amount": 210.0
+      }
+    ],
+    "tests": "A cancellation for a sibling's terminal illness where the hotel's partial refund is already netted out of the claimed amount and must not be deducted again",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1420",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-08-26",
+    "reason": "Severe weather is normally a covered cause of a Trip Delay. Section 9, however, excludes events that were publicly known before the policy was bought, such as a named storm. The ferry company's notice says Storm Corwen was named on August 3, 2026, and the policy was bought on August 6, 2026. The two hotel nights are therefore not covered, and nothing is payable.",
+    "reference": "Policy wording, sections 3 and 9",
+    "calculation": [
+      {
+        "step": "Hotel, two nights, excluded because the named storm was publicly known before purchase",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A storm delay looks like a covered Trip Delay, but the storm was named three days before the policy was bought, and that fact only appears by comparing the carrier's notice with the purchase date.",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1421",
+    "decision": "approve",
+    "payout": 300.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-01",
+    "decided_on": "2026-08-31",
+    "reason": "The airline confirms the flight was canceled, which is a covered cause, and the delay of more than three days is well past the 12-hour Economy waiting period. Because the delay happened on the way home, cover continued past the August 12 return date until she got home. The hotel at $140 a night, the meals and the taxis are all receipted and reasonable, a total of $660.60, and Trip Delay has no deductible. Economy pays up to $300 for Trip Delay, so the payout is $300.00.",
+    "reference": "Policy wording, sections 1, 3 and 10; claims manual, waiting periods, delay on the way home and reasonable accommodation",
+    "calculation": [
+      {
+        "step": "Hotel, three nights at $140",
+        "amount": 420.0
+      },
+      {
+        "step": "Meals, with receipts",
+        "amount": 188.6
+      },
+      {
+        "step": "Taxis to and from the airport",
+        "amount": 52.0
+      },
+      {
+        "step": "Capped at the $300 Economy Trip Delay maximum",
+        "amount": -360.6
+      }
+    ],
+    "tests": "A canceled return flight is a covered delay that carries cover past the return date, but the total is capped at the low Economy Trip Delay maximum",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1422",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-08-29",
+    "reason": "Trip Delay pays only when the carrier delays you, because of a mechanical or crew problem, a canceled service, severe weather or a strike (section 3). The airline confirms that flight CV 482 left on time at 19:12 and that the customer missed boarding. Traffic on the road to the airport is not a carrier delay, so the hotel and the new ticket are not covered, even though both have receipts.",
+    "reference": "Policy wording, section 3; claims manual, sections 2 and 6",
+    "calculation": [
+      {
+        "step": "Airport hotel, no carrier delay",
+        "amount": 0.0
+      },
+      {
+        "step": "New ticket, no carrier delay",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A missed flight caused by road traffic: Trip Delay needs a delay by the carrier, and the carrier's record shows the flight left on time",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1423",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-03",
+    "decided_on": "2026-05-25",
+    "reason": "Section 2 pays for cancellation only for the five reasons it lists, and says we do not pay for cancellation for any other reason. Neither traveler was sick, the airline flew as scheduled, the hotel stayed open and the health authority placed no restriction on travel, so worry about catching the illness is not one of the listed reasons. The losses are non-refundable and fully documented, but without a covered reason nothing is payable.",
+    "reference": "Policy wording, section 2; claims manual, sections 2 and 6",
+    "calculation": [
+      {
+        "step": "Cancellation out of concern about an outbreak, not a covered reason under section 2",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A well-documented, sympathetic cancellation for fear of an outbreak, with no illness, no carrier disruption and no travel ban, is not one of the listed reasons and is declined.",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1424",
+    "decision": "approve",
+    "payout": 1140.0,
+    "over_approval_limit": true,
+    "handler_id": "HND-01",
+    "decided_on": "2026-09-24",
+    "reason": "The bag was snatched from the customer's shoulder and reported to the police within the hour, so it is a covered theft. The policy has no Electronics Plus, so the laptop, the tablet and the camera with its lens are each held to the $300 Premium per-item limit, with the camera and lens counting as one set and each shirt counting as a separate item. The baggage total of $1,080 less the $50 deductible is $1,030. The $110 emergency passport fee is paid under Passport and Travel Documents, where no deductible applies, making $1,140, which needs sign-off.",
+    "reference": "Policy wording, sections 1, 5, 6 and 10; claims manual, sections 3, 6 and 7 (pairs and sets)",
+    "calculation": [
+      {
+        "step": "Laptop, capped at the $300 per-item limit",
+        "amount": 300.0
+      },
+      {
+        "step": "Camera with lens as one set, capped at the $300 per-item limit",
+        "amount": 300.0
+      },
+      {
+        "step": "Tablet, capped at the $300 per-item limit",
+        "amount": 300.0
+      },
+      {
+        "step": "Shirt 1",
+        "amount": 60.0
+      },
+      {
+        "step": "Shirt 2",
+        "amount": 60.0
+      },
+      {
+        "step": "Shirt 3",
+        "amount": 60.0
+      },
+      {
+        "step": "Less the baggage deductible",
+        "amount": -50.0
+      },
+      {
+        "step": "Emergency passport fee, within the $250 passport maximum, no deductible",
+        "amount": 110.0
+      }
+    ],
+    "tests": "A theft claim that splits across two benefits, applying the per-item limit to electronics without Electronics Plus, treating the camera and lens as one set and the shirts as separate items, and taking the deductible off the baggage part only",
+    "difficulty": "hard",
+    "tempts": "payout",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
+  },
+  {
+    "claim_id": "CLM-1425",
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
+    "handler_id": "HND-02",
+    "decided_on": "2026-06-02",
+    "reason": "Section 2 of the wording pays for cancellation only for the five listed reasons, and losing passports at home is not one of them: \"We do not pay for cancellation or interruption for any other reason.\" The Passport and Travel Documents benefit in section 6 covers passports lost during the covered trip, and these went missing at home on May 19, before the trip began on May 22, so it does not apply either. The supplier and payment documents are all in order, but there is no covered reason, so nothing is payable.",
+    "reference": "Policy wording, sections 2, 6 and 9; claims manual, sections 2 and 4",
+    "calculation": [
+      {
+        "step": "Non-refundable flights and resort, canceled for a reason not listed in section 2",
+        "amount": 0.0
+      }
+    ],
+    "tests": "A cancellation caused by passports lost at home before departure: the reason is not on the section 2 list, and the passport benefit only covers losses during the covered trip",
+    "difficulty": "hard",
+    "tempts": "approve",
+    "needs": [],
+    "tone": "plain",
+    "tiny": false
   }
 ]

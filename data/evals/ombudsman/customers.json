@@ -73,5 +73,316 @@
     },
     "customer_since": "2025-04-02",
     "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3406",
+    "name": "Delia Fenwick",
+    "email": "delia.fenwick@example.com",
+    "phone": "+1 412 555 0187",
+    "date_of_birth": "1971-11-08",
+    "address": {
+      "street": "77 Liberty Avenue",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "zip": "15222"
+    },
+    "customer_since": "2025-03-04",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3407",
+    "name": "Marcus Oyelaran",
+    "email": "marcus.oyelaran@example.com",
+    "phone": "+1 612 555 0187",
+    "date_of_birth": "1988-11-03",
+    "address": {
+      "street": "2215 Hennepin Avenue",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55405"
+    },
+    "customer_since": "2025-03-22",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3408",
+    "name": "Gareth Ollander",
+    "email": "gareth.ollander@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1961-03-04",
+    "address": {
+      "street": "2210 Tamarack Drive",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215"
+    },
+    "customer_since": "2023-05-22",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3409",
+    "name": "Delphine Okafor-Reyes",
+    "email": "delphine.okaforreyes@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1971-11-02",
+    "address": {
+      "street": "2290 Indianola Avenue",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43201"
+    },
+    "customer_since": "2025-03-14",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3410",
+    "name": "Derek Halvorsen",
+    "email": "derek.halvorsen@example.com",
+    "phone": "+1 612 555 0187",
+    "date_of_birth": "1979-11-02",
+    "address": {
+      "street": "2214 Hennepin Avenue",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55405"
+    },
+    "customer_since": "2023-04-18",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3411",
+    "name": "Renata Kowalczyk",
+    "email": "renata.kowalczyk@example.com",
+    "phone": "+1 612 555 0187",
+    "date_of_birth": "1991-09-03",
+    "address": {
+      "street": "2207 Bryant Avenue South",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55405"
+    },
+    "customer_since": "2026-01-12",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3412",
+    "name": "Renata Holloway",
+    "email": "renata.holloway@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1985-02-11",
+    "address": {
+      "street": "77 Brevoort Lane",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215"
+    },
+    "customer_since": "2023-09-04",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3413",
+    "name": "Desmond Okafor",
+    "email": "desmond.okafor@example.com",
+    "phone": "+1 612 555 0187",
+    "date_of_birth": "1987-08-03",
+    "address": {
+      "street": "2210 Hennepin Avenue",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55405"
+    },
+    "customer_since": "2025-11-20",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3414",
+    "name": "Dario Pelletier",
+    "email": "dario.pelletier@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1979-10-02",
+    "address": {
+      "street": "2207 Hollis Avenue",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215"
+    },
+    "customer_since": "2025-04-22",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3415",
+    "name": "Ingrid Halvorsen",
+    "email": "ingrid.halvorsen@example.com",
+    "phone": "+1 617 555 0187",
+    "date_of_birth": "1979-11-03",
+    "address": {
+      "street": "72 Tremont Lane",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02116"
+    },
+    "customer_since": "2025-03-04",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3416",
+    "name": "Lena Okafor",
+    "email": "lena.okafor@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1990-02-11",
+    "address": {
+      "street": "227 Neil Avenue",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215"
+    },
+    "customer_since": "2025-06-03",
+    "previous_claims": [
+      {
+        "claim_id": "CLM-0982",
+        "filed_on": "2025-11-18",
+        "summary": "Baggage claim for a suitcase damaged by the airline on a trip to Montreal"
+      },
+      {
+        "claim_id": "CLM-1197",
+        "filed_on": "2026-03-04",
+        "summary": "Trip delay claim for a flight held overnight by a crew problem on a trip to Denver"
+      }
+    ]
+  },
+  {
+    "customer_id": "CUS-3417",
+    "name": "Delia Marchetti",
+    "email": "delia.marchetti@example.com",
+    "phone": "+1 520 555 0187",
+    "date_of_birth": "1979-09-23",
+    "address": {
+      "street": "2214 East Speedway Boulevard",
+      "city": "Tucson",
+      "state": "AZ",
+      "zip": "85719"
+    },
+    "customer_since": "2026-03-14",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3418",
+    "name": "Daniel Whitman",
+    "email": "daniel.whitman@example.com",
+    "phone": "+1 503 555 0187",
+    "date_of_birth": "1983-09-02",
+    "address": {
+      "street": "2215 SE Alder Street",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97214"
+    },
+    "customer_since": "2025-03-08",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3419",
+    "name": "Marisol Venn",
+    "email": "marisol.venn@example.com",
+    "phone": "+1 503 555 0187",
+    "date_of_birth": "1979-09-02",
+    "address": {
+      "street": "2216 SE Belmont Street",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97214"
+    },
+    "customer_since": "2026-03-14",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3420",
+    "name": "Ines Valdmaa",
+    "email": "ines.valdmaa@example.com",
+    "phone": "+1 207 555 0186",
+    "date_of_birth": "1979-11-02",
+    "address": {
+      "street": "63 Fore Street",
+      "city": "Portland",
+      "state": "ME",
+      "zip": "04101"
+    },
+    "customer_since": "2026-08-06",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3421",
+    "name": "Renata Okafor",
+    "email": "renata.okafor@example.com",
+    "phone": "+1 617 555 0187",
+    "date_of_birth": "1979-11-03",
+    "address": {
+      "street": "62 Centre Street",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02130"
+    },
+    "customer_since": "2025-03-14",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3422",
+    "name": "Daniel Okafor",
+    "email": "daniel.okafor@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1979-11-04",
+    "address": {
+      "street": "2250 Neil Avenue",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43201"
+    },
+    "customer_since": "2023-09-20",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3423",
+    "name": "Harold Wrenfield",
+    "email": "harold.wrenfield@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1961-08-23",
+    "address": {
+      "street": "2290 Kenwick Road",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43221"
+    },
+    "customer_since": "2023-04-02",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3424",
+    "name": "Renata Okafor",
+    "email": "renata.okafor@example.com",
+    "phone": "+1 614 555 0187",
+    "date_of_birth": "1979-11-03",
+    "address": {
+      "street": "72 Mulberry Lane",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215"
+    },
+    "customer_since": "2023-05-08",
+    "previous_claims": []
+  },
+  {
+    "customer_id": "CUS-3425",
+    "name": "Daniel Okafor",
+    "email": "daniel.okafor@example.com",
+    "phone": "+1 614 555 0178",
+    "date_of_birth": "1988-11-03",
+    "address": {
+      "street": "2207 Neil Avenue",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43201"
+    },
+    "customer_since": "2025-01-22",
+    "previous_claims": []
   }
 ]
