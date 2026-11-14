@@ -396,3 +396,12 @@ The note above says an existing database keeps its old recipe. Ours did, so on 1
 - **How it was added.** No round was open. The Supabase tool is read-only, so the row went in through the backend's own `versions.add_version` after a dry run that printed the diff. It is recorded as proposed by "claude-code (for steve)", kept, with the reason that it was added directly at the student's request and not by a round. Versions 1 to 7 are untouched.
 - **To undo it,** mark version 8 as rolled back. The current recipe is the highest kept version, so version 7 becomes current again.
 - **The recipe can still change.** The improver may rewrite it at the end of any round, and a handler approves that, so a later version could drop the step. If it stops trying other models, read the recipe text first.
+
+### An approval whose reply was lost (round 16)
+
+Approving the proposal in round 16 (Gemini 3.5 Flash Lite at minimal effort, instructions unchanged) left the round stuck. The backend stored everything within a fraction of a second (version 11, the proposal approved, a new improver stretch), but the agent's call to the backend for the confirmation timed out after 30 seconds, so the agent never resumed the improver. Meanwhile the backend had given up on the agent after 5 seconds and the dashboard showed a 503. Neither Postgres nor the connection pooler logged anything wrong, so why the reply stalled is not known.
+
+- **A repeat of a decision is safe.** `record_decision` answers the same decision again with its original result while its stretch is still running, if no later proposal of the round has been decided. A different decision, or the same one once the stretch ended, is still refused. The agent now asks again once after a timeout (`attempts` in `agent/backend_http.py`).
+- **The timeouts agree.** The backend waits 70 seconds for the agent (it was 5); the agent waits 30 seconds twice. A test fails if the first is lowered below the second.
+- **`read_results` counts a model as tried only for a round that reached a verdict.** Round 16 was stopped before any evaluation, so Gemini minimal was never tested and must not look tried.
+- **A timing log.** `Stopwatch` (`backend/stopwatch.py`, `agent/stopwatch.py`) times the decision step by step and the backend's wait on the agent, and warns in the console when a step totals 3 seconds or more, with the step that took the time. `npm run dev:agent` has no `--reload`, so the agent needs a restart to pick this up.

@@ -11,6 +11,8 @@ from typing import Any
 from agent import api
 from agent.backend_http import call
 
+DECISION_ATTEMPTS = 2
+
 
 def create_round(handler_id: str, model: str, reasoning_effort: str) -> dict[str, Any]:
     """Start a round and its first stretch of work; return their ids."""
@@ -108,7 +110,11 @@ def record_proposal_decision(
     rejection_reason: str,
     used: tuple[str, str],
 ) -> dict[str, Any]:
-    """Record a handler's decision; refused if something else is running."""
+    """Record a handler's decision; refused if something else is running.
+
+    The backend answers a repeat of the same decision as it did the first time, so
+    a reply lost to a timeout is asked for again.
+    """
     body = {
         "approved": approved,
         "handler_id": handler_id,
@@ -116,7 +122,12 @@ def record_proposal_decision(
         "model": used[0],
         "reasoning_effort": used[1],
     }
-    return call("POST", f"/api/improver/proposals/{proposal_id}/decision", json=body)
+    return call(
+        "POST",
+        f"/api/improver/proposals/{proposal_id}/decision",
+        attempts=DECISION_ATTEMPTS,
+        json=body,
+    )
 
 
 def finish_run(run_id: int) -> None:

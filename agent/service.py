@@ -20,6 +20,7 @@ from agent import (
     harness,
     improver_api,
     rounds,
+    stopwatch,
 )
 
 
@@ -166,14 +167,19 @@ def decide_proposal(
     """Record a handler's decision, then resume the improver with it."""
     approved = decision.decision == "approve"
     settings = harness.improver_settings()
-    recorded = _create(
-        improver_api.record_proposal_decision,
-        proposal_id,
-        approved,
-        decision.handler_id,
-        decision.reason,
-        (settings.name, settings.reasoning_effort),
-    )
+    watch = stopwatch.Stopwatch(f"Recording the decision on proposal {proposal_id}")
+    try:
+        recorded = _create(
+            improver_api.record_proposal_decision,
+            proposal_id,
+            approved,
+            decision.handler_id,
+            decision.reason,
+            (settings.name, settings.reasoning_effort),
+        )
+    finally:
+        watch.lap("the backend's answer")
+        watch.log()
     background.add_task(
         worker,
         recorded["round_id"],

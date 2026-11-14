@@ -25,11 +25,24 @@ class ApiRefusal(Exception):  # noqa: N818 - a refusal, not a failure
         self.detail = detail
 
 
-def call(method: str, path: str, **kwargs: Any) -> Any:
-    """Call the backend and return its JSON; a 4xx is an ApiRefusal."""
-    response = client.request(method, path, **kwargs)
+def _answer(response: httpx.Response) -> Any:
+    """Return the backend's JSON; a 4xx is an ApiRefusal."""
     if response.is_client_error:
         detail = response.json().get("detail", response.text)
         raise ApiRefusal(response.status_code, str(detail))
     response.raise_for_status()
     return response.json()
+
+
+def call(method: str, path: str, attempts: int = 1, **kwargs: Any) -> Any:
+    """Call the backend and return its JSON; a 4xx is an ApiRefusal.
+
+    A request that times out is sent again, up to `attempts` times in all. Only
+    ask for more than one for a request the backend answers the same way twice.
+    """
+    for _ in range(attempts - 1):
+        try:
+            return _answer(client.request(method, path, **kwargs))
+        except httpx.TimeoutException:
+            continue
+    return _answer(client.request(method, path, **kwargs))

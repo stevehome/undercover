@@ -157,6 +157,47 @@ def test_a_proposal_changes_nothing_until_it_is_approved(client, flow):
     assert first["version"] == 1
 
 
+def test_the_same_decision_again_while_its_stretch_goes_answers_as_before(client, flow):
+    flow.first_evaluations()
+    proposal_id = flow.propose().json()["proposal_id"]
+    flow.end_stretch()
+    url = f"/api/improver/proposals/{proposal_id}/decision"
+    approve = {"approved": True, "handler_id": "HND-01", "rejection_reason": ""}
+
+    first = client.post(url, json={**approve, **IMPROVER})
+    again = client.post(url, json={**approve, **IMPROVER})
+
+    assert (first.status_code, again.status_code) == (200, 200)
+    assert again.json() == first.json()
+    assert len(client.get("/api/configurations").json()) == 2
+    different = client.post(url, json={**approve, "approved": False, **IMPROVER})
+    assert different.status_code == 409
+    client.post(f"/api/runs/{first.json()['run_id']}/finish")
+    late = client.post(url, json={**approve, **IMPROVER})
+    assert late.status_code == 409
+
+
+def test_a_repeat_of_an_older_decision_does_not_take_a_later_decisions_stretch(
+    client, flow
+):
+    flow.first_evaluations()
+    older = flow.propose().json()["proposal_id"]
+    flow.end_stretch()
+    body = {"approved": True, "handler_id": "HND-01", "rejection_reason": ""}
+    first = client.post(
+        f"/api/improver/proposals/{older}/decision", json={**body, **IMPROVER}
+    )
+    client.post(f"/api/runs/{first.json()['run_id']}/finish")
+    later = flow.propose(kind="recipe").json()["proposal_id"]
+    client.post(f"/api/improver/proposals/{later}/decision", json={**body, **IMPROVER})
+
+    repeat = client.post(
+        f"/api/improver/proposals/{older}/decision", json={**body, **IMPROVER}
+    )
+
+    assert repeat.status_code == 409
+
+
 def test_the_proposals_diff_shows_the_change_and_the_models(client, flow):
     flow.first_evaluations()
 
@@ -405,6 +446,26 @@ def test_the_improver_sees_the_model_each_earlier_round_tried(client, flow):
         "google/gemini-3.5-flash-lite",
         "minimal",
     )
+
+
+def test_a_round_stopped_before_its_verdict_does_not_count_its_model_as_tried(
+    client, flow
+):
+    other = {
+        **CHANGE,
+        "model": "google/gemini-3.5-flash-lite",
+        "reasoning_effort": "minimal",
+    }
+    flow.first_evaluations(correct=True)
+    flow.decide(flow.propose(content=other).json()["proposal_id"])
+    flow.end_stretch()
+    client.post(f"/api/rounds/{flow.round_id}/stop")
+
+    view = client.get(Flow(client).url("view")).json()
+
+    [earlier] = view["earlier_rounds"]
+    assert earlier["configuration_version"] == 2
+    assert (earlier["model"], earlier["reasoning_effort"]) == (None, None)
 
 
 def test_an_evaluation_too_costly_for_what_is_left_is_refused(client, flow):

@@ -6,17 +6,23 @@ from typing import Any
 
 import httpx
 
+from backend import stopwatch
 from backend.errors import Conflict, ServiceUnavailable
 
 DEFAULT_AGENT_URL = "http://127.0.0.1:8002"
 TIMEOUT_SECONDS = 5
+# What the agent takes to answer a start or a decision, which waits on its own calls
+# to the backend: 30 seconds each, asked up to twice. This must stay above that.
+ANSWER_TIMEOUT_SECONDS = 70
 
 logger = logging.getLogger(__name__)
 
 
-def _post(path: str, body: dict[str, Any] | None = None) -> httpx.Response:
+def _post(
+    path: str, body: dict[str, Any] | None = None, timeout: int = TIMEOUT_SECONDS
+) -> httpx.Response:
     base_url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
-    return httpx.post(f"{base_url}{path}", json=body, timeout=TIMEOUT_SECONDS)
+    return httpx.post(f"{base_url}{path}", json=body, timeout=timeout)
 
 
 def notify_sign_off(claim_id: str) -> None:
@@ -35,10 +41,14 @@ def _start(path: str, body: dict[str, Any], key: str = "run_id") -> int:
 
     Raises Conflict while a run is going and ServiceUnavailable if the agent is down.
     """
+    watch = stopwatch.Stopwatch(f"The agent's answer to {path}")
     try:
-        response = _post(path, body)
+        response = _post(path, body, ANSWER_TIMEOUT_SECONDS)
     except httpx.HTTPError as error:
         raise ServiceUnavailable("The agent's service isn't running") from error
+    finally:
+        watch.lap("the agent's answer")
+        watch.log()
     if response.status_code == httpx.codes.CONFLICT:
         raise Conflict(response.json()["detail"])
     response.raise_for_status()

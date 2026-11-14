@@ -7,9 +7,18 @@ from typing import Any
 
 from sqlalchemy import Connection, insert, select, update
 
-from backend import db, diffs, platform_settings, reference, rounds, tables, versions
+from backend import (
+    db,
+    diffs,
+    platform_settings,
+    reference,
+    rounds,
+    stopwatch,
+    tables,
+    versions,
+)
 from backend.errors import Conflict, Invalid, NotFound
-from backend.statuses import ProposalKind, ProposalStatus, Stage
+from backend.statuses import ProposalKind, ProposalStatus, RunKind, RunStatus, Stage
 
 
 def _checked_change(content: dict[str, Any]) -> None:
@@ -147,6 +156,92 @@ def for_rounds(round_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
     return by_round
 
 
+def _running_stretch(round_id: int) -> int | None:
+    """The round's improver stretch that is going, or None."""
+    runs = tables.runs.c
+    with db.connection() as conn:
+        return conn.execute(
+            select(runs.run_id)
+            .where(
+                runs.round_id == round_id,
+                runs.kind == RunKind.IMPROVER,
+                runs.status == RunStatus.RUNNING,
+            )
+            .order_by(runs.run_id.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+
+
+def _decided_since(row: dict[str, Any]) -> bool:
+    """Say whether a later proposal of the proposal's round has been decided."""
+    columns = tables.proposals.c
+    with db.connection() as conn:
+        return (
+            conn.execute(
+                select(columns.proposal_id)
+                .where(
+                    columns.round_id == row["round_id"],
+                    columns.proposal_id > row["proposal_id"],
+                    columns.status != ProposalStatus.PENDING,
+                )
+                .limit(1)
+            ).first()
+            is not None
+        )
+
+
+def _replay(row: dict[str, Any], decided: ProposalStatus) -> dict[str, Any] | None:
+    """Answer a repeat of the decision already made, while its stretch is going."""
+    if row["status"] != decided or _decided_since(row):
+        return None
+    run_id = _running_stretch(row["round_id"])
+    if run_id is None:
+        return None
+    return {"run_id": run_id, "version": row["version"], "round_id": row["round_id"]}
+
+
+def _record(
+    row: dict[str, Any],
+    decided: ProposalStatus,
+    handler_id: str,
+    rejection_reason: str,
+    stretch_model: tuple[str, str],
+) -> dict[str, Any]:
+    """Record the decision, its stretch and its version in one transaction."""
+    approved = decided == ProposalStatus.APPROVED
+    watch = stopwatch.Stopwatch(
+        f"Recording the decision on proposal {row['proposal_id']}"
+    )
+    try:
+        with db.connection() as conn:
+            run_id = rounds.begin_stretch(conn, row["round_id"], *stretch_model)
+            watch.lap("begin the stretch")
+            version = _add_version(conn, row, handler_id) if approved else None
+            watch.lap("add the version")
+            conn.execute(
+                update(tables.proposals)
+                .where(tables.proposals.c.proposal_id == row["proposal_id"])
+                .values(
+                    status=decided,
+                    decided_by=handler_id,
+                    decided_on=db.now(),
+                    rejection_reason=None if approved else rejection_reason,
+                    version=version,
+                )
+            )
+            watch.lap("update the proposal")
+            conn.execute(
+                update(tables.rounds)
+                .where(tables.rounds.c.round_id == row["round_id"])
+                .values(**_round_after(row, approved, version))
+            )
+            watch.lap("update the round")
+        watch.lap("commit")
+        return {"run_id": run_id, "version": version, "round_id": row["round_id"]}
+    finally:
+        watch.log()
+
+
 def record_decision(
     proposal_id: int,
     approved: bool,
@@ -156,32 +251,18 @@ def record_decision(
 ) -> dict[str, Any]:
     """Record a handler's decision, and begin the stretch of work that follows.
 
-    Raises RunAlreadyGoing before anything is recorded if something is running.
+    Asked again for the same decision while its stretch is still going, as when
+    the first reply was lost, it answers as it did. Raises RunAlreadyGoing before
+    anything is recorded if something else is running.
     """
     row = _row(proposal_id)
     rounds.require_open(row["round_id"])
+    decided = ProposalStatus.APPROVED if approved else ProposalStatus.REJECTED
+    if (replayed := _replay(row, decided)) is not None:
+        return replayed
     if row["status"] != ProposalStatus.PENDING:
         raise Conflict(f"Proposal {proposal_id} is already {row['status']}")
-    with db.connection() as conn:
-        run_id = rounds.begin_stretch(conn, row["round_id"], *stretch_model)
-        version = _add_version(conn, row, handler_id) if approved else None
-        conn.execute(
-            update(tables.proposals)
-            .where(tables.proposals.c.proposal_id == proposal_id)
-            .values(
-                status=ProposalStatus.APPROVED if approved else ProposalStatus.REJECTED,
-                decided_by=handler_id,
-                decided_on=db.now(),
-                rejection_reason=None if approved else rejection_reason,
-                version=version,
-            )
-        )
-        conn.execute(
-            update(tables.rounds)
-            .where(tables.rounds.c.round_id == row["round_id"])
-            .values(**_round_after(row, approved, version))
-        )
-    return {"run_id": run_id, "version": version, "round_id": row["round_id"]}
+    return _record(row, decided, handler_id, rejection_reason, stretch_model)
 
 
 def _add_version(conn: Connection, row: dict[str, Any], handler_id: str) -> int:

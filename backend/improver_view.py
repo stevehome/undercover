@@ -144,7 +144,18 @@ def _earlier_rounds(round_id: int) -> list[dict[str, Any]]:
             .where(columns.round_id != round_id)
             .order_by(columns.round_id)
         )
-        return [dict(row._mapping) for row in found]
+        return [_tried(dict(row._mapping)) for row in found]
+
+
+def _tried(found_round: dict[str, Any]) -> dict[str, Any]:
+    """Keep a round's model and effort only if it reached a verdict.
+
+    A round stopped before its evaluations never tested its model, so the improver
+    must not count it as tried.
+    """
+    if found_round["verdict"] is None:
+        found_round["model"] = found_round["reasoning_effort"] = None
+    return found_round
 
 
 def _group(settings: dict[str, Any], prefix: str) -> dict[str, Decimal]:
