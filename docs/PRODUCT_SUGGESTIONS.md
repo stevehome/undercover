@@ -43,10 +43,29 @@ A customer complains to a bank, insurer or broker. Someone decides whether the f
 Did a delay, cancellation or denied boarding qualify for compensation under EU261 or UK261, and for how much?
 
 - **Rules:** the regulations themselves and the Court of Justice's case law, for example on what counts as "extraordinary circumstances".
-- **Outcomes:** court judgments and national enforcement-body decisions are public but scattered. Synthesised cases with a rule-derived answer key are credible here, because the rules are mostly arithmetic on distance and delay plus an exceptions list.
-- **Data to link:** US Bureau of Transportation Statistics on-time data, and historical weather. The agent can check whether a "weather" excuse matches the actual weather.
+- **Outcomes:** see the data check below. In short, case-level outcomes are not openly published in the way the Ombudsman's decisions are. Synthesised cases with a rule-derived answer key are credible for the calculable part, because the rules are mostly arithmetic on distance and delay plus an exceptions list.
+- **Data to link:** flight delay data (free for the US, mostly paid at flight level for Europe) and historical weather. The agent can check whether a "weather" excuse matches the actual weather.
 - **Buyer:** claim-management companies and airline customer-relations teams.
 - **Why it fits:** it sits next to travel insurance, so the existing domain knowledge is reusable.
+
+**Data check (14 November 2026, a light look at search results and not the full pages, so confirm each lead before relying on it).**
+
+| Need | What exists | Verdict |
+|---|---|---|
+| Rules | The EU261 and UK261 regulations and the Court of Justice's case law | Public |
+| Case-level outcomes | Aggregate statistics only. The UK CAA publishes passenger complaints data, and AviationADR and CEDR publish reports with counts by type (for example about 18,000 delay-compensation complaints a year at AviationADR). The Commission's enforcement reports are aggregate, and a UK government comparison says national data is inconsistent. | **The gap.** No searchable database of decisions like the Ombudsman's was found. Whether AviationADR or national bodies publish individual decisions is unconfirmed. |
+| Flight delay data | US: the Bureau of Transportation Statistics on-time database is free, flight-level, with delay-cause categories, but EU261 mostly does not cover US domestic flights. Europe: Eurocontrol publishes airport-level and delay-code (CODA) data. Flight-level history is a paid product, for example OAG. | Free for the US, paid for Europe |
+| Weather | Public (see the sports section) | Fine |
+
+What this means:
+
+- **No ready-made answer key.** Idea 1 worked because decisions with outcomes are published. Here labels would have to be built.
+- **Most of the decision is calculable.** Eligibility follows distance, delay length and the airline's reason, and the compensation bands (EUR 250, 400 and 600) come from distance. Labels for that part can be generated from the rules, which gives a consistent but circular test.
+- **The disputed part is the hard part.** "Extraordinary circumstances", such as weather or air traffic control, is where claims are contested. Evidence is the airline's delay code and the weather. Labels would come from Court of Justice rulings, which are few, plus a small expert-labelled set.
+- **A different shape from idea 1.** Predicting an outcome from text topped out at about 75% in the first experiment and more text did not help. This idea suits an agent that checks facts with tools, such as the flight record and the weather, and then calculates the compensation. That fits the UnderCover agent's design better than a text classifier does, and the compensation amount is a richer target than upheld or not.
+- **Cheap checks to do later:** whether AviationADR or the national enforcement bodies publish individual decisions, and how many Court of Justice rulings on extraordinary circumstances are available.
+
+Sources: the CAA passenger complaints data page, AviationADR's bi-annual report 2024 to 2026, the UK government's "international comparisons of EU Regulation 261 enforcement", the BTS "airline on-time performance and causes of flight delays" page, Eurocontrol Data Snapshot #20, and OAG's historical flight data page.
 
 ### 3. Employment and tenancy tribunal pre-screening
 
@@ -218,7 +237,7 @@ Reproduce with `uv run --env-file .env data/ombudsman/baseline.py`, `distil_rule
 ## Recommendation
 
 1. **Build idea 1 (financial complaints) as the second product, aimed at more than the plain outcome.** It has the strongest public labels, the closest decision shape, and a buyer who already pays people to do this by hand. A plain model gets about three in four outcomes right, but nothing we tried moved it, so the product value is more likely in the evidence given to the model and in richer targets such as redress and the deciding rule.
-2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up**, since it shares the travel domain and gives a clear weather-linked story.
+2. **Keep idea 2 (flight delay) as the insurance-adjacent follow-up, behind idea 1.** It shares the travel domain, gives a clear weather-linked story, and suits an agent that checks facts with tools. Its data is thinner: no open case-level outcomes were found, so labels would be rule-derived, with a small expert-labelled set for the disputed cases. Check for published decisions before committing.
 3. **Run a small sports forecasting experiment alongside**, only as a test bed for the improver loop. Score it against closing odds, and do not offer it as advice.
 
 The first step for idea 1 has been done (see above): a plain model reaches about 75% from the complaint text against 51% for guessing, on 683 held-out cases. Rules and similar cases did not help. An improver loop over the model, effort and prompt did not beat it. Giving the model the policy clause the ombudsman relied on did not help either. The next step is to aim at redress and the deciding rule instead of the plain outcome, and then to write a plan in `docs/PLAN_<NAME>.md` if that shows a gain.
