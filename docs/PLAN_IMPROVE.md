@@ -386,3 +386,13 @@ Our recipe said "keeping the same model and reasoning level", so the improver on
 - The improver couldn't see which model earlier rounds had tried, so `read_results` now gives each earlier round's `model` and `reasoning_effort` (`backend/improver_view.py`), with a test.
 - The recipe is only copied from `data/improver_recipe.md` when a database is first seeded. **An existing database keeps its current recipe**, so the improver there won't follow the new step until a round proposes it as a new recipe and a handler approves it.
 - With six allowed pairs this can use up to five rounds on model-only changes. The keep rule needs a gain beyond the noise, so most of them will roll back; the useful case is a cheaper model that scores about the same.
+
+### Recipe version 8 added to the database
+
+The note above says an existing database keeps its old recipe. Ours did, so on 14 November 2026 the new step was added to the live recipe by hand.
+
+- **The recipe in use was not the repo's file.** The improver had rewritten its own recipe six times (rounds 2 to 9), and version 7 was current. Copying `data/improver_recipe.md` over it would have discarded that, so version 8 was built from version 7 with the model step added.
+- **What version 8 changes from version 7:** a new step 3 that tries an allowed model and effort not yet used, with the instructions unchanged; the old steps 3 to 6 renumbered 4 to 7; step 4 (was 3) now says to keep the model and effort only for an instruction change, because the old wording ("absent a strong evidence-based reason") would have contradicted the new step; step 5 (was 4) proposes the instructions, model and effort together and, for a model-only round, says why the model might help. Everything else is version 7's text.
+- **How it was added.** No round was open. The Supabase tool is read-only, so the row went in through the backend's own `versions.add_version` after a dry run that printed the diff. It is recorded as proposed by "claude-code (for steve)", kept, with the reason that it was added directly at the student's request and not by a round. Versions 1 to 7 are untouched.
+- **To undo it,** mark version 8 as rolled back. The current recipe is the highest kept version, so version 7 becomes current again.
+- **The recipe can still change.** The improver may rewrite it at the end of any round, and a handler approves that, so a later version could drop the step. If it stops trying other models, read the recipe text first.
