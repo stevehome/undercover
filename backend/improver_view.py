@@ -123,7 +123,8 @@ def _evaluation_claims(version: int) -> dict[str, list[dict[str, Any]]]:
 
 
 def _earlier_rounds(round_id: int) -> list[dict[str, Any]]:
-    columns = tables.rounds.c
+    """The other rounds, each with the model and effort of the version it tried."""
+    columns, tried = tables.rounds.c, tables.configurations.c
     with db.connection() as conn:
         found = conn.execute(
             select(
@@ -134,6 +135,11 @@ def _earlier_rounds(round_id: int) -> list[dict[str, Any]]:
                 columns.held_out_after,
                 columns.verdict,
                 columns.verdict_reason,
+                tried.model,
+                tried.reasoning_effort,
+            )
+            .outerjoin(
+                tables.configurations, tried.version == columns.configuration_version
             )
             .where(columns.round_id != round_id)
             .order_by(columns.round_id)

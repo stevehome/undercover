@@ -385,6 +385,28 @@ def test_the_improver_sees_the_wrong_claims_and_five_right_ones(client, flow):
     assert view["objectives_on_the_held_out_set"]["accuracy"] == "0.60"
 
 
+def test_the_improver_sees_the_model_each_earlier_round_tried(client, flow):
+    other = {
+        **CHANGE,
+        "model": "google/gemini-3.5-flash-lite",
+        "reasoning_effort": "minimal",
+    }
+    flow.first_evaluations(correct=True)
+    flow.decide(flow.propose(content=other).json()["proposal_id"])
+    for eval_set in ("evaluation", "held_out", "held_out"):
+        flow.evaluate(2, eval_set, correct=True)
+    client.post(flow.url("verdict"))
+    flow.end_stretch()
+
+    view = client.get(Flow(client).url("view")).json()
+
+    [earlier] = view["earlier_rounds"]
+    assert (earlier["model"], earlier["reasoning_effort"]) == (
+        "google/gemini-3.5-flash-lite",
+        "minimal",
+    )
+
+
 def test_an_evaluation_too_costly_for_what_is_left_is_refused(client, flow):
     run = flow.evaluate(1, "evaluation", correct=False)
     for claim in run["claims"]:

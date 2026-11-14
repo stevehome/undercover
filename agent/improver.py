@@ -37,6 +37,11 @@ and the customer's earlier claims, and its tools for working out a payout. It ne
 sees the handlers' decisions or the scores. You may change only its instructions, \
 its model and its reasoning effort, and only to the models allowed.
 
+A model allowed, at a reasoning effort allowed for it, that neither the current \
+version nor any earlier round's version has used is always a change worth trying. \
+Only when none is left and you find no other change worth proposing, say why and \
+end the round without one.
+
 A change teaches the agent a rule that holds for any claim: it never names a claim \
 or a claim's details. A handler reviews each proposal before it takes effect, and \
 tells you why if they reject it, so that you can propose again. Code, not you, keeps \

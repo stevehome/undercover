@@ -377,3 +377,12 @@ The Scoreboard now has a **Round** column: the round that started an evaluation,
 ### A model call that never ended (round 7)
 
 One claim in round 7's held-out evaluation stalled for 9 minutes: its model call kept receiving a few bytes, so the SDK's 120 second timeout, which applies to each read, never fired, and something other than our code cut it off. A stub server that trickles bytes reproduced it (`agent/tests/test_deadline.py`). Now `agent/deadline.py` gives each model response 120 seconds in all, on the claim agent's client, and the SDK retries once, not twice. A failed attempt's reason is also kept as a step on the claim: it was only in the run's note, which the retry overwrote.
+
+### The improver now tries the other models (after comparing with Ed's build)
+
+Our recipe said "keeping the same model and reasoning level", so the improver only changed instructions and never tried the other models allowed. Ed's recipe has a step for it, and we took it: if an allowed model at an allowed reasoning effort hasn't been used by the current version or any earlier round's, try it, starting with a higher effort on the current model, with the instructions unchanged so the round shows what the model alone changes. Only when none is left does it go back to adding rules.
+
+- `data/improver_recipe.md` has the new step 2, and `agent/improver.py`'s instructions say an untried model is always worth trying.
+- The improver couldn't see which model earlier rounds had tried, so `read_results` now gives each earlier round's `model` and `reasoning_effort` (`backend/improver_view.py`), with a test.
+- The recipe is only copied from `data/improver_recipe.md` when a database is first seeded. **An existing database keeps its current recipe**, so the improver there won't follow the new step until a round proposes it as a new recipe and a handler approves it.
+- With six allowed pairs this can use up to five rounds on model-only changes. The keep rule needs a gain beyond the noise, so most of them will roll back; the useful case is a cheaper model that scores about the same.
