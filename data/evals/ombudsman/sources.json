@@ -1,10 +1,10 @@
 [
   {
     "claim_id": "CLM-1401",
-    "fos": "DRN-4676116",
+    "fos": "DRN-3283535",
     "fos_outcome": "Not upheld",
-    "ours": "decline",
-    "relation": "same outcome"
+    "ours": "approve",
+    "relation": "facts changed: FOS decided a liability point, ours is the vehicle rule, partly paid"
   },
   {
     "claim_id": "CLM-1402",
@@ -17,8 +17,8 @@
     "claim_id": "CLM-1403",
     "fos": "DRN-2594397",
     "fos_outcome": "Not upheld",
-    "ours": "approve",
-    "relation": "facts changed: earlier visit outside the 60-day window"
+    "ours": "decline",
+    "relation": "same outcome: earlier condition linked to the claim, here through a dose change in the window"
   },
   {
     "claim_id": "CLM-1404",
@@ -32,6 +32,6 @@
     "fos": "DRN-2875228",
     "fos_outcome": "Not upheld",
     "ours": "decline",
-    "relation": "same outcome"
+    "relation": "same outcome; the reason for cancelling is a different listed-reason test"
   }
 ]

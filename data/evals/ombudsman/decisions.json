@@ -1,17 +1,30 @@
 [
   {
     "claim_id": "CLM-1401",
-    "decision": "decline",
-    "payout": 0.0,
+    "decision": "approve",
+    "payout": 255.0,
     "over_approval_limit": false,
     "handler_id": "HND-02",
     "decided_on": "2026-07-20",
-    "reason": "The theft was reported to the police the same afternoon, but the bag was on a sunbed at a public pool while Tomas swam, out of his sight and reach in a place the public can get to. That is unattended, and section 5 does not pay for belongings left unattended.",
-    "reference": "Policy wording, section 5; claims manual, unattended belongings",
-    "calculation": [],
-    "tests": "A theft with a police report in time, but the bag was left unattended at a public pool while the customer swam",
+    "reason": "A bag on the rear seat is unattended even in a locked car, so the laptop and the jacket are left out. The sunglasses and the charger were locked in the glove compartment and out of sight, so they are covered: $260.00 is inside the $300 per-item limit on Premium, and the charger is $45.00. The rental company's window bill is damage to the rental car, which is not baggage or personal effects. The total of $305.00 less the $50 deductible leaves $255.00.",
+    "reference": "Policy wording, sections 5 and 10; claims manual, vehicles",
+    "calculation": [
+      {
+        "step": "Prescription sunglasses, within the $300 limit",
+        "amount": 260.0
+      },
+      {
+        "step": "Portable charger",
+        "amount": 45.0
+      },
+      {
+        "step": "Less the deductible",
+        "amount": -50.0
+      }
+    ],
+    "tests": "A car break-in: the back seat is unattended and the locked glove compartment is covered, and the rental company's bill is not baggage",
     "difficulty": "hard",
-    "tempts": "approve",
+    "tempts": "decline",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -52,42 +65,17 @@
   },
   {
     "claim_id": "CLM-1403",
-    "decision": "approve",
-    "payout": 2646.5,
-    "over_approval_limit": true,
+    "decision": "decline",
+    "payout": 0.0,
+    "over_approval_limit": false,
     "handler_id": "HND-01",
     "decided_on": "2026-08-30",
-    "reason": "The policy was bought on June 20, so the 60 days before it start on April 21. The one visit for back strain was on April 10, before the window, with no treatment, visits or medication change since, so the condition is not pre-existing. The five treatment lines abroad come to $2,696.50. The physiotherapy at home is follow-up care and is not covered. The $50 deductible comes off, leaving $2,646.50. The payout needs sign-off.",
-    "reference": "Policy wording, section 7; claims manual, pre-existing conditions and treatment that can wait",
-    "calculation": [
-      {
-        "step": "Emergency department assessment",
-        "amount": 540.0
-      },
-      {
-        "step": "MRI scan",
-        "amount": 1180.0
-      },
-      {
-        "step": "Orthopedic consultation",
-        "amount": 320.0
-      },
-      {
-        "step": "Medication",
-        "amount": 46.5
-      },
-      {
-        "step": "Overnight observation",
-        "amount": 610.0
-      },
-      {
-        "step": "Less the deductible",
-        "amount": -50.0
-      }
-    ],
-    "tests": "An earlier visit for back trouble that falls just outside the 60-day window, and follow-up care at home to leave out",
+    "reason": "The policy was bought on June 20, so the 60 days before it start on April 21. The customer's own physician increased the naproxen dose for the same back condition on May 30, inside that window, and a change in dose is a change in medication. The condition is pre-existing, the policy has no Pre-Existing Condition Waiver, and section 7 excludes it.",
+    "reference": "Policy wording, section 7; claims manual, pre-existing conditions",
+    "calculation": [],
+    "tests": "The story and the April visit sit outside the window, but the records show a dose change inside it",
     "difficulty": "hard",
-    "tempts": "decline",
+    "tempts": "approve",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -95,35 +83,31 @@
   {
     "claim_id": "CLM-1404",
     "decision": "approve",
-    "payout": 279.7,
+    "payout": 456.0,
     "over_approval_limit": false,
     "handler_id": "HND-02",
     "decided_on": "2026-09-22",
-    "reason": "The carrier confirms a delay of 13 hours caused by a strike, past the 6 hour waiting period on Premium. The hotel, the meals and the taxis are covered and come to $279.70, inside the $800 maximum with no deductible. The paid night in Bologna is a consequential loss under section 9 and is left out.",
-    "reference": "Policy wording, sections 3 and 9",
+    "reason": "The carrier confirms a delay of 13 hours caused by a strike, past the 6 hour waiting period on Premium. The hotel is paid at the $350 a night limit for one room for two travelers. Without meal receipts the meals are paid at the flat $35 per traveler for each 24 hours or part of them: $70.00 for two. Both taxis have receipts and are paid at $36.00. The paid night in Bologna is a consequential loss under section 9. The total is $456.00, inside the $800 maximum with no deductible.",
+    "reference": "Policy wording, sections 3 and 9; claims manual, reasonable accommodation, consequential losses and meals without receipts",
     "calculation": [
       {
-        "step": "Hotel in Split",
-        "amount": 168.0
+        "step": "Hotel, at the $350 a night limit",
+        "amount": 350.0
       },
       {
-        "step": "Dinner for two",
-        "amount": 54.3
-      },
-      {
-        "step": "Breakfast for two",
-        "amount": 21.4
+        "step": "Meals, flat $35 for two travelers for one day",
+        "amount": 70.0
       },
       {
         "step": "Taxi to the hotel",
         "amount": 18.0
       },
       {
-        "step": "Taxi back",
+        "step": "Taxi back to the port",
         "amount": 18.0
       }
     ],
-    "tests": "A covered strike delay with a consequential loss to leave out",
+    "tests": "Three rules in one claim: the hotel limit, flat meals without receipts, and a consequential loss to leave out",
     "difficulty": "hard",
     "tempts": "payout",
     "needs": [],
@@ -137,10 +121,10 @@
     "over_approval_limit": false,
     "handler_id": "HND-03",
     "decided_on": "2026-08-29",
-    "reason": "Section 2 pays for a cancellation only for the reasons it lists, and a visa that did not arrive in time is not one of them. The claim is declined under section 2.",
+    "reason": "Losing a job through no fault of your own is a covered reason under section 2, but only after at least one year with the employer. The employer's letter shows the job began on October 6, 2025 and ended on August 14, 2026, about ten months, so the condition is not met. The claim is declined under section 2.",
     "reference": "Policy wording, section 2",
     "calculation": [],
-    "tests": "A well-documented non-refundable loss, but the visa delay is not a covered reason to cancel",
+    "tests": "A listed reason, job loss, whose one-year condition fails on dates in the employer's letter",
     "difficulty": "hard",
     "tempts": "approve",
     "needs": [],

@@ -2,12 +2,12 @@
   {
     "policy_id": "POL-2401",
     "customer_id": "CUS-3401",
-    "plan": "economy",
+    "plan": "premium",
     "add_ons": [],
     "purchased_on": "2026-06-02",
     "sold_through": "TripNest checkout",
     "trip": {
-      "destination": "Barcelona, Spain",
+      "destination": "Lisbon, Portugal",
       "departs_on": "2026-07-10",
       "returns_on": "2026-07-20",
       "trip_cost": 2600.0

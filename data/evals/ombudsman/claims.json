@@ -6,37 +6,52 @@
     "claim_type": "baggage",
     "submitted_on": "2026-07-16",
     "incident_date": "2026-07-14",
-    "incident_location": "Barcelona, Spain",
-    "summary": "Bag with watch, phone and cash stolen from a sunbed at the public pool",
-    "story": "On July 14 I went swimming at the public pool at Montjuic. I left my bag on a sunbed and swam lengths for about forty minutes. When I got out the bag was gone, with my watch, my phone and some cash. I went to the police station that afternoon and they gave me a report. I have listed what was in it.",
+    "incident_location": "Sintra, Portugal",
+    "summary": "Rental car broken into at a viewpoint near Sintra",
+    "story": "On July 14 we parked our rental car at a viewpoint near Sintra for about an hour. When we came back the rear window was smashed. My backpack was gone from the back seat, with my laptop and a jacket, and the glove compartment had been forced and my sunglasses and a charger taken. I went to the police that afternoon. I am also claiming the rental company's bill for the window.",
     "items": [
       {
-        "description": "Wrist watch",
-        "category": "jewelry",
-        "amount": 380.0
-      },
-      {
-        "description": "Smartphone",
+        "description": "Laptop, in the backpack on the rear seat",
         "category": "electronics",
-        "amount": 310.0
+        "amount": 1150.0
       },
       {
-        "description": "Cash",
-        "category": "cash",
-        "amount": 240.0
+        "description": "Jacket, in the backpack on the rear seat",
+        "category": "clothing",
+        "amount": 210.0
+      },
+      {
+        "description": "Prescription sunglasses, taken from the glove compartment",
+        "category": "accessories",
+        "amount": 260.0
+      },
+      {
+        "description": "Portable charger, taken from the glove compartment",
+        "category": "electronics",
+        "amount": 45.0
+      },
+      {
+        "description": "Rental company's bill for the rear window",
+        "category": "other",
+        "amount": 380.0
       }
     ],
-    "amount_claimed": 930.0,
+    "amount_claimed": 2045.0,
     "documents": [
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Mossos d'Esquadra, Barcelona. Report made July 14, 2026 at 17:20 by Tomas Brandt. He left a bag on a sunbed at the Montjuic municipal pool at about 13:00 and swam until about 13:45. On return the bag was missing, with a watch, a phone and about EUR 220 in cash."
+        "content": "Policia de Seguranca Publica, Sintra. Report made July 14, 2026 at 16:40 by Tomas Brandt. A rental car parked at the Monserrate viewpoint was entered at about 14:30 by breaking the rear window. A backpack was taken from the rear seat. The glove compartment, which had been locked, was forced and prescription sunglasses and a charger were taken. The trunk was not opened."
       },
       {
         "name": "Receipts",
         "type": "receipt",
-        "content": "Watch, bought 2023: $380.00. Smartphone, bought 2025: $310.00. Cash withdrawn at an ATM on July 13: $240.00."
+        "content": "Laptop, bought 2025: $1,150.00. Jacket: $210.00. Prescription sunglasses, bought 2026: $260.00. Charger: $45.00."
+      },
+      {
+        "name": "Rental company invoice",
+        "type": "receipt",
+        "content": "Rear window replacement, charged to the renter: $380.00."
       }
     ],
     "status": "open"
@@ -87,7 +102,7 @@
     "incident_date": "2026-08-06",
     "incident_location": "Santiago, Chile",
     "summary": "Disc pain and sciatica needing an emergency admission in Santiago",
-    "story": "On August 6 I woke with severe pain down my left leg and could not stand. I was admitted overnight in Santiago and had an MRI. I did have some back trouble last spring, which I mention in case it matters. Once I got home I had four physiotherapy sessions, which I have also listed.",
+    "story": "On August 6 I woke with severe pain down my left leg and could not stand. I was admitted overnight in Santiago and had an MRI. I did have some back trouble last spring, but it was a simple strain in April and it cleared up. Once I got home I had four physiotherapy sessions, which I have also listed.",
     "items": [
       {
         "description": "Emergency department assessment",
@@ -125,7 +140,7 @@
       {
         "name": "Hospital bill and records",
         "type": "medical_records",
-        "content": "Clinica Santa Maria, Santiago, August 6 to 7, 2026. Diagnosis: lumbar disc herniation with left sciatica. History: one visit to a physician for a lower back strain on April 10, 2026, treated with rest and stretching; no medication prescribed; no further visits."
+        "content": "Clinica Santa Maria, Santiago, August 6 to 7, 2026. Diagnosis: lumbar disc herniation with left sciatica. Referral letter from the patient's physician in Seattle, enclosed: April 10, 2026, visit for a lower back strain, naproxen 250 mg twice daily prescribed. May 30, 2026, telephone review, pain persisting, naproxen increased to 500 mg twice daily. No visits after that date."
       },
       {
         "name": "Itemized bill",
@@ -149,22 +164,17 @@
     "incident_date": "2026-09-13",
     "incident_location": "Split, Croatia",
     "summary": "Held overnight in Split by a ferry crew strike on the way home",
-    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. We had a hotel room in Split for the night and paid for meals and taxis. We also lost our first night's hotel in Bologna, which we had already paid for. Receipts are attached.",
+    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. We stayed at a hotel near the port, ate at the quay and took taxis. We paid cash for the meals and have no receipts for them. We also lost our first night's hotel in Bologna, which we had already paid for.",
     "items": [
       {
         "description": "Hotel in Split, one room, one night",
         "category": "accommodation",
-        "amount": 168.0
+        "amount": 410.0
       },
       {
-        "description": "Dinner for two",
+        "description": "Meals for two at the quay, cash",
         "category": "meals",
-        "amount": 54.3
-      },
-      {
-        "description": "Breakfast for two",
-        "category": "meals",
-        "amount": 21.4
+        "amount": 75.7
       },
       {
         "description": "Taxi to the hotel",
@@ -182,7 +192,7 @@
         "amount": 140.0
       }
     ],
-    "amount_claimed": 419.7,
+    "amount_claimed": 661.7,
     "documents": [
       {
         "name": "Ferry delay confirmation",
@@ -192,7 +202,7 @@
       {
         "name": "Receipts",
         "type": "receipt",
-        "content": "Hotel Marjan, September 13 to 14: $168.00. Restaurant Fish Door, dinner: $54.30. Cafe Riva, breakfast: $21.40. Taxis: $18.00 and $18.00. Hotel Torre, Bologna, no-show September 14: $140.00."
+        "content": "Hotel Marjan, September 13 to 14, one room: $410.00. Taxis, receipts 8841 and 8842: $18.00 and $18.00. Hotel Torre, Bologna, no-show September 14: $140.00."
       }
     ],
     "status": "open"
@@ -203,10 +213,10 @@
     "customer_id": "CUS-3405",
     "claim_type": "trip_cancellation",
     "submitted_on": "2026-08-25",
-    "incident_date": "2026-08-12",
+    "incident_date": "2026-08-14",
     "incident_location": "Miami, Florida",
-    "summary": "Trip to Vietnam cancelled because my visa did not arrive",
-    "story": "I applied for my Vietnam visa five weeks before the trip. The visa office was closed for several days and the visa had not arrived by August 12, so I could not travel on August 20. The airline and the hotel will not refund me. I would like my costs back.",
+    "summary": "Trip to Vietnam cancelled after my position was cut",
+    "story": "My employer cut my position on August 14, through no fault of mine, and I could not afford to take the trip on August 20. I had worked there for almost a year. The airline and the hotel will not refund me. I would like my costs back.",
     "items": [
       {
         "description": "Flights, not refundable",
@@ -222,9 +232,9 @@
     "amount_claimed": 2300.0,
     "documents": [
       {
-        "name": "Visa office email",
+        "name": "Letter from the employer",
         "type": "other",
-        "content": "Your application is still being processed. The office was closed from August 5 to August 11 and applications are taking longer than usual."
+        "content": "Harbor Freight Logistics. This confirms that your employment, which began on October 6, 2025, ended on August 14, 2026 because your position was eliminated in a restructuring. You did nothing wrong."
       },
       {
         "name": "Supplier confirmations",
