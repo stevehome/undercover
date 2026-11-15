@@ -277,3 +277,38 @@ FOS decides under UK law and each insurer's own terms. UnderCover has its own wo
 1. Set size: 25 claims to match the others, or another number.
 2. Luna accuracy to tune towards. Ed's held-out sets give a reference; about 60 to 70% is a suggestion.
 3. Start with a pilot of 5 claims, reviewed before scaling to 25.
+
+### Result: the ombudsman-derived set, built and measured (14 to 15 November 2026)
+
+The set is in `data/evals/ombudsman/`: 25 claims in the course's four-file shape, plus `sources.json` linking each claim to the FOS case it started from. The mix is 11 approve, 9 decline and 5 refer.
+
+**How it was built.** Each claim started from a real FOS case and was rewritten as a fictional UnderCover claim, with the decision worked out under UnderCover's own wording and manual. Opus 5.5 drafted the claims from briefs where the intended decision and payout were fixed in advance. Code checks rejected any draft with a wrong payout, item sum, date or copied FOS text. GPT-6.1 Sol, from a different model family, and Opus then decided every claim blind, and the set kept only claims where both matched the answer key. That check caught one real mistake (a receipt dated before the product's release).
+
+**What the measurements showed.**
+
+| Method | Luna, low effort | Notes |
+|---|---|---|
+| First 5 claims, wording and manual in the prompt | about 95% | far too easy |
+| 25 claims, same prompt-only method | 85 to 91% | extra rules did not help |
+| 25 claims, real agent in a scratch schema, first version | 21, 19, 18 of 25 (77%) | |
+| 25 claims, real agent, final set | 16, 16, 15 of 25 (63%) | inside the 60 to 70% target |
+| Ed's `even_harder`, real agent | 15, 15, 15 of 25 (60%) | same yardstick |
+
+A single run varies by about 4 points.
+
+**What makes a claim hard for the real agent.** Adding more rules to a claim did not help: Luna handles several interacting rules when they are in the wording. It fails on three things:
+- **A place or operator that must be looked up.** A dive site, a jet boat, a river run, or a helicopter flight. The agent assumes a risky-sounding activity is an excluded adventure sport. It declined CLM-1411 (a shallow reef dive), CLM-1412 (a jet-boat ride) and CLM-1417 (a grade 2 family raft trip) every run, though all three are covered.
+- **An event announced before the policy was bought.** The agent did not look up the announcement date, and missed it on CLM-1421 (a ferry strike) every run.
+- **Counting earlier claims.** A third claim in 12 months should be referred. The agent paid CLM-1416 and CLM-1419 every run.
+
+A prompt-only check with the whole knowledge base in the prompt overstates the agent's ability and understates how hard these claims are. The real agent has to decide to search, and often does not.
+
+**How it was run.** The app seeds only an `evaluation` and a `held_out` set, so the 25 claims were loaded as the held-out set into a separate Postgres schema, `scratch_eval`, with their own backend and agent on ports 8100 and 8102. This needed one small change, a `UNDERCOVER_SCHEMA` setting (default `undercover`, so nothing changes unless it is set). Ed's `even_harder` set can be loaded the same way. Every run used the starting prompt (version 1), so these numbers will move after an improver round.
+
+**Limits.**
+- Seven claims have moved away from their FOS case; `sources.json` marks them "starting point only". Only 9 of the 25 still share the FOS outcome's direction.
+- The labels were set and checked by models. A person has not yet reviewed them, and a spot-check of about 10 claims is still needed.
+- The set is tuned to Luna at low effort, and may not hold for other models.
+- Keep it out of any prompt or rule that is written while improving the agent, as with the course's held-out sets.
+
+**Next steps.** Spot-check about 10 claims by hand. Then decide whether to use the set as the held-out set in the app, which means a reseed, or to keep it as a separate benchmark in a scratch schema.
