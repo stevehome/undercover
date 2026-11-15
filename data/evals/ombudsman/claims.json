@@ -269,12 +269,17 @@
       {
         "name": "Hospital medical records",
         "type": "medical_record",
-        "content": "Hospital Regional Turrialba, Emergency Department. Patient: Rafael Ortiz, male, 38, US visitor. Arrival 13:42, August 26, 2026, by ambulance. History: fall from the raft at Tallow Gorge, struck left shoulder on rock. Wearing helmet and flotation device. No loss of consciousness. Examination: deformity and tenderness over the mid-shaft left clavicle, neurovascular intact. Imaging: displaced mid-shaft fracture of the left clavicle, no other injury. Past history: no prior shoulder injury, no regular medications, no known chronic conditions. Plan: sling, analgesia, orthopedic review in 72 hours to confirm alignment before air travel. Seen by Dr. Andrea Solano Vargas. Orthopedic review August 29, 2026: alignment acceptable, fit to fly with sling, follow-up with own physician at home. Dr. Marco Jim\u00e9nez Rojas."
+        "content": "Hospital Regional Turrialba, Emergency Department. Patient: Rafael Ortiz, male, 38, US visitor. Arrival 13:42, August 26, 2026, by ambulance. History: fall from the raft at Tallow Gorge, struck left shoulder on rock. Wearing helmet and flotation device. No loss of consciousness. Examination: deformity and tenderness over the mid-shaft left clavicle, neurovascular intact. Imaging: displaced mid-shaft fracture of the left clavicle, no other injury. Past history: no prior shoulder injury, no regular medications, no known chronic conditions. Plan: sling, analgesia, orthopedic review in 72 hours to confirm alignment before air travel. Seen by Dr. Andrea Solano Vargas. Orthopedic review August 29, 2026: alignment acceptable, fit to fly with sling, follow-up with own physician at home. Dr. Marco Jiménez Rojas."
       },
       {
         "name": "Rio Verde Aventuras booking confirmation",
         "type": "other",
         "content": "Rio Verde Aventuras S.A., Turrialba. Booking RV-08261. Lead guest: Rafael Ortiz. Guests: 3 (2 adults, 1 youth aged 14). Date: August 26, 2026. Hotel pickup 06:15 from Casa Turrialba, breakfast stop 07:00, put-in approx. 08:30, riverside lunch, take-out approx. 14:30, return to hotel approx. 16:30. Price per guest $115.00, total $345.00, paid in full on August 10, 2026. Included: certified guides (1 per raft plus safety kayaker), helmets, flotation devices, paddles, dry bags, lunch, photos. Run: Tallow Gorge, 14 km. Minimum age 12. Guests must be able to swim. Safety notes: the Tallow Gorge section is rated international grade IV (4) from put-in to take-out with no easier stretches, and all guests take part in the full safety briefing and swim practice before launch. Not recommended for guests with back or heart problems or who are pregnant. Cancellation: full refund up to 48 hours before the trip. Please bring sunscreen, a change of clothes and secure footwear."
+      },
+      {
+        "name": "Rafting company booking confirmation",
+        "type": "other",
+        "content": "Booking confirmation, family river day, Rio Cuyo, Costa Rica. Run booked: Tallow Gorge, a white-water rafting run with grade 4 rapids from start to finish. Helmets and life jackets included. Guests: 3."
       }
     ],
     "status": "open"
@@ -332,6 +337,11 @@
         "name": "Physiotherapy invoice",
         "type": "medical_bill",
         "content": "Three Rivers Physical Therapy, 410 Penn Avenue, Pittsburgh, PA 15222. Patient: Delia Fenwick. Diagnosis: post-fracture stiffness, right wrist. Sessions: September 1, 2026 $120.00; September 3, 2026 $120.00; September 5, 2026 $120.00; September 8, 2026 $120.00. Total $480.00."
+      },
+      {
+        "name": "Glacier Air booking confirmation",
+        "type": "other",
+        "content": "Glacier Air, Interlaken, Switzerland. Helicopter sightseeing flight over the Jungfrau region, passengers seated throughout, no landing activities."
       }
     ],
     "status": "open"
@@ -394,6 +404,11 @@
         "name": "Meal receipts",
         "type": "receipt",
         "content": "Trattoria Monti, Rome, July 21, 2026, 22:41, $38.00. Bar Gelsomino, Rome, July 22, 2026, 08:52, $16.00. Pizzeria Leonina, Rome, July 22, 2026, 13:20, $22.00. All paid by card."
+      },
+      {
+        "name": "Rail unions' strike announcement",
+        "type": "other",
+        "content": "Rome, July 3, 2026: Italy's rail unions have called a 24 hour national rail strike from 9 pm on July 21 to 9 pm on July 22. Most high-speed and regional trains will not run."
       }
     ],
     "status": "open"
@@ -611,12 +626,12 @@
     "story": "On the third day of my trip I went scuba diving with a local dive shop at Parrotfish Garden. On the way down I had trouble clearing my left ear. By the time we got back to the boat it was very painful and my hearing on that side was muffled. The dive shop drove me to the clinic in town that afternoon. The doctor said it was ear barotrauma, gave me medicine and told me not to dive again on the trip. She asked me to come back two days later so she could check it, and I did. It was getting better. When I got home I still felt a little blocked, so I had a hearing test at an audiology clinic on February 18. Everything was fine by then. I am claiming the two clinic visits in Honduras and the hearing test at home.",
     "items": [
       {
-        "description": "Emergency visit for left ear barotrauma, Cl\u00ednica Isle\u00f1a, Cayo Brava",
+        "description": "Emergency visit for left ear barotrauma, Clínica Isleña, Cayo Brava",
         "category": "medical",
         "amount": 640.0
       },
       {
-        "description": "Follow-up visit to recheck the ear, Cl\u00ednica Isle\u00f1a, Cayo Brava",
+        "description": "Follow-up visit to recheck the ear, Clínica Isleña, Cayo Brava",
         "category": "medical",
         "amount": 180.0
       },
@@ -631,27 +646,32 @@
       {
         "name": "Clinic itemized bill, first visit",
         "type": "medical_bill",
-        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava, Honduras. February 9, 2026. Patient: Renata Kowalczyk. Urgent consultation $290.00. Otoscopic examination and tympanometry $210.00. Medication (decongestant, analgesic, ear drops) $140.00. Total $640.00. Paid by card."
+        "content": "Clínica Isleña, Cayo Brava, Honduras. February 9, 2026. Patient: Renata Kowalczyk. Urgent consultation $290.00. Otoscopic examination and tympanometry $210.00. Medication (decongestant, analgesic, ear drops) $140.00. Total $640.00. Paid by card."
       },
       {
         "name": "Clinic medical record, first visit",
         "type": "medical_record",
-        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava. February 9, 2026, 15:40. Patient presents after scuba diving at Parrotfish Garden this morning. Reports difficulty equalizing on descent, then left ear pain and muffled hearing. Exam: left tympanic membrane intact, retracted, with hemorrhage. Right ear normal. Diagnosis: left middle ear barotrauma. Plan: oral decongestant, analgesic, ear drops. No diving or flying for 48 hours. Recheck in 2 days. No previous ear problems reported. No regular medication."
+        "content": "Clínica Isleña, Cayo Brava. February 9, 2026, 15:40. Patient presents after scuba diving at Parrotfish Garden this morning. Reports difficulty equalizing on descent, then left ear pain and muffled hearing. Exam: left tympanic membrane intact, retracted, with hemorrhage. Right ear normal. Diagnosis: left middle ear barotrauma. Plan: oral decongestant, analgesic, ear drops. No diving or flying for 48 hours. Recheck in 2 days. No previous ear problems reported. No regular medication."
       },
       {
         "name": "Clinic itemized bill, follow-up visit",
         "type": "medical_bill",
-        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava, Honduras. February 11, 2026. Patient: Renata Kowalczyk. Follow-up consultation $150.00. Medication refill (decongestant) $30.00. Total $180.00. Paid by card."
+        "content": "Clínica Isleña, Cayo Brava, Honduras. February 11, 2026. Patient: Renata Kowalczyk. Follow-up consultation $150.00. Medication refill (decongestant) $30.00. Total $180.00. Paid by card."
       },
       {
         "name": "Clinic medical record, follow-up visit",
         "type": "medical_record",
-        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava. February 11, 2026. Recheck of left middle ear barotrauma after scuba diving. Pain much reduced. Hemorrhage resolving, membrane intact. Cleared to fly on February 14 as planned. No further diving this trip. If hearing does not feel normal after returning home, a routine hearing test can be arranged there."
+        "content": "Clínica Isleña, Cayo Brava. February 11, 2026. Recheck of left middle ear barotrauma after scuba diving. Pain much reduced. Hemorrhage resolving, membrane intact. Cleared to fly on February 14 as planned. No further diving this trip. If hearing does not feel normal after returning home, a routine hearing test can be arranged there."
       },
       {
         "name": "Home audiology invoice",
         "type": "medical_bill",
         "content": "North Loop Hearing Center, Minneapolis, MN. February 18, 2026. Patient: Renata Kowalczyk. Comprehensive audiometric evaluation and tympanometry. Results within normal limits both ears. Total $220.00."
+      },
+      {
+        "name": "Dive operator site sheet",
+        "type": "other",
+        "content": "Parrotfish Garden, Cayo Brava, Honduras: a shallow reef dive for beginners. The reef lies between 4 and 8 meters, and no part of the site is deeper than 9 meters."
       }
     ],
     "status": "open"
@@ -719,6 +739,11 @@
         "name": "Physiotherapy receipt",
         "type": "receipt",
         "content": "Scioto Valley Physical Therapy, Columbus, OH. Patient: Renata Holloway. Date of service: November 20, 2026. Initial evaluation and treatment, right shoulder post-dislocation: $180.00. Paid by card."
+      },
+      {
+        "name": "Talon Excursions booking confirmation",
+        "type": "other",
+        "content": "Talon Excursions, Queenstown, New Zealand: jet-boat rides through the canyons of the Arrowmere River."
       }
     ],
     "status": "open"
@@ -766,6 +791,11 @@
         "name": "Card statement extract",
         "type": "card_statement",
         "content": "North Star Visa, card ending 4471, cardholder Desmond Okafor. Transactions: Feb 10, 2026, HOTEL BRUNNENHOF INTERLAKEN, $164.00. Feb 11, 2026, AERIE ADVENTURES GMBH BEATENBERG, TANDEM PARAGLIDE BEATENBERG-INTERLAKEN 1 PAX, $210.00. Feb 11, 2026, LAKESIDE REGIONAL HOSPITAL INTERLAKEN, $2,585.00. Feb 11, 2026, APOTHEKE BAHNHOF INTERLAKEN, $18.40. Feb 12, 2026, CAFE AARE INTERLAKEN, $14.75."
+      },
+      {
+        "name": "Aerie Adventures booking confirmation",
+        "type": "other",
+        "content": "Aerie Adventures, Interlaken, Switzerland: tandem paragliding flights from Beatenberg, landing in Interlaken."
       }
     ],
     "status": "open"
@@ -779,10 +809,10 @@
     "incident_date": "2026-03-18",
     "incident_location": "Cayo Brava, Honduras",
     "summary": "Ruptured eardrum treated at a local clinic after a morning dive trip",
-    "story": "On March 18 I went out on a morning dive trip with Arrecife Azul Divers from the main pier on Cayo Brava. Our first dive was at Sentinel Wall. It was an easy dive, calm water and good visibility, and I stayed with the group and the guide the whole time. On the way down my right ear would not clear properly, and by the time we were back on the boat it was really painful and I could hear a ringing. The dive shop sent me to the Cl\u00ednica Isle\u00f1a in town that afternoon, where the doctor said my eardrum had ruptured. I got drops and painkillers and was told not to dive again on the trip. The doctor asked me to come back before my flight home to check the ear was safe for flying, so I went back on March 22. I would like to claim the clinic costs.",
+    "story": "On March 18 I went out on a morning dive trip with Arrecife Azul Divers from the main pier on Cayo Brava. Our first dive was at Sentinel Wall. It was an easy dive, calm water and good visibility, and I stayed with the group and the guide the whole time. On the way down my right ear would not clear properly, and by the time we were back on the boat it was really painful and I could hear a ringing. The dive shop sent me to the Clínica Isleña in town that afternoon, where the doctor said my eardrum had ruptured. I got drops and painkillers and was told not to dive again on the trip. The doctor asked me to come back before my flight home to check the ear was safe for flying, so I went back on March 22. I would like to claim the clinic costs.",
     "items": [
       {
-        "description": "Cl\u00ednica Isle\u00f1a emergency consultation, March 18",
+        "description": "Clínica Isleña emergency consultation, March 18",
         "category": "medical",
         "amount": 380.0
       },
@@ -805,12 +835,12 @@
     "amount_claimed": 854.0,
     "documents": [
       {
-        "name": "Cl\u00ednica Isle\u00f1a itemized bill",
+        "name": "Clínica Isleña itemized bill",
         "type": "medical_bill",
-        "content": "Cl\u00ednica Isle\u00f1a, Calle del Muelle, Cayo Brava. Patient: Dario Pelletier. March 18, 2026: emergency consultation $380.00; otoscopy and audiometry $260.00; pharmacy, ciprofloxacin otic drops and acetaminophen $64.00. March 22, 2026: follow-up examination, fitness to fly $150.00. Total $854.00. Paid by card ending 4471."
+        "content": "Clínica Isleña, Calle del Muelle, Cayo Brava. Patient: Dario Pelletier. March 18, 2026: emergency consultation $380.00; otoscopy and audiometry $260.00; pharmacy, ciprofloxacin otic drops and acetaminophen $64.00. March 22, 2026: follow-up examination, fitness to fly $150.00. Total $854.00. Paid by card ending 4471."
       },
       {
-        "name": "Cl\u00ednica Isle\u00f1a medical record",
+        "name": "Clínica Isleña medical record",
         "type": "medical_record",
         "content": "Dr. Marisol Andino. March 18, 2026, 14:20. 46-year-old male, presents with right ear pain, tinnitus and reduced hearing. Onset during descent on the first scuba dive of a morning boat trip today; patient reports difficulty equalizing. No previous ear problems, no ear complaints before travel, no regular medication. Examination: perforation of right tympanic membrane, small amount of blood in canal. Diagnosis: barotrauma of the middle ear with tympanic membrane perforation. Plan: otic antibiotic drops, analgesia, keep ear dry, no diving for the rest of the trip, review before air travel. March 22, 2026: perforation healing, no infection, fit to fly."
       },
@@ -823,6 +853,11 @@
         "name": "Flight itinerary",
         "type": "booking_confirmation",
         "content": "Passenger Dario Pelletier. March 14, 2026: Columbus to Cayo Brava via Houston. March 24, 2026: Cayo Brava to Columbus via Houston."
+      },
+      {
+        "name": "Dive operator site sheet",
+        "type": "other",
+        "content": "Sentinel Wall, Cayo Brava, Honduras: a wall dive. The top of the wall is at 14 meters and it drops past 40 meters, so every dive on it goes deeper than 10 meters."
       }
     ],
     "status": "open"
@@ -989,6 +1024,11 @@
         "name": "Physiotherapy receipt",
         "type": "receipt",
         "content": "Desert Motion Physical Therapy, 1180 North Campbell Avenue, Tucson, AZ. Patient: Delia Marchetti. Ankle rehabilitation sessions on June 18, June 22, June 25 and June 29, 2026, $85.00 each. Total: $340.00. Paid in full."
+      },
+      {
+        "name": "Rafting company booking confirmation",
+        "type": "other",
+        "content": "Lantern Run, Rio Cuyo, Costa Rica: a family rafting trip on the lower river, with grade 2 rapids from start to finish."
       }
     ],
     "status": "open"
@@ -1144,7 +1184,7 @@
       {
         "name": "Meal receipts",
         "type": "receipt",
-        "content": "Terminal Caf\u00e9, Holyhead port, September 4, 2026, 09:50: $14.50. The Harbour Arms, Holyhead, September 4, 2026, 19:20: $31.00. Anglesey Quay Hotel restaurant, September 5, 2026, 08:30, breakfast: $18.50. Total: $64.00."
+        "content": "Terminal Café, Holyhead port, September 4, 2026, 09:50: $14.50. The Harbour Arms, Holyhead, September 4, 2026, 19:20: $31.00. Anglesey Quay Hotel restaurant, September 5, 2026, 08:30, breakfast: $18.50. Total: $64.00."
       },
       {
         "name": "Concert ticket confirmation",
@@ -1155,6 +1195,11 @@
         "name": "Policy confirmation email",
         "type": "other",
         "content": "UnderCover Travel Insurance. Thank you for your purchase, Ines. Policy POL-2420, Economy plan. Purchased September 1, 2026 through TideTrip checkout. Covered trip: Ireland, September 3 to September 17, 2026."
+      },
+      {
+        "name": "Weather bulletin",
+        "type": "other",
+        "content": "North Atlantic weather bulletin, September 2, 2026: Storm Ysolde has been named. Gales are expected across Ireland, Wales and western Scotland from the morning of September 4, and ferry crossings on the Irish Sea are likely to be canceled."
       }
     ],
     "status": "open"
@@ -1207,6 +1252,11 @@
         "name": "Taxi receipts",
         "type": "receipt",
         "content": "Piraeus Radio Taxi. August 27, Gate E7 to Hotel Limani Piraeus: $12.00. August 28, Hotel Limani Piraeus to Gate E7: $12.00. Total $24.00."
+      },
+      {
+        "name": "Ferry workers' strike announcement",
+        "type": "other",
+        "content": "Athens, August 19, 2026: Greek ferry workers have called a 24 hour strike for August 27. Ferries between Piraeus and the islands will stay in port."
       }
     ],
     "status": "open"
@@ -1243,7 +1293,7 @@
       {
         "name": "Hotel receipt",
         "type": "receipt",
-        "content": "Hotel Belvue A\u00e9roport, Lyon. Guest Daniel Okafor. One night, August 17 to 18, 2026. Total paid by card: $210.00."
+        "content": "Hotel Belvue Aéroport, Lyon. Guest Daniel Okafor. One night, August 17 to 18, 2026. Total paid by card: $210.00."
       },
       {
         "name": "New ticket receipt",
@@ -1291,6 +1341,11 @@
         "name": "Card statement",
         "type": "receipt",
         "content": "Visa ending 3318. July 2, 2026: Skylark Airways $1,180.00. July 5, 2026: Hotel Arena Turquesa $1,260.00. August 24, 2026: Hotel Arena Turquesa refund -$520.00."
+      },
+      {
+        "name": "National Hurricane Center advisory",
+        "type": "other",
+        "content": "National Hurricane Center, August 18, 2026: Tropical Storm Tobias has formed in the western Caribbean. It is expected to become a hurricane and to reach the coast of the Yucatan Peninsula near Cancun on August 21."
       }
     ],
     "status": "open"
@@ -1353,6 +1408,11 @@
         "name": "Customer's list of clothing",
         "type": "other",
         "content": "Two cotton t-shirts, $40.00 each, $80.00 in all."
+      },
+      {
+        "name": "Product details",
+        "type": "other",
+        "content": "Corvane Lumen X2: a smartwatch with GPS, heart-rate tracking and contactless payments, released in March 2026. Vantor Halo: a titanium smart ring that tracks sleep, heart rate and activity. Quillon Wayfinder 5: a handheld GPS unit for hikers, with topographic maps and two-way satellite messaging. Brisa Pocket 2: a compact digital camera with a 1 inch sensor and a fixed 24-120mm zoom lens."
       }
     ],
     "status": "open"
@@ -1366,7 +1426,7 @@
     "incident_date": "2026-09-03",
     "incident_location": "Seattle, Washington, USA",
     "summary": "Checked bag delayed on the outbound flight to Seattle; policyholder bought clothing and toiletries while waiting for delivery",
-    "story": "Ren\u00e9e and I flew from Columbus to Seattle on September 3 for a week visiting friends. When we got to the carousel my suitcase never came out. We filed a report with the airline at the baggage desk and they said it would probably be on the next flight. We had a dinner with our friends the next day and nothing to wear but what we had flown in, so as soon as we landed we bought what we needed: a change of clothes, a toothbrush, deodorant and so on. The bag finally turned up at our hotel the next afternoon. I have attached the airline report and both receipts, which come to $211.50.",
+    "story": "Renée and I flew from Columbus to Seattle on September 3 for a week visiting friends. When we got to the carousel my suitcase never came out. We filed a report with the airline at the baggage desk and they said it would probably be on the next flight. We had a dinner with our friends the next day and nothing to wear but what we had flown in, so as soon as we landed we bought what we needed: a change of clothes, a toothbrush, deodorant and so on. The bag finally turned up at our hotel the next afternoon. I have attached the airline report and both receipts, which come to $211.50.",
     "items": [
       {
         "description": "Clothing and toiletries, Cascade Drug & Apparel",
