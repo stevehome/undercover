@@ -312,3 +312,26 @@ A prompt-only check with the whole knowledge base in the prompt overstates the a
 - Keep it out of any prompt or rule that is written while improving the agent, as with the course's held-out sets.
 
 **Next steps.** Spot-check about 10 claims by hand. Then decide whether to use the set as the held-out set in the app, which means a reseed, or to keep it as a separate benchmark in a scratch schema.
+
+### Ed's `even_harder` set in detail (real agent, 15 November 2026)
+
+Luna at low effort with the starting prompt (version 1), in the scratch schema, three runs of the 25 claims.
+
+| Run | Right | Wrong claims (CLM-13xx) |
+|---|---|---|
+| 1 | 15 | 01 03 05 07 08 10 12 14 15 17 |
+| 2 | 15 | 01 03 05 07 10 14 15 16 17 18 |
+| 3 | 15 | 01 03 05 07 09 12 14 15 16 17 |
+
+**Wrong in all three runs:**
+- CLM-1301, 1303 and 1305: an event announced before the policy was bought. A storm was named the day before purchase (1301, 1305), and a strike was announced four days before (1303).
+- CLM-1307: a device that is off the Electronics Plus list, which only the knowledge base shows, with a carrier payment and the deductible to take off.
+- CLM-1314: a dive site deeper than 10 meters, which only the knowledge base shows.
+- CLM-1315: a dive site shallower than 10 meters, so it is covered.
+- CLM-1317: a grade 2 rafting run, so it is covered.
+
+**Wrong in two of three runs:** CLM-1310 (a smart ring off the Electronics Plus list), CLM-1312 (a GPS unit off the list) and CLM-1316 (a rafting run above grade 3).
+
+**Wrong in one run:** CLM-1308, 1309 and 1318.
+
+**Reading.** The agent fails when a decisive fact lives only in the knowledge base: an announcement made before purchase, or a device or place that has to be looked up. It rarely fails on rules that are in the wording. This is the same pattern as in the ombudsman-derived set, where CLM-1421 (a strike announced before purchase) fails every run. At about 60% against 63% for ours, the two sets are about equally hard for Luna at low effort. A single run varies by about 4 points.
