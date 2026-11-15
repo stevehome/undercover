@@ -405,3 +405,15 @@ Approving the proposal in round 16 (Gemini 3.5 Flash Lite at minimal effort, ins
 - **The timeouts agree.** The backend waits 70 seconds for the agent (it was 5); the agent waits 30 seconds twice. A test fails if the first is lowered below the second.
 - **`read_results` counts a model as tried only for a round that reached a verdict.** Round 16 was stopped before any evaluation, so Gemini minimal was never tested and must not look tried.
 - **A timing log.** `Stopwatch` (`backend/stopwatch.py`, `agent/stopwatch.py`) times the decision step by step and the backend's wait on the agent, and warns in the console when a step totals 3 seconds or more, with the step that took the time. `npm run dev:agent` has no `--reload`, so the agent needs a restart to pick this up.
+
+### A cost baseline distorted by a stalled run (found after round 19)
+
+Version 7's held-out baseline averaged two runs: run 38 and run 39. Run 38 was the evaluation that stalled in round 7 (see "A model call that never ended"). It took 579 seconds where every other held-out run took 80 to 181, and its cost per claim was $0.0022 against about $0.0008 for the other Luna low-effort runs. The average put version 7's cost at $0.0015, its grade at 1.5675 and its time at 65.2 seconds a claim; run 39 alone gives $0.0008, 1.504 and 57.9.
+
+- **What it distorted.** The keep rule counts a measure that improves by more than its noise, so against the inflated baseline any ordinary Luna low-effort run looked about 40% cheaper. A change that left accuracy and grade alone could have been kept on that phantom gain.
+- **It did not change any verdict.** Rounds 15 to 19 were each re-decided against run 39 alone and all five are still rolled back, for the same reasons: accuracy or grade fell by more than the tolerance, or nothing improved by more than the noise.
+- **Earlier cost comparisons in this document and in the chat were wrong.** Against about $0.00088 a claim for Luna at low effort: round 15 (Luna medium) cost about 20% more, round 18 (Luna none) about 7% more, round 17 (DeepSeek low) about 3 times, and round 16 (Gemini minimal) about 5 times. No change of model alone was cheaper.
+- **The fix.** Run 38 was marked `stopped` in the database (`update undercover.runs set status = 'stopped' where run_id = 38`), which takes it out of the average, as `version_scores` counts only finished runs. Version 7 now has one held-out run, so `missing_runs` lists a held-out evaluation and the start of the next round measures version 7 again. Taking a median instead would not have helped, as the median of two runs is their mean.
+- **A stopped run does not block a later verdict.** `record_verdict` looks for stopped evaluations only on the version being tested, never on the one it is compared with.
+- **To undo it,** set run 38's status back to `finished`.
+- **Watch for it again.** Run 16 (version 3, 531 seconds) was a similar outlier, but version 3 was rolled back and is no longer a baseline. A stalled run can still enter any version's baseline; if a round's numbers look odd, compare each run's duration first.
