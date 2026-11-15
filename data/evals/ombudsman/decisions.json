@@ -686,7 +686,7 @@
     "over_approval_limit": true,
     "handler_id": "HND-01",
     "decided_on": "2026-09-24",
-    "reason": "The bag was snatched from the customer's shoulder on the last day of the trip. It was reported to the police within the hour and receipts are on file, so it is a covered theft. With Electronics Plus, the Corvane Lumen X2 (a smartwatch) and the Brisa Pocket 2 (a camera) are electronics with a $1,200 per-item limit, and both are paid in full. The Vantor Halo (a smart ring) and the Quillon Wayfinder 5 (a handheld GPS unit) are not on the electronics list, so each is held to the $300 Premium per-item limit. Each t-shirt counts as a separate item. The total of $2,428 less the $50 deductible is $2,378. This is capped at the $1,500 Premium Baggage and Personal Effects maximum, and the payout needs sign-off.",
+    "reason": "The bag was snatched from the customer's shoulder on the last day of the trip. It was reported to the police within the hour and receipts are on file, so it is a covered theft. With Electronics Plus, the Corvane Lumen X2 (a smartwatch) and the Brisa Pocket 2 (a camera) are electronics with a $1,200 per-item limit, and both are paid in full. The Vantor Halo (a smart ring) and the Halden Arc (a pocket projector) are not on the electronics list, so each is held to the $300 Premium per-item limit. Each t-shirt counts as a separate item. The total of $2,428 less the $50 deductible is $2,378. This is capped at the $1,500 Premium Baggage and Personal Effects maximum, and the payout needs sign-off.",
     "reference": "Policy wording, sections 1, 5, 8 (Electronics Plus) and 10; claims manual, sections 3, 6 and 7",
     "calculation": [
       {
@@ -698,7 +698,7 @@
         "amount": 300.0
       },
       {
-        "step": "Quillon Wayfinder 5, handheld GPS, not on the electronics list, capped at the $300 per-item limit",
+        "step": "Halden Arc, pocket projector, not on the electronics list, capped at the $300 per-item limit",
         "amount": 300.0
       },
       {

@@ -1372,9 +1372,9 @@
         "amount": 449.0
       },
       {
-        "description": "Quillon Wayfinder 5, in the stolen cabin bag",
+        "description": "Halden Arc, in the stolen cabin bag",
         "category": "personal_effects",
-        "amount": 599.0
+        "amount": 899.0
       },
       {
         "description": "Brisa Pocket 2, in the stolen cabin bag",
@@ -1392,17 +1392,17 @@
         "amount": 40.0
       }
     ],
-    "amount_claimed": 2876.0,
+    "amount_claimed": 3176.0,
     "documents": [
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Policia Nacional, Valencia, Estacion del Norte office. Report made September 12, 2026 at 10:25 by Renata Okafor. At about 09:40 at the ticket machines, a man on a scooter pulled a cabin bag from the complainant's shoulder and rode off. Contents reported: Corvane Lumen X2, Vantor Halo, Quillon Wayfinder 5, Brisa Pocket 2, two t-shirts. No arrest."
+        "content": "Policia Nacional, Valencia, Estacion del Norte office. Report made September 12, 2026 at 10:25 by Renata Okafor. At about 09:40 at the ticket machines, a man on a scooter pulled a cabin bag from the complainant's shoulder and rode off. Contents reported: Corvane Lumen X2, Vantor Halo, Halden Arc, Brisa Pocket 2, two t-shirts. No arrest."
       },
       {
         "name": "Receipts",
         "type": "receipt",
-        "content": "Corvane store, order 55120, bought April 2026: Corvane Lumen X2, $649.00. Vantor online store, order VH-88213, bought April 2026: Vantor Halo, $449.00. Trailhead Outfitters, bought May 2026: Quillon Wayfinder 5, $599.00. Halden Photo, bought June 2026: Brisa Pocket 2, $1,099.00."
+        "content": "Corvane store, order 55120, bought April 2026: Corvane Lumen X2, $649.00. Vantor online store, order VH-88213, bought April 2026: Vantor Halo, $449.00. Halden store, bought May 2026: Halden Arc, $899.00. Halden Photo, bought June 2026: Brisa Pocket 2, $1,099.00."
       },
       {
         "name": "Customer's list of clothing",
@@ -1412,7 +1412,7 @@
       {
         "name": "Product details",
         "type": "other",
-        "content": "Corvane Lumen X2: a smartwatch with GPS, heart-rate tracking and contactless payments, released in March 2026. Vantor Halo: a titanium smart ring that tracks sleep, heart rate and activity. Quillon Wayfinder 5: a handheld GPS unit for hikers, with topographic maps and two-way satellite messaging. Brisa Pocket 2: a compact digital camera with a 1 inch sensor and a fixed 24-120mm zoom lens."
+        "content": "Corvane Lumen X2: a smartwatch with GPS, heart-rate tracking and contactless payments, released in March 2026. Vantor Halo: a titanium smart ring that tracks sleep, heart rate and activity. Halden Arc: a pocket projector that throws a picture of up to 100 inches from a phone or laptop. Brisa Pocket 2: a compact digital camera with a 1 inch sensor and a fixed 24-120mm zoom lens."
       }
     ],
     "status": "open"
