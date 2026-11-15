@@ -4,29 +4,29 @@
     "policy_id": "POL-2401",
     "customer_id": "CUS-3401",
     "claim_type": "baggage",
-    "submitted_on": "2026-07-16",
+    "submitted_on": "2026-08-03",
     "incident_date": "2026-07-14",
     "incident_location": "Sintra, Portugal",
     "summary": "Rental car broken into at a viewpoint near Sintra",
-    "story": "On July 14 we parked our rental car at a viewpoint near Sintra for about an hour. When we came back the rear window was smashed. My backpack was gone from the back seat, with my laptop and a jacket, and the glove compartment had been forced and my sunglasses and a charger taken. I went to the police that afternoon. I am also claiming the rental company's bill for the window.",
+    "story": "On July 14 I parked my rental car at a viewpoint near Sintra and walked up to the gardens for about an hour. The car was locked. When I came back the rear window was smashed and my things were gone from inside the car: my backpack with my laptop and a jacket, my prescription sunglasses and a portable charger. I went to the police that afternoon and they took down everything. The rental company has since charged me for the window, so I am claiming that bill too. Everything I lost is listed below with the receipts.",
     "items": [
       {
-        "description": "Laptop, in the backpack on the rear seat",
+        "description": "Laptop",
         "category": "electronics",
         "amount": 1150.0
       },
       {
-        "description": "Jacket, in the backpack on the rear seat",
+        "description": "Jacket",
         "category": "clothing",
         "amount": 210.0
       },
       {
-        "description": "Prescription sunglasses, taken from the glove compartment",
+        "description": "Prescription sunglasses",
         "category": "accessories",
-        "amount": 260.0
+        "amount": 340.0
       },
       {
-        "description": "Portable charger, taken from the glove compartment",
+        "description": "Portable charger",
         "category": "electronics",
         "amount": 45.0
       },
@@ -36,22 +36,27 @@
         "amount": 380.0
       }
     ],
-    "amount_claimed": 2045.0,
+    "amount_claimed": 2125.0,
     "documents": [
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Policia de Seguranca Publica, Sintra. Report made July 14, 2026 at 16:40 by Tomas Brandt. A rental car parked at the Monserrate viewpoint was entered at about 14:30 by breaking the rear window. A backpack was taken from the rear seat. The glove compartment, which had been locked, was forced and prescription sunglasses and a charger were taken. The trunk was not opened."
+        "content": "Policia de Seguranca Publica, Sintra. Report made July 14, 2026 at 16:40 by Tomas Brandt, US citizen, visitor. Vehicle: rental car, grey hatchback, parked at the Monserrate viewpoint car park. Owner states the vehicle was locked at about 13:45. Entry was made at about 14:30, per a witness, by breaking the rear passenger-side window. A backpack containing a laptop computer and a jacket was taken from the rear seat. The glove compartment, which the owner states had been locked, shows signs of being forced open with a tool; prescription sunglasses and a portable charger were taken from it. The trunk was not opened. No suspects identified. Reference PSP-SNT-2026-07-1183."
       },
       {
         "name": "Receipts",
         "type": "receipt",
-        "content": "Laptop, bought 2025: $1,150.00. Jacket: $210.00. Prescription sunglasses, bought 2026: $260.00. Charger: $45.00."
+        "content": "Laptop, bought March 2025: $1,150.00. Jacket, bought 2025: $210.00. Prescription sunglasses, frames and lenses, bought January 2026: $340.00, paid by Visa ending 4471. Portable charger: $45.00."
       },
       {
         "name": "Rental company invoice",
         "type": "receipt",
-        "content": "Rear window replacement, charged to the renter: $380.00."
+        "content": "Lusa Rent-a-Car, Lisbon airport. Agreement LRC-558210. Rear window replacement, charged to the renter: $380.00."
+      },
+      {
+        "name": "Card issuer letter",
+        "type": "settlement_letter",
+        "content": "Northline Bank Visa Card Benefits, July 29, 2026. Dear Mr. Brandt, thank you for your Purchase Protection claim for the item bought on your card ending 4471 and reported stolen on July 14, 2026. Item: prescription eyewear, purchase price $340.00. Under your card's benefit terms we have approved a payment of $120.00, which has been credited to your card account. This closes your Purchase Protection claim. Claim reference NB-PP-77310."
       }
     ],
     "status": "open"
@@ -102,7 +107,7 @@
     "incident_date": "2026-08-06",
     "incident_location": "Santiago, Chile",
     "summary": "Disc pain and sciatica needing an emergency admission in Santiago",
-    "story": "On August 6 I woke with severe pain down my left leg and could not stand. I was admitted overnight in Santiago and had an MRI. I did have some back trouble last spring, but it was a simple strain in April and it cleared up. Once I got home I had four physiotherapy sessions, which I have also listed.",
+    "story": "On August 6 I woke in my hotel in Santiago with severe pain down my left leg and could not stand. The hotel called an ambulance and I was admitted overnight and had an MRI. They told me it was a herniated disc. I saw my doctor once back in April about my back, and I have not had an appointment since. Once I got home I had four physiotherapy sessions, which I have also listed. I have attached everything the hospital gave me.",
     "items": [
       {
         "description": "Emergency department assessment",
@@ -138,19 +143,24 @@
     "amount_claimed": 2876.5,
     "documents": [
       {
-        "name": "Hospital bill and records",
+        "name": "Hospital discharge summary",
         "type": "medical_records",
-        "content": "Clinica Santa Maria, Santiago, August 6 to 7, 2026. Diagnosis: lumbar disc herniation with left sciatica. Referral letter from the patient's physician in Seattle, enclosed: April 10, 2026, visit for a lower back strain, naproxen 250 mg twice daily prescribed. May 30, 2026, telephone review, pain persisting, naproxen increased to 500 mg twice daily. No visits after that date."
+        "content": "Clinica Santa Maria, Santiago. Patient: Helen Park. Admitted August 6, 2026, 07:40, discharged August 7, 2026, 11:15. Presenting complaint: acute left leg pain, unable to bear weight. Examination: positive straight leg raise on the left, reduced ankle reflex. MRI lumbar spine: L5-S1 disc herniation compressing the left S1 nerve root. Diagnosis: lumbar disc herniation with left sciatica. Treatment: analgesia, observation overnight, orthopedic review. Medication reconciliation on admission, from the patient's US pharmacy record: multivitamin daily; cetirizine 10 mg as needed; naproxen 500 mg twice daily, increased from 250 mg twice daily by the prescriber on May 7, 2026, after a patient portal message reporting continuing back pain. Plan: discharge with analgesia, avoid flying for 48 hours, follow up with own physician at home."
+      },
+      {
+        "name": "Letter from home physician",
+        "type": "medical_records",
+        "content": "Northlake Family Medicine, Seattle. To whom it may concern: Ms. Park was seen in clinic on April 10, 2026, for a lower back strain after lifting. Naproxen 250 mg twice daily was prescribed. She has had no further office visits with this practice."
       },
       {
         "name": "Itemized bill",
         "type": "receipt",
-        "content": "Emergency assessment $540.00; MRI $1,180.00; orthopedic consultation $320.00; medication $46.50; overnight observation $610.00."
+        "content": "Clinica Santa Maria. Emergency assessment $540.00; MRI $1,180.00; orthopedic consultation $320.00; medication $46.50; overnight observation $610.00. Total $2,696.50, paid by card August 7, 2026."
       },
       {
         "name": "Home physiotherapy receipts",
         "type": "receipt",
-        "content": "Four sessions, August 17 to 23, 2026: $180.00."
+        "content": "Fremont Physical Therapy, Seattle. Four sessions, August 17 to 23, 2026: $180.00."
       }
     ],
     "status": "open"
@@ -164,7 +174,7 @@
     "incident_date": "2026-09-13",
     "incident_location": "Split, Croatia",
     "summary": "Held overnight in Split by a ferry crew strike on the way home",
-    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. We stayed at a hotel near the port, ate at the quay and took taxis. We paid cash for the meals and have no receipts for them. We also lost our first night's hotel in Bologna, which we had already paid for.",
+    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. To be honest, the strike had been in the local news for a couple of weeks before we flew out, but we hoped it would be settled. We stayed at a hotel near the port, ate at the quay and took taxis. We paid cash for the meals and have no receipts for them. We also lost our first night's hotel in Bologna, which we had already paid for.",
     "items": [
       {
         "description": "Hotel in Split, one room, one night",
@@ -197,7 +207,7 @@
       {
         "name": "Ferry delay confirmation",
         "type": "carrier_report",
-        "content": "Adria Lines. Sailing AL 212 Split to Ancona, scheduled September 13, 2026 at 20:00, departed September 14 at 09:00 because of a strike by the crew. Passengers: Owen Castell and Mara Castell."
+        "content": "Adria Lines. Sailing AL 212 Split to Ancona, scheduled September 13, 2026 at 20:00, departed September 14 at 09:00 because of a strike by the crew. The crew union served strike notice on August 18, 2026. Passengers: Owen Castell and Mara Castell. Under our passenger care policy, an overnight accommodation allowance of $40.00 per listed passenger, $80.00 in total, was refunded to the booking card on September 16, 2026."
       },
       {
         "name": "Receipts",
@@ -215,16 +225,16 @@
     "submitted_on": "2026-08-25",
     "incident_date": "2026-08-14",
     "incident_location": "Miami, Florida",
-    "summary": "Trip to Vietnam cancelled after my position was cut",
-    "story": "My employer cut my position on August 14, through no fault of mine, and I could not afford to take the trip on August 20. I had worked there for almost a year. The airline and the hotel will not refund me. I would like my costs back.",
+    "summary": "Trip to Vietnam cancelled after my position was eliminated",
+    "story": "On August 14 my employer told me my position was being eliminated in a restructuring. It had nothing to do with my work, and the letter they gave me says so. I had been with the company since last year, and losing the income a week before I was due to fly meant I could not go. I cancelled the trip that same week. Skylark would not refund the flights at all. Hotel Lotus gave back part of the deposit, but most of what I paid is gone. I am claiming what I could not get back.",
     "items": [
       {
-        "description": "Flights, not refundable",
+        "description": "Return flights Miami to Hanoi, not refunded",
         "category": "flights",
         "amount": 1480.0
       },
       {
-        "description": "Prepaid hotel, not refundable",
+        "description": "Prepaid hotel stay, unrefunded balance",
         "category": "accommodation",
         "amount": 820.0
       }
@@ -232,14 +242,19 @@
     "amount_claimed": 2300.0,
     "documents": [
       {
-        "name": "Letter from the employer",
+        "name": "Separation letter from the employer",
         "type": "other",
-        "content": "Harbor Freight Logistics. This confirms that your employment, which began on October 6, 2025, ended on August 14, 2026 because your position was eliminated in a restructuring. You did nothing wrong."
+        "content": "Harbor Freight Logistics, Human Resources, 800 NW 25th Street, Miami, FL. August 14, 2026. Dear Rafael Ortiz, Re: Separation from employment. As discussed today, your role as Dispatch Coordinator has been eliminated as part of the restructuring of the Miami operations team, effective August 14, 2026. This decision is not related to your performance or conduct. Final pay: your final paycheck, including accrued vacation, will be paid on August 28, 2026. Severance: two weeks of base pay, paid with your final paycheck. Benefits: medical and dental coverage end on August 31, 2026, and COBRA information will be mailed to your home address. Records: employee ID HFL-20417; continuous service date September 8, 2025; reference requests should go to hr@harborfreightlogistics.example. Please return your badge and company phone to reception by August 21. We thank you for your contribution and wish you well. Dana Whitfield, HR Business Partner."
       },
       {
-        "name": "Supplier confirmations",
+        "name": "Skylark Airways cancellation confirmation",
         "type": "receipt",
-        "content": "Skylark Airways: ticket not refundable, $1,480.00. Hotel Lotus: prepaid stay not refundable, $820.00."
+        "content": "Skylark Airways. Booking ref SK7QH2. Passenger: Rafael Ortiz. MIA-HAN, departing August 20, 2026, returning September 3, 2026. Fare paid by card ending 4471 on June 30, 2026: $1,480.00. Fare type: Saver, non-refundable. Booking cancelled at the passenger's request on August 16, 2026. Refund: $0.00. No travel credit issued."
+      },
+      {
+        "name": "Hotel Lotus cancellation statement",
+        "type": "receipt",
+        "content": "Hotel Lotus, Hoan Kiem, Hanoi. Guest: Rafael Ortiz. Stay August 21 to September 2, 2026. Prepaid on July 1, 2026: $1,020.00. Cancelled August 16, 2026. Refund under the property's cancellation terms: $200.00, returned to the original card. Non-refundable balance retained: $820.00."
       }
     ],
     "status": "open"
@@ -252,21 +267,21 @@
     "submitted_on": "2026-08-20",
     "incident_date": "2026-08-03",
     "incident_location": "Valletta, Malta",
-    "summary": "Checked suitcase did not arrive on the flight to Malta and was handed over the next evening",
-    "story": "I flew to Malta on August 3 and my suitcase didn't come off the belt. I filed a report at the baggage desk and went to my guesthouse with only my handbag. That evening and the next morning I had to buy some clothes, underwear and toiletries to get by. On August 4 the airline phoned to say the bag was at the airport and I could pick it up, so I took a taxi there and collected it from the baggage office that evening. I'm claiming the things I had to buy and the taxi.",
+    "summary": "Checked suitcase did not arrive on the late flight to Malta and was delivered to the guesthouse the next day",
+    "story": "My flight landed in Malta late on the evening of August 3 and my suitcase never came off the belt. I filed a report at the baggage desk and the airline said they would send it on to me. Before leaving the airport I bought toiletries at the pharmacy there, because I had nothing with me but my handbag. The next morning I went into town and bought some T-shirts, underwear, socks and a pair of trousers so I had something to wear. The suitcase was brought to my guesthouse by a courier on August 4. That afternoon I also picked up a pair of sandals in Valletta. I'm claiming everything I had to buy.",
     "items": [
       {
-        "description": "Two T-shirts bought while waiting for the suitcase",
+        "description": "Two T-shirts",
         "category": "clothing",
         "amount": 38.5
       },
       {
-        "description": "Underwear and socks bought while waiting for the suitcase",
+        "description": "Underwear and socks",
         "category": "clothing",
         "amount": 29.9
       },
       {
-        "description": "Pair of lightweight trousers bought while waiting for the suitcase",
+        "description": "Pair of lightweight trousers",
         "category": "clothing",
         "amount": 41.0
       },
@@ -276,32 +291,27 @@
         "amount": 23.0
       },
       {
-        "description": "Taxi from the guesthouse to the airport to collect the suitcase",
-        "category": "transport",
-        "amount": 45.0
+        "description": "Pair of sandals",
+        "category": "clothing",
+        "amount": 64.0
       }
     ],
-    "amount_claimed": 177.4,
+    "amount_claimed": 196.4,
     "documents": [
       {
         "name": "Delayed baggage report",
         "type": "carrier_report",
-        "content": "Azura Wings, Malta International Airport. Property irregularity report MLA-AZ-48217, passenger Delia Fenwick, flight AZ 612. Flight arrived August 3, 2026 at 14:10. One checked suitcase not received; report opened at 14:55. Suitcase located and held at the Azura Wings baggage office for collection. Suitcase collected by the passenger and signed for on August 4, 2026 at 20:10."
-      },
-      {
-        "name": "Clothing receipts",
-        "type": "receipt",
-        "content": "Sliema Shore Outfitters, August 3, 2026, 18:42: two T-shirts $38.50, underwear and socks $29.90. Strada Moda, Valletta, August 4, 2026, 10:15: lightweight trousers $41.00."
+        "content": "Azura Wings, Malta International Airport. Property irregularity report MLA-AZ-48217, passenger Delia Fenwick, flight AZ 618. Flight arrived August 3, 2026 at 22:40. One checked suitcase not received; report opened at 23:05. Suitcase traced to connecting station and forwarded on flight AZ 602, August 4. Delivered by courier to passenger's local address (Triq il-Merkanti, Valletta) and signed for on August 4, 2026 at 13:05. Interim expense payment of $50.00 issued to the passenger's card on August 4, 2026. File closed."
       },
       {
         "name": "Pharmacy receipt",
         "type": "receipt",
-        "content": "Farmacija Kalkara, Valletta, August 3, 2026, 19:05: toothbrush, toothpaste, deodorant, shampoo, sunscreen. Total $23.00."
+        "content": "Airport Pharmacy, Malta International Airport, August 3, 2026, 23:24: toothbrush, toothpaste, deodorant, shampoo, sunscreen. Total $23.00."
       },
       {
-        "name": "Taxi receipt",
+        "name": "Clothing receipts",
         "type": "receipt",
-        "content": "Harbour Cabs, August 4, 2026, 19:20. Valletta to Malta International Airport. Fare $45.00."
+        "content": "Strada Moda, Valletta, August 4, 2026, 09:38: two T-shirts $38.50, underwear and socks $29.90, lightweight trousers $41.00. Total $109.40. Passi Footwear, Valletta, August 4, 2026, 16:52: sandals, one pair $64.00."
       }
     ],
     "status": "open"
@@ -314,8 +324,8 @@
     "submitted_on": "2026-02-26",
     "incident_date": "2026-02-14",
     "incident_location": "Valbrenna, Switzerland",
-    "summary": "Checked ski bag did not arrive on the flight to Valbrenna; replacement ski clothes bought",
-    "story": "I flew out for a week of skiing and landed on the morning of February 14. My big duffel with all my ski clothes never came off the carousel. I filed a report at the airline desk before I left the airport. I had a lesson booked for that afternoon and nothing warm to wear, so I took the shuttle to the resort and went straight to a sports shop in the village. I bought a jacket, ski pants, base layers, gloves and socks so I could get on the mountain. I'm claiming what I spent and I've attached the receipts and the airline report.",
+    "summary": "Checked ski bag did not arrive on a late-running flight to Valbrenna; replacement ski clothes bought before it was delivered the next day",
+    "story": "My flight out for a week of skiing ran late, and we didn't get in until well into the evening of February 14. My big duffel with all my ski clothes never came off the carousel. I filed a report at the airline desk before I left the airport, and they gave me a small cash advance for toiletries. I had a group lesson booked for 9 the next morning and nothing warm to wear. There was no word on the bag overnight, so I was at the sports shop in the village when it opened and bought a jacket, ski pants, base layers, gloves and socks so I could make the lesson. The bag didn't turn up at the hotel until the next day, after I'd already bought everything. I'm claiming what I spent and I've attached the receipt and the airline report.",
     "items": [
       {
         "description": "Ski jacket bought in the resort",
@@ -348,12 +358,12 @@
       {
         "name": "Delayed baggage report",
         "type": "carrier_report",
-        "content": "Alpenwind Air, Property Irregularity Report AW-77341, Valbrenna Regional Airport. Passenger: Marcus Oyelaran. Flight AW 512, arrived February 14, 2026 at 09:35. One checked duffel bag, black, not received at arrival. Bag located at transfer point and forwarded on the next flight. Delivered to Hotel Edelgrat, Valbrenna, on February 14, 2026 at 19:35 and signed for by hotel reception."
+        "content": "Alpenwind Air, Property Irregularity Report AW-77341, Valbrenna Regional Airport. Passenger: Marcus Oyelaran. Flight AW 512, February 14, 2026. Scheduled arrival 20:15. Actual arrival 21:50 (late inbound aircraft). One checked duffel bag, black, not received at arrival. Report opened 22:20. Bag located at transfer point and forwarded on first available service. Interim expense advance of $50.00 paid to passenger at desk. Delivery: Hotel Edelgrat, Valbrenna, February 15, 2026 at 08:40, signed for by hotel reception. File closed."
       },
       {
-        "name": "Shop receipts",
+        "name": "Shop receipt",
         "type": "receipt",
-        "content": "Sport Kessler, Dorfstrasse 8, Valbrenna. February 14, 2026, 12:18. Ski jacket $289.00. Ski pants $168.00. Thermal base layer set $74.00. Ski gloves $38.00. Ski socks x2 $24.00. Total $593.00, paid by card."
+        "content": "Sport Kessler, Dorfstrasse 8, Valbrenna. February 15, 2026, 08:06. Ski jacket $289.00. Ski pants $168.00. Thermal base layer set $74.00. Ski gloves $38.00. Ski socks x2 $24.00. Total $593.00, paid by card."
       }
     ],
     "status": "open"
@@ -364,10 +374,10 @@
     "customer_id": "CUS-3408",
     "claim_type": "passport",
     "submitted_on": "2026-09-08",
-    "incident_date": "2026-08-15",
-    "incident_location": "Columbus, Ohio, USA",
-    "summary": "Both passports lost at home before a cruise, replaced urgently",
-    "story": "On Saturday August 15 I went to pack our travel folder for our cruise, which was leaving on August 20. Both our passports were gone. We had kept them in a drawer at home and we turned the whole house upside down, but they never turned up. On Monday we got new photos taken and applied for emergency passports at the passport office. The new passports were couriered to us on August 18 and we sailed on time. I am claiming the passport fees, the photos and the courier.",
+    "incident_date": "2026-08-19",
+    "incident_location": "Port Calder, Florida, USA",
+    "summary": "Both passports lost on the way to the cruise port, replaced at the port passport agency on embarkation day",
+    "story": "We drove down from Columbus to Port Calder for our Seabright cruise and stayed the night near the terminal. I had checked the travel folder with both passports before we left home and put it in my backpack. When we unpacked at the hotel that night the folder was gone. We think it slipped out at one of the rest stops along the highway. We called the rest stops and the highway patrol, but nobody had handed it in. First thing on embarkation morning we took a taxi to the passport agency in town, got photos done across the street and applied for emergency passports. They were ready before lunch, we took a taxi back to the hotel for our bags and we made it on board before the ship sailed. I am claiming the passport fees, the photos and the taxis.",
     "items": [
       {
         "description": "Emergency passport fees for my wife and me",
@@ -380,32 +390,37 @@
         "amount": 24.0
       },
       {
-        "description": "Courier delivery of the new passports",
+        "description": "Taxis between the hotel and the passport agency, both ways",
         "category": "transport",
-        "amount": 60.0
+        "amount": 46.0
       }
     ],
-    "amount_claimed": 414.0,
+    "amount_claimed": 400.0,
     "documents": [
       {
-        "name": "Passport office receipt",
+        "name": "Passport agency receipt",
         "type": "receipt",
-        "content": "Midwest Regional Passport Agency, Chicago. August 17, 2026. Expedited emergency passport applications for Gareth Ollander and Renata Ollander, $165.00 each. Total paid: $330.00. Reason given on application: passports lost at home."
+        "content": "Port Calder Passport Agency, 400 Harbor Boulevard, Port Calder, FL. August 20, 2026, 9:12 am. Same-day emergency passport applications for Gareth Ollander and Renata Ollander, $165.00 each. Total paid: $330.00. Statement of loss on file: applicant states both passports were last seen at home in Columbus, OH on the morning of August 19, 2026 and were found to be missing on arrival at lodging in Port Calder on the evening of August 19, 2026. Passports issued 11:40 am."
       },
       {
         "name": "Photo receipt",
         "type": "receipt",
-        "content": "SnapQuick Photo, High Street, Columbus. August 17, 2026. Two sets of passport photos at $12.00. Total: $24.00."
+        "content": "Harbor Photo & Print, 405 Harbor Boulevard, Port Calder, FL. August 20, 2026, 9:01 am. Two sets of passport photos at $12.00. Total: $24.00."
       },
       {
-        "name": "Courier receipt",
+        "name": "Taxi receipts",
         "type": "receipt",
-        "content": "BlueLine Express. Collected August 17, 2026, delivered August 18, 2026 to 2210 Tamarack Drive, Columbus, OH. Next-day secured delivery: $60.00."
+        "content": "Calder Cabs. Receipt 1: August 20, 2026, 8:35 am, Harborview Inn to 400 Harbor Boulevard, $22.00. Receipt 2: August 20, 2026, 11:55 am, 400 Harbor Boulevard to Harborview Inn, $24.00. Total: $46.00."
+      },
+      {
+        "name": "Hotel folio",
+        "type": "receipt",
+        "content": "Harborview Inn, Port Calder, FL. Guests: Gareth and Renata Ollander, home address 2210 Tamarack Drive, Columbus, OH. Arrival August 19, 2026, 8:47 pm. Departure August 20, 2026, 12:30 pm. One night, king room: $189.00. Paid by card ending 4471."
       },
       {
         "name": "Cruise booking confirmation",
         "type": "booking",
-        "content": "Seabright Cruises. Booking SB-55821 for Gareth Ollander and Renata Ollander. Embarkation Port Calder, August 20, 2026. Disembarkation August 30, 2026. Paid in full: $4,800.00."
+        "content": "Seabright Cruises. Booking SB-55821 for Gareth Ollander and Renata Ollander. Embarkation Port Calder, August 20, 2026, boarding closes 3:30 pm. Disembarkation August 30, 2026. Paid in full: $4,800.00."
       }
     ],
     "status": "open"
@@ -481,7 +496,7 @@
     "incident_date": "2026-09-08",
     "incident_location": "Near Impruneta, Tuscany, Italy",
     "summary": "Backpack stolen from a locked rental car at a fuel station",
-    "story": "On September 8 I stopped for fuel at a station outside Impruneta. I locked the car and went inside to pay. I was gone maybe five minutes. When I came back the passenger window was broken and my backpack was gone from the front seat. It had my passport, my laptop, $150 in cash and some clothes in it. The station attendant helped me call the police and I made a report straight away. The next day I took a taxi to the US Consulate in Florence, had new passport photos taken and paid for an emergency passport so I could fly home. I am claiming for everything I lost and what the passport cost me.",
+    "story": "On September 8 I stopped for fuel at a station outside Impruneta. I locked the rental car and went inside to pay. I was gone maybe five minutes. When I came back the car had been broken into and my backpack was gone. It had my passport, my laptop, some cash and some clothes in it. The station attendant helped me call the police and I made a report straight away. I also told the rental company, because the rental came with some cover for belongings, and they have since settled part of it. The next day I took a taxi to the US Consulate in Florence, had new passport photos taken and paid for an emergency passport so I could fly home. I am claiming for everything I lost and what the passport cost me.",
     "items": [
       {
         "description": "Laptop, in the backpack",
@@ -491,12 +506,17 @@
       {
         "description": "Cash, in the backpack",
         "category": "cash",
-        "amount": 150.0
+        "amount": 90.0
       },
       {
-        "description": "Clothes, in the backpack",
+        "description": "Jacket, in the backpack",
         "category": "clothing",
-        "amount": 230.0
+        "amount": 140.0
+      },
+      {
+        "description": "Two shirts, in the backpack",
+        "category": "clothing",
+        "amount": 90.0
       },
       {
         "description": "Emergency passport fee at the consulate",
@@ -514,17 +534,22 @@
         "amount": 44.0
       }
     ],
-    "amount_claimed": 1599.0,
+    "amount_claimed": 1539.0,
     "documents": [
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Carabinieri, Impruneta station. Report made September 8, 2026 at 11:25 by Derek Halvorsen. At about 10:50 the reporting person left a locked rental car at the Carburanti Vallebruna fuel station to pay inside. On returning he found the front passenger window broken and a backpack missing from the front passenger seat. Reported contents: US passport, laptop computer, about $150 in cash, clothing. No suspects identified."
+        "content": "Carabinieri, Impruneta station. Report made September 8, 2026 at 11:25 by Derek Halvorsen. At about 10:50 the reporting person left a locked rental car, a grey hatchback, at the Carburanti Vallebruna fuel station to pay inside. On returning he found the rear hatch lock forced and the parcel shelf cover pulled back. A backpack that had been in the closed luggage compartment under the cover was missing. Reported contents: US passport, laptop computer, about $90 in cash, a jacket, two shirts. No suspects identified."
       },
       {
         "name": "Laptop and clothing receipts",
         "type": "receipt",
         "content": "Laptop, bought March 2025: $1,000.00. Clothing, bought 2026: jacket $140.00, two shirts $90.00."
+      },
+      {
+        "name": "Rental company settlement letter",
+        "type": "settlement_letter",
+        "content": "Arno Autonoleggio, Florence. September 15, 2026. Rental agreement RA-77182, renter Derek Halvorsen. Personal Effects Protection claim for theft from vehicle on September 8, 2026. Settlement for the stolen laptop: $200.00, paid to the renter's card. This settlement is final under the terms of the protection."
       },
       {
         "name": "Consulate receipt",
@@ -550,53 +575,53 @@
     "customer_id": "CUS-3411",
     "claim_type": "emergency_medical",
     "submitted_on": "2026-03-02",
-    "incident_date": "2026-02-08",
-    "incident_location": "Sankt Felden, Austria",
-    "summary": "Skiing fall on the second day of the trip, with an injured wrist and a broken front tooth",
-    "story": "On my second day skiing I caught an edge on a blue run and went down hard. I landed on my wrist and hit my face on the snow. One of my front teeth broke. The ski patrol took me down, and I went to the hospital in Sankt Felden, where they X-rayed my wrist and strapped it. That afternoon they sent me to a dentist in town. He saved the tooth and put a temporary crown on it, and he told me to get the permanent crown done at home. I flew home as planned and had the crown fitted by my own dentist on February 24. I am claiming the hospital bill, the dentist in Austria and the crown at home.",
+    "incident_date": "2026-02-09",
+    "incident_location": "Cayo Brava, Honduras",
+    "summary": "Ear injury from scuba diving on the third day of the trip, treated at a local clinic with a follow-up visit, and a hearing check at home",
+    "story": "On the third day of my trip I went scuba diving with a local dive shop at Parrotfish Garden. On the way down I had trouble clearing my left ear. By the time we got back to the boat it was very painful and my hearing on that side was muffled. The dive shop drove me to the clinic in town that afternoon. The doctor said it was ear barotrauma, gave me medicine and told me not to dive again on the trip. She asked me to come back two days later so she could check it, and I did. It was getting better. When I got home I still felt a little blocked, so I had a hearing test at an audiology clinic on February 18. Everything was fine by then. I am claiming the two clinic visits in Honduras and the hearing test at home.",
     "items": [
       {
-        "description": "Emergency department visit, wrist X-ray and strapping, Landesklinik Sankt Felden",
+        "description": "Emergency visit for left ear barotrauma, Cl\u00ednica Isle\u00f1a, Cayo Brava",
         "category": "medical",
-        "amount": 880.0
+        "amount": 640.0
       },
       {
-        "description": "Emergency dental treatment of a broken front tooth, with a temporary crown, Zahnpraxis Moosbrugger, Sankt Felden",
-        "category": "dental",
-        "amount": 1140.0
+        "description": "Follow-up visit to recheck the ear, Cl\u00ednica Isle\u00f1a, Cayo Brava",
+        "category": "medical",
+        "amount": 180.0
       },
       {
-        "description": "Permanent crown fitted by my own dentist after I got home",
-        "category": "dental",
-        "amount": 650.0
+        "description": "Hearing test at an audiology clinic after I got home",
+        "category": "medical",
+        "amount": 220.0
       }
     ],
-    "amount_claimed": 2670.0,
+    "amount_claimed": 1040.0,
     "documents": [
       {
-        "name": "Ski patrol incident note",
-        "type": "other",
-        "content": "Bergrettung Hochalm, Sankt Felden. February 8, 2026, 11:15. Skier Renata Kowalczyk fell on groomed piste 14 (blue, marked run) inside the resort boundary. Conscious, pain in the right wrist, a broken upper front tooth. Taken down by sled to the valley station and on to Landesklinik Sankt Felden."
-      },
-      {
-        "name": "Hospital itemized bill",
+        "name": "Clinic itemized bill, first visit",
         "type": "medical_bill",
-        "content": "Landesklinik Sankt Felden, emergency department, February 8, 2026. Patient: Renata Kowalczyk. Emergency assessment $310.00. X-ray of the right wrist, two views $260.00. Splint and strapping $190.00. Pain medication $120.00. Total $880.00. Paid by card."
+        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava, Honduras. February 9, 2026. Patient: Renata Kowalczyk. Urgent consultation $290.00. Otoscopic examination and tympanometry $210.00. Medication (decongestant, analgesic, ear drops) $140.00. Total $640.00. Paid by card."
       },
       {
-        "name": "Hospital medical record",
+        "name": "Clinic medical record, first visit",
         "type": "medical_record",
-        "content": "Landesklinik Sankt Felden. February 8, 2026. Fall while skiing on a marked piste. Right wrist sprain, no fracture seen on X-ray. Splint applied, to be worn for two weeks. Fractured upper right central incisor with the pulp exposed, referred the same day to an emergency dentist. No relevant medical history reported. Patient takes no regular medication."
+        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava. February 9, 2026, 15:40. Patient presents after scuba diving at Parrotfish Garden this morning. Reports difficulty equalizing on descent, then left ear pain and muffled hearing. Exam: left tympanic membrane intact, retracted, with hemorrhage. Right ear normal. Diagnosis: left middle ear barotrauma. Plan: oral decongestant, analgesic, ear drops. No diving or flying for 48 hours. Recheck in 2 days. No previous ear problems reported. No regular medication."
       },
       {
-        "name": "Dental invoice and treatment note",
+        "name": "Clinic itemized bill, follow-up visit",
         "type": "medical_bill",
-        "content": "Zahnpraxis Moosbrugger, Sankt Felden. February 8, 2026. Patient: Renata Kowalczyk. Traumatic fracture of the upper right central incisor with pulp exposure. Emergency root canal treatment $780.00. Temporary crown $360.00. Total $1,140.00. Paid by card. Note: the tooth is stable. The temporary crown will last several weeks, and the permanent crown can be made and fitted by the patient's own dentist after her return home."
+        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava, Honduras. February 11, 2026. Patient: Renata Kowalczyk. Follow-up consultation $150.00. Medication refill (decongestant) $30.00. Total $180.00. Paid by card."
       },
       {
-        "name": "Home dentist invoice",
+        "name": "Clinic medical record, follow-up visit",
+        "type": "medical_record",
+        "content": "Cl\u00ednica Isle\u00f1a, Cayo Brava. February 11, 2026. Recheck of left middle ear barotrauma after scuba diving. Pain much reduced. Hemorrhage resolving, membrane intact. Cleared to fly on February 14 as planned. No further diving this trip. If hearing does not feel normal after returning home, a routine hearing test can be arranged there."
+      },
+      {
+        "name": "Home audiology invoice",
         "type": "medical_bill",
-        "content": "Lakeview Family Dental, Minneapolis, MN. February 24, 2026. Patient: Renata Kowalczyk. Permanent porcelain crown, upper right central incisor, replacing the temporary crown placed abroad. Total $650.00."
+        "content": "North Loop Hearing Center, Minneapolis, MN. February 18, 2026. Patient: Renata Kowalczyk. Comprehensive audiometric evaluation and tympanometry. Results within normal limits both ears. Total $220.00."
       }
     ],
     "status": "open"
@@ -606,49 +631,64 @@
     "policy_id": "POL-2412",
     "customer_id": "CUS-3412",
     "claim_type": "emergency_medical",
-    "submitted_on": "2026-08-19",
-    "incident_date": "2026-08-07",
-    "incident_location": "Kalavria Bay, Greece",
-    "summary": "Dislocated shoulder after falling off a rented jet ski",
-    "story": "On August 7 I rented a jet ski for half an hour from a shop on the beach at Kalavria Bay. When I was signing the form, the man at the desk asked if I had extreme sports cover and said most travel policies don't pay for jet skis. I told him I had normal travel insurance and went out anyway. About twenty minutes in I hit a wake from a bigger boat, got thrown off and landed badly on my right arm. My shoulder had come out of place. The shop called a taxi and I went to the hospital in Poros town, where they put it back in and kept me overnight. A shoulder specialist saw me the next morning and I left with a sling and painkillers. I paid all the bills myself and I'm claiming them now. I'm worried after what the shop said.",
+    "submitted_on": "2026-12-01",
+    "incident_date": "2026-11-08",
+    "incident_location": "Queenstown, New Zealand",
+    "summary": "Dislocated shoulder on a canyon ride with Talon Excursions",
+    "story": "On November 8 I went on what I can only call an extreme canyon ride with Talon Excursions outside Queenstown. When I booked at their hire desk, the woman there asked about my insurance and said the ride 'needs adventure cover'. I told her I just had ordinary travel insurance and went anyway, because everyone said it was the best thing in Queenstown. Partway down the canyon we did one of the fast spins, I was thrown sideways against the rail and my right shoulder came out. Talon's staff drove me straight to the hospital in town, where they put it back under sedation and kept me in overnight. I left the next day in a brace with painkillers. Once I was home in Columbus I had a physio session, which I've added. I paid the hospital in full before I left, and I've since had some money back from a New Zealand accident scheme the hospital signed me up for. I'm claiming the hospital bills and the physio. After what the desk told me I'm half expecting a no.",
     "items": [
       {
         "description": "Emergency department treatment, including reducing the dislocated shoulder under sedation",
         "category": "medical",
-        "amount": 1150.0
+        "amount": 980.0
       },
       {
-        "description": "Orthopedic consultation the next morning",
+        "description": "X-rays of the right shoulder",
         "category": "medical",
-        "amount": 300.0
-      },
-      {
-        "description": "Sling and prescribed medication",
-        "category": "medical",
-        "amount": 85.5
+        "amount": 340.0
       },
       {
         "description": "Overnight hospital stay for observation",
         "category": "medical",
-        "amount": 620.0
+        "amount": 610.0
+      },
+      {
+        "description": "Shoulder brace and prescribed medication",
+        "category": "medical",
+        "amount": 95.0
+      },
+      {
+        "description": "Physiotherapy session in Columbus",
+        "category": "medical",
+        "amount": 180.0
       }
     ],
-    "amount_claimed": 2155.5,
+    "amount_claimed": 2205.0,
     "documents": [
       {
         "name": "Itemized hospital bill",
         "type": "medical_bill",
-        "content": "Aegina Coast General Hospital, Poros. Patient: Renata Holloway. Dates of service: August 7-8, 2026. Emergency department attendance, X-rays, closed reduction of right shoulder under procedural sedation: $1,150.00. Inpatient observation, one night: $620.00. Orthopedic consultation, August 8: $300.00. Shoulder sling and dispensed medication (ibuprofen, paracetamol, codeine): $85.50. Total: $2,155.50. Paid in full by card, August 8, 2026."
+        "content": "Remarkables District Hospital, Queenstown. Patient: Renata Holloway. Dates of service: November 8-9, 2026. Emergency department attendance and closed reduction of right shoulder under procedural sedation: $980.00. Radiology, right shoulder, two views pre- and post-reduction: $340.00. Inpatient observation, one night: $610.00. Shoulder immobilizer brace and dispensed medication (paracetamol, ibuprofen, tramadol): $95.00. Total: $2,025.00. Paid in full by card, November 9, 2026."
       },
       {
         "name": "Medical records",
         "type": "medical_record",
-        "content": "Aegina Coast General Hospital, emergency and orthopedic notes. Patient: Renata Holloway, 41. Arrived 15:20 on August 7, 2026, by taxi, after a fall from a personal watercraft at sea. Alert and oriented, no signs of intoxication, patient reports no alcohol that day. X-ray: anterior dislocation of the right shoulder, no fracture. Closed reduction under sedation at 16:05, successful. Admitted overnight for observation after sedation. No previous shoulder dislocation or injury, no shoulder complaints before this event, no regular medication. Orthopedic review August 8: joint stable, neurovascular status normal. Sling for 2 to 3 weeks, analgesia, physiotherapy review with own physician at home. Fit to travel."
+        "content": "Remarkables District Hospital, emergency and ward notes. Patient: Renata Holloway, 41. Arrived 13:40 on November 8, 2026, brought by tour operator staff after being thrown against the side rail of a passenger craft during a turn on the river. Alert and oriented, no signs of intoxication, patient reports no alcohol that day. X-ray: anterior dislocation of right shoulder, no fracture. Closed reduction under sedation at 14:25, successful. Admitted overnight for observation after sedation. No previous dislocation or injury of either shoulder, no shoulder complaints before this event, no regular medication. Review November 9: joint stable, neurovascular status normal. Brace for 3 weeks, analgesia. Physiotherapy to be arranged with own physician on return home. Fit to fly. ACC claim lodged on patient's behalf."
       },
       {
-        "name": "Jet ski rental agreement",
+        "name": "Talon Excursions booking and incident form",
         "type": "other",
-        "content": "Kalavria Wave Rentals, Poros. Renter: Renata Holloway. August 7, 2026, 14:30. One personal watercraft, 30 minutes, $75.00 paid. Safety briefing given, life jacket provided. Renter confirms they are not under the influence of alcohol. Handwritten note: 'Customer advised to check for extreme sports cover.'"
+        "content": "Talon Excursions, Queenstown. Passenger: Renata Holloway. Booking: Arrowmere Canyon Run, November 8, 2026, 12:30 departure, $165.00 paid. Safety briefing given, life jacket issued, passenger seated row 2 left. Desk note: 'Advised passenger to check travel policy, needs adventure cover.' Incident 12:58: passenger struck forward-left rail during 360 spin, complained of right shoulder pain, run ended early, staff transported passenger to Remarkables District Hospital."
+      },
+      {
+        "name": "ACC reimbursement letter",
+        "type": "other",
+        "content": "Accident Compensation Corporation, New Zealand. To: Renata Holloway, 77 Brevoort Lane, Columbus, OH 43215. Re: accident on November 8, 2026, Queenstown. Your claim for cover has been accepted. We have reviewed the invoice from Remarkables District Hospital and contributed toward the cost of your emergency treatment. Amount reimbursed to your nominated card on November 26, 2026: $420.00. ACC does not cover treatment received outside New Zealand."
+      },
+      {
+        "name": "Physiotherapy receipt",
+        "type": "receipt",
+        "content": "Scioto Valley Physical Therapy, Columbus, OH. Patient: Renata Holloway. Date of service: November 20, 2026. Initial evaluation and treatment, right shoulder post-dislocation: $180.00. Paid by card."
       }
     ],
     "status": "open"
@@ -658,44 +698,44 @@
     "policy_id": "POL-2413",
     "customer_id": "CUS-3413",
     "claim_type": "emergency_medical",
-    "submitted_on": "2026-03-02",
-    "incident_date": "2026-02-17",
-    "incident_location": "Glacier Fork, British Columbia, Canada",
-    "summary": "Broken leg on a guided skiing day trip near Glacier Fork",
-    "story": "On February 17 I went on a skiing day trip with a guide out of Glacier Fork. It was my third day there. Partway down a steep run I caught an edge, went over and felt my leg snap. The guide splinted it and I was taken to the hospital in Glacier Fork, where they said my shin bone was broken in two places. I had surgery that evening and stayed one night. I flew home on my original date with a cast and crutches. I am claiming the hospital bill, which I paid on my card before I left.",
+    "submitted_on": "2026-02-26",
+    "incident_date": "2026-02-11",
+    "incident_location": "Interlaken, Switzerland",
+    "summary": "Broken ankle on landing after a scenic flight with Aerie Adventures near Interlaken",
+    "story": "On February 11, my fifth day in the Bernese Oberland, I booked a sightseeing flight with a local company called Aerie Adventures. The views over the two lakes and the mountains were incredible. We came in to land in Interlaken a little faster than expected, and when we touched down my right foot went under me and I heard a crack in my ankle. Staff from the company called an ambulance and I was taken to the hospital in Interlaken. They X-rayed it, said the ankle was broken, set it and put it in a splint, and sent me back to my hotel that night with crutches and a walking boot. I managed the rest of the trip slowly and flew home on my original date. I paid the hospital on my card before I left and am claiming the bill.",
     "items": [
       {
         "description": "Emergency department assessment and X-rays",
         "category": "medical",
-        "amount": 1180.0
+        "amount": 960.0
       },
       {
-        "description": "Surgery to fix the broken tibia",
+        "description": "Closed reduction and splinting of the broken ankle",
         "category": "medical",
-        "amount": 4650.0
+        "amount": 1340.0
       },
       {
-        "description": "Cast, crutches and dressings",
+        "description": "Walking boot and crutches",
         "category": "medical",
-        "amount": 390.0
-      },
-      {
-        "description": "One night in hospital after surgery",
-        "category": "medical",
-        "amount": 1200.0
+        "amount": 285.0
       }
     ],
-    "amount_claimed": 7420.0,
+    "amount_claimed": 2585.0,
     "documents": [
       {
         "name": "Itemized hospital bill",
         "type": "medical_bill",
-        "content": "Glacier Fork Regional Hospital. Patient: Desmond Okafor. Dates of service: February 17-18, 2026. Emergency department assessment and X-rays: $1,180.00. Open reduction and internal fixation, right tibia: $4,650.00. Cast, crutches and dressings: $390.00. Inpatient stay, one night: $1,200.00. Total: $7,420.00. Paid in full by card on February 18, 2026."
+        "content": "Lakeside Regional Hospital Interlaken. Patient: Desmond Okafor. Date of service: February 11, 2026. Emergency department assessment and X-rays: $960.00. Closed reduction and below-knee splint, right ankle: $1,340.00. Walking boot and crutches: $285.00. Total: $2,585.00. Paid in full by card on February 11, 2026."
       },
       {
         "name": "Hospital medical records",
         "type": "medical_record",
-        "content": "Glacier Fork Regional Hospital, emergency and surgical notes. Patient: Desmond Okafor, age 38. Arrived February 17, 2026 at 13:55, brought in by mountain rescue. History: patient was heli-skiing with a guided group and was dropped by helicopter on the upper ridge of the Corran range. Fell on a steep descent at about 12:20 and could not bear weight. Guide applied a splint on the slope. Examination: deformity of the right lower leg, skin intact. X-ray: displaced fracture of the right tibia at two levels, fibula intact. Treated with open reduction and internal fixation the same evening under Dr. Helena Marsh. Recovery uneventful. Discharged February 18 with a cast and crutches, fit to fly, to follow up with his own doctor at home."
+        "content": "Lakeside Regional Hospital Interlaken, emergency department notes. Patient: Desmond Okafor, age 38. Arrived February 11, 2026 at 11:40 by ambulance. Mechanism: fall on landing at Interlaken, flight operator Aerie Adventures. Patient reports right foot inverted on touchdown, unable to bear weight. Examination: swelling and tenderness over the right lateral malleolus, skin intact, foot pulses normal. X-ray: minimally displaced fracture of the right lateral malleolus, ankle joint otherwise intact. Closed reduction under local anesthetic, below-knee splint applied, walking boot and crutches supplied. No other injuries. Discharged the same day, fit to fly in the boot, to follow up with his own doctor at home."
+      },
+      {
+        "name": "Card statement extract",
+        "type": "card_statement",
+        "content": "North Star Visa, card ending 4471, cardholder Desmond Okafor. Transactions: Feb 10, 2026, HOTEL BRUNNENHOF INTERLAKEN, $164.00. Feb 11, 2026, AERIE ADVENTURES GMBH BEATENBERG, TANDEM PARAGLIDE BEATENBERG-INTERLAKEN 1 PAX, $210.00. Feb 11, 2026, LAKESIDE REGIONAL HOSPITAL INTERLAKEN, $2,585.00. Feb 11, 2026, APOTHEKE BAHNHOF INTERLAKEN, $18.40. Feb 12, 2026, CAFE AARE INTERLAKEN, $14.75."
       }
     ],
     "status": "open"
@@ -833,7 +873,7 @@
     "incident_date": "2026-09-05",
     "incident_location": "Valencia, Spain",
     "summary": "Phone taken from the front desk of a hotel lobby during check-in",
-    "story": "On September 5 we got to the Hotel Miralbo in Valencia in the late afternoon. At the front desk I put my phone down on the counter next to me while I filled in and signed the check-in form. The lobby was busy. When I finished and reached for it, the phone was gone. The desk clerk checked the camera and saw a man pick it up and walk out. The hotel helped me go to the police that same evening. I am claiming the cost of the phone.",
+    "story": "On September 5 I got to the Hotel Miralbo in Valencia in the late afternoon after a day trip to Xativa. At the front desk I put my phone down on the counter right next to my hand while I filled in and signed the check-in form. The lobby was busy with a tour group. When I finished and reached for it, the phone was gone. The desk clerk checked the camera and saw a man pick it up and walk straight out. The manager was very apologetic and the hotel helped me go to the police that same evening. I bought the phone in March and it was the one thing I really needed on the trip. I am claiming the cost of the phone.",
     "items": [
       {
         "description": "Smartphone, taken from the hotel front desk counter",
@@ -846,17 +886,17 @@
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Policia Nacional, Valencia, Ciutat Vella station. Report made September 5, 2026 at 20:15 by Lena Okafor. At about 17:40 at the reception desk of the Hotel Miralbo, the complainant placed her mobile phone on the counter beside her while completing check-in. An unknown man took the phone from the counter and left the hotel. Hotel staff confirm the incident from their camera footage."
+        "content": "Policia Nacional, Valencia, Ciutat Vella station. Report made September 5, 2026 at 20:15 by Lena Okafor. At about 17:40 at the reception desk of the Hotel Miralbo, the complainant placed her mobile phone on the counter beside her while completing check-in. An unknown man took the phone from the counter and left the hotel. Hotel staff confirm the incident from their camera footage. Reference VLC-CV-2026-04417."
       },
       {
         "name": "Phone receipt",
         "type": "receipt",
-        "content": "Brightline Mobile, Columbus OH. Smartphone, 256GB, purchased March 22, 2026: $640.00. Paid by card."
+        "content": "Brightline Mobile, Columbus OH. Smartphone, 256GB, purchased March 22, 2026: $640.00. Paid by card ending 4471."
       },
       {
         "name": "Hotel statement",
         "type": "other",
-        "content": "Hotel Miralbo, Valencia. On September 5, 2026 at about 17:40 our guest Lena Okafor was checking in at reception when a man who was not a guest took her phone from the counter beside her and left. Our staff assisted her in reporting the theft to the police the same evening. The hotel has made no payment for the loss."
+        "content": "Hotel Miralbo, Calle de la Paz 18, Valencia. Guest: Lena Okafor, room 312, staying September 5 to September 8, 2026. On September 5, 2026 at about 17:40 our guest was checking in at reception when a man who was not a guest took her phone from the counter beside her and left the building. Our camera footage has been given to the police. Our duty manager accompanied the guest to the Ciutat Vella station the same evening. In recognition of the incident taking place at our reception desk, the hotel refunded $100.00 to the guest's card ending 4471 on September 7, 2026 for the loss of the phone. We regret the experience our guest had during her stay."
       }
     ],
     "status": "open"
@@ -922,7 +962,7 @@
     "incident_date": "2026-06-17",
     "incident_location": "Portland, Oregon",
     "summary": "Family trip to Ireland canceled after the traveling son was admitted to hospital three days before departure",
-    "story": "We were due to fly to Ireland on June 20 for two weeks, the three of us. On the evening of June 17 our son Owen started having bad stomach pain and by that night he was in hospital. They found appendicitis and operated the next morning. We were told he should not travel for several weeks, so we had to cancel everything. The airline would not refund the flights. The cottage owner gave back part of the deposit but kept the rest. I have attached the medical letter, the refund confirmations and our payment receipts.",
+    "story": "We were due to fly to Ireland on June 20 for two weeks, the three of us. On the evening of June 17 our son Owen started having bad stomach pain and by that night he was in hospital. They found appendicitis and operated the next morning. We were told he should not travel for several weeks, so we had to cancel everything. The airline would not refund the flights, and the cottage owner gave back part of the deposit but kept the rest. We are claiming the full flight cost and the part of the deposit we lost. I have attached the hospital letter, both cancellation confirmations and our card statement.",
     "items": [
       {
         "description": "Return flights Portland to Dublin for three travelers, non-refundable",
@@ -938,14 +978,14 @@
     "amount_claimed": 3240.0,
     "documents": [
       {
-        "name": "Medical letter",
+        "name": "Hospital letter",
         "type": "medical_letter",
-        "content": "Harborview Ridge Children's Hospital, Portland, Oregon. June 19, 2026. To whom it may concern. This is to confirm that Owen Whitman, age 9, was admitted on June 17, 2026 with acute appendicitis and underwent an appendectomy on June 18, 2026. He is recovering on the pediatric ward. He should not undertake air travel for at least four weeks after surgery, and travel abroad on June 20, 2026 is not advised. Signed: Dr. Laura Whitman, MD. Mother of the patient."
+        "content": "Harborview Ridge Children's Hospital, Portland, Oregon. Department of Pediatric Medicine. June 19, 2026. To whom it may concern. This is to confirm that Owen Whitman, age 9, was admitted through the emergency department on the night of June 17, 2026 with acute appendicitis and underwent a laparoscopic appendectomy on the morning of June 18, 2026. He is recovering well on the pediatric ward and is expected to be discharged on June 21, 2026. He should not undertake air travel for at least four weeks after surgery, and travel abroad on June 20, 2026 is not advised. I am a physician on staff at this hospital and I am also Owen's mother. I have written this letter so that the family's travel arrangements can be canceled. Signed: Dr. Laura Whitman, MD, Pediatric Hospitalist."
       },
       {
         "name": "Airline cancellation confirmation",
         "type": "supplier_confirmation",
-        "content": "Aerlinea Cascadia, booking ref QX7R2M. Three passengers, Portland to Dublin June 20, 2026, return July 4, 2026. Fare class Saver, non-refundable. Booking canceled at customer request on June 18, 2026. Refund: $0.00. Total fare paid: $2,340.00."
+        "content": "Aerlinea Cascadia, booking ref QX7R2M. Passengers: Daniel Whitman, Laura Whitman, Owen Whitman. Portland to Dublin June 20, 2026, return July 4, 2026. Fare class Saver, non-refundable. Total fare paid: $2,340.00. Booking canceled at customer request on June 18, 2026. Cash refund: $0.00. Under our medical goodwill policy, a future travel credit of $780.00 has been issued to the lead passenger in respect of the fare of passenger Owen Whitman, valid for 12 months on any Aerlinea Cascadia route. Credit reference FTC-55190."
       },
       {
         "name": "Cottage owner refund letter",
@@ -969,7 +1009,7 @@
     "incident_date": "2026-05-04",
     "incident_location": "Portland, Oregon, USA",
     "summary": "Trip to Iceland cancelled after the customer's sister received a terminal diagnosis",
-    "story": "On May 4 my sister Celia called to tell me her doctors had found her cancer had spread and that it is terminal. I was supposed to fly to Iceland on May 14 for a week. There was no way I could go, so I cancelled everything the next day to stay near her. The airline would not give me anything back for the flights. The hotel kept part of what I paid and gave me back $150 of the $360. The glacier tour refunded me in full. I am claiming the flights and the $210 the hotel kept.",
+    "story": "On May 4 my sister Celia called to tell me her doctors had found her cancer had spread and that it is terminal. I was supposed to fly to Iceland on May 14 for a week. There was no way I could go, so I cancelled everything the next day to stay near her. The airline would not refund the fare. The hotel kept part of what I paid and gave me back $150 of the $360. The glacier tour refunded me in full. I am claiming the flights and the $210 the hotel kept.",
     "items": [
       {
         "description": "Round-trip flights Portland to Reykjavik, non-refundable",
@@ -992,7 +1032,7 @@
       {
         "name": "Airline cancellation confirmation",
         "type": "supplier_confirmation",
-        "content": "Northgale Air. Booking reference NG7Q4K, passenger Marisol Venn. Portland to Reykjavik May 14, 2026, return May 21, 2026. Cancelled by the passenger on May 5, 2026. Fare class Basic Saver, non-refundable. Amount refunded: $0.00. Fare paid: $1,150.00."
+        "content": "Northgale Air. Booking reference NG7Q4K, passenger Marisol Venn. Portland to Reykjavik May 14, 2026, return May 21, 2026. Cancelled by the passenger on May 5, 2026. Fare class Basic Saver, non-refundable. Fare paid: $1,150.00. Amount refunded to original payment: $0.00. Goodwill travel credit issued to passenger account: $150.00, voucher NGV-55120, valid for travel booked by May 5, 2027. Travel credit is non-transferable and has no cash value."
       },
       {
         "name": "Hotel cancellation confirmation",
@@ -1007,7 +1047,7 @@
       {
         "name": "Card statement",
         "type": "card_statement",
-        "content": "Cascade Federal card ending 4471, cardholder Marisol Venn. Mar 12, 2026: Northgale Air, $1,150.00. Mar 13, 2026: Hotel Fjallsljos, $360.00. Mar 20, 2026: Bluefrost Glacier Tours, $390.00. May 7, 2026: Hotel Fjallsljos refund, -$150.00. May 8, 2026: Bluefrost Glacier Tours refund, -$390.00."
+        "content": "Cascade Federal card ending 4471, cardholder Marisol Venn. Mar 12, 2026: Northgale Air, $1,150.00. Mar 13, 2026: Hotel Fjallsljos, $360.00. Mar 14, 2026: UnderCover Travel Insurance via Northgale Air, $58.00. Mar 20, 2026: Bluefrost Glacier Tours, $390.00. May 7, 2026: Hotel Fjallsljos refund, -$150.00. May 8, 2026: Bluefrost Glacier Tours refund, -$390.00."
       }
     ],
     "status": "open"
@@ -1017,39 +1057,64 @@
     "policy_id": "POL-2420",
     "customer_id": "CUS-3420",
     "claim_type": "trip_delay",
-    "submitted_on": "2026-08-20",
-    "incident_date": "2026-08-10",
-    "incident_location": "Port Halden, Canada",
-    "summary": "Ferry to Marrow Island canceled by a storm, two extra hotel nights in Port Halden",
-    "story": "I was booked on the 8:00 am ferry from Port Halden to Marrow Island on August 10. When I got to the terminal that morning the sailing was canceled because of the weather, and the ferry company said nothing would go until the seas calmed down. The next boat I could get on left on August 12. I had to stay two more nights at a hotel near the harbor, and I am claiming those two nights.",
+    "submitted_on": "2026-09-20",
+    "incident_date": "2026-09-04",
+    "incident_location": "Holyhead, Wales, United Kingdom",
+    "summary": "Ferry from Holyhead to Dublin canceled by a storm, one extra night in Holyhead",
+    "story": "I was booked on the 8:15 am ferry from Holyhead to Dublin on September 4. When I got to the port the sailing had been canceled because of the storm, and the staff told us nothing would cross the Irish Sea until it passed. I ended up waiting about a day and a half and finally sailed the next afternoon. I took a taxi to a hotel in town for the night and ate at the port and in town while I waited. Because I got to Dublin so late I also missed a concert I had a ticket for on the evening of September 4, so I am including that too. The ferry company sent me something toward the hotel afterwards.",
     "items": [
       {
-        "description": "Harborview Inn, Port Halden, night of August 10",
+        "description": "Anglesey Quay Hotel, Holyhead, night of September 4",
         "category": "accommodation",
-        "amount": 190.0
+        "amount": 240.0
       },
       {
-        "description": "Harborview Inn, Port Halden, night of August 11",
-        "category": "accommodation",
-        "amount": 190.0
+        "description": "Taxi from Holyhead port to hotel",
+        "category": "local_transport",
+        "amount": 28.0
+      },
+      {
+        "description": "Meals in Holyhead, September 4 and 5",
+        "category": "meals",
+        "amount": 64.0
+      },
+      {
+        "description": "Concert ticket, Dublin, evening of September 4, unused",
+        "category": "other",
+        "amount": 95.0
       }
     ],
-    "amount_claimed": 380.0,
+    "amount_claimed": 427.0,
     "documents": [
       {
         "name": "Ferry cancellation notice",
         "type": "carrier_letter",
-        "content": "Saltway Ferries, Port Halden terminal. Passenger: Ines Valdmaa, booking SW-77215. Sailing: Port Halden to Marrow Island, scheduled August 10, 2026 at 08:00. Status: canceled. Cause: severe weather from Storm Corwen. The storm was named by the national weather service on August 3, 2026 and has been tracking slowly up the coast since then. Sailings were suspended from August 9. The passenger was rebooked on the first available sailing, which departed August 12, 2026 at 09:30."
+        "content": "Celtic Strait Ferries, Holyhead terminal. Passenger: Ines Valdmaa, booking CSF-40318. Sailing: Holyhead to Dublin, scheduled September 4, 2026 at 08:15. Status: canceled. Cause: severe weather, Storm Ysolde. The passenger was transferred to the first available sailing, which departed Holyhead on September 5, 2026 at 14:05. In recognition of the disruption, a goodwill payment of $60.00 toward overnight accommodation was paid to the passenger's card on September 8, 2026. Customer Services, Celtic Strait Ferries."
       },
       {
         "name": "Hotel receipt",
         "type": "receipt",
-        "content": "Harborview Inn, 22 Wharf Road, Port Halden. Guest: Ines Valdmaa. Check-in August 10, 2026, check-out August 12, 2026. Two nights at $190.00. Total paid by card: $380.00."
+        "content": "Anglesey Quay Hotel, 4 Victoria Road, Holyhead. Guest: Ines Valdmaa. Check-in September 4, 2026, check-out September 5, 2026. One night, single room, $240.00. Total paid by card: $240.00."
+      },
+      {
+        "name": "Taxi receipt",
+        "type": "receipt",
+        "content": "Holy Island Cabs. September 4, 2026, 10:40. Holyhead ferry terminal to Victoria Road. Fare paid by card: $28.00."
+      },
+      {
+        "name": "Meal receipts",
+        "type": "receipt",
+        "content": "Terminal Caf\u00e9, Holyhead port, September 4, 2026, 09:50: $14.50. The Harbour Arms, Holyhead, September 4, 2026, 19:20: $31.00. Anglesey Quay Hotel restaurant, September 5, 2026, 08:30, breakfast: $18.50. Total: $64.00."
+      },
+      {
+        "name": "Concert ticket confirmation",
+        "type": "other",
+        "content": "Liffey Hall, Dublin. Ticket holder: Ines Valdmaa. Event: evening concert, September 4, 2026, doors 19:30. One standing ticket, $95.00, non-refundable."
       },
       {
         "name": "Policy confirmation email",
         "type": "other",
-        "content": "UnderCover Travel Insurance. Thank you for your purchase, Ines. Policy POL-2420, Economy plan. Purchased August 6, 2026 through TideTrip checkout. Covered trip: Marrow Island, August 8 to August 18, 2026."
+        "content": "UnderCover Travel Insurance. Thank you for your purchase, Ines. Policy POL-2420, Economy plan. Purchased September 1, 2026 through TideTrip checkout. Covered trip: Ireland, September 3 to September 17, 2026."
       }
     ],
     "status": "open"
@@ -1063,12 +1128,12 @@
     "incident_date": "2026-08-12",
     "incident_location": "Athens, Greece",
     "summary": "Return flight canceled after an air traffic control failure, home four days late",
-    "story": "I was due to fly home from Athens on the morning of August 12. When I got to the airport the board showed my flight as canceled, and the airline staff said the air traffic control system had gone down and almost nothing was taking off. The next seat they could give me was on the evening of August 15, so I took a taxi back into the city and stayed at a small hotel for three nights. I ate my meals out and kept the receipts. On the 15th I took another taxi to the airport and I landed at home on August 16, four days later than planned. I am claiming the hotel, the meals and the two taxis.",
+    "story": "I was due to fly home from Athens on the morning of August 12. When I got to the airport the board showed my flight as canceled, and the airline staff said the air traffic control system had gone down and almost nothing was taking off. The next seat they could give me was on the evening of August 15. Half the airport was trying to find a bed that night, and the only room I could get in the city was at a hotel near Syntagma at $410 a night, so I stayed there for three nights. I ate my meals out and kept the receipts, and I took a taxi in from the airport and another back on the 15th. I landed at home on August 16, four days later than planned, which also meant I missed a concert in Boston on August 13 that I had a ticket for. I am claiming the hotel, the meals, the two taxis and the concert ticket.",
     "items": [
       {
-        "description": "Hotel in Athens, three nights at $140 a night",
+        "description": "Hotel in Athens, three nights at $410 a night",
         "category": "accommodation",
-        "amount": 420.0
+        "amount": 1230.0
       },
       {
         "description": "Meals while waiting for the rebooked flight",
@@ -1079,19 +1144,24 @@
         "description": "Taxis from the airport to the hotel and back",
         "category": "transport",
         "amount": 52.0
+      },
+      {
+        "description": "Concert ticket in Boston for August 13, unused",
+        "category": "other",
+        "amount": 180.0
       }
     ],
-    "amount_claimed": 660.6,
+    "amount_claimed": 1650.6,
     "documents": [
       {
         "name": "Airline cancellation and rebooking notice",
         "type": "carrier_confirmation",
-        "content": "Halcyon Air. Passenger: Renata Okafor. Flight HQ 418 Athens to Boston, scheduled departure August 12, 2026 at 10:15, canceled. Cause: failure of the regional air traffic control system, which halted departures. Passenger rebooked on flight HQ 422, departed August 15, 2026 at 19:40, arrived Boston August 16, 2026 at 00:55 local time."
+        "content": "Halcyon Air. Passenger: Renata Okafor. Booking reference K7RQ2M. Flight HQ 418 Athens to Boston, scheduled departure August 12, 2026 at 10:15, canceled. Cause: failure of the regional air traffic control system, which halted departures. Passenger rebooked on flight HQ 422, departed August 15, 2026 at 19:40, arrived Boston August 16, 2026 at 00:55 local time. Checked baggage transferred to the new flight. Passenger care: following the passenger's request of August 16, Halcyon Air has reimbursed $300.00 toward hotel accommodation in Athens for the nights of August 12 to 14, paid to the card ending 4471 on August 20, 2026. This payment settles the airline's accommodation obligation for this disruption."
       },
       {
         "name": "Hotel invoice",
         "type": "receipt",
-        "content": "Hotel Lykavittos Garden, Athens. Guest: Renata Okafor. Check-in August 12, 2026, check-out August 15, 2026. Three nights at $140.00, single room. Total $420.00, paid by card."
+        "content": "Hotel Amalias Syntagma, Athens. Guest: Renata Okafor. Check-in August 12, 2026, check-out August 15, 2026. Three nights at $410.00, single room. Total $1,230.00, paid by card ending 4471."
       },
       {
         "name": "Meal receipts",
@@ -1101,7 +1171,12 @@
       {
         "name": "Taxi receipts",
         "type": "receipt",
-        "content": "Athens Metro Taxi. August 12, airport to Hotel Lykavittos Garden: $26.00. August 15, Hotel Lykavittos Garden to airport: $26.00. Total $52.00."
+        "content": "Athens Metro Taxi. August 12, airport to Hotel Amalias Syntagma: $26.00. August 15, Hotel Amalias Syntagma to airport: $26.00. Total $52.00."
+      },
+      {
+        "name": "Concert ticket confirmation",
+        "type": "receipt",
+        "content": "Boston Harbor Pavilion. One general admission ticket, August 13, 2026, 20:00. Purchaser: Renata Okafor. Price $180.00. Non-refundable."
       }
     ],
     "status": "open"
@@ -1153,44 +1228,39 @@
     "policy_id": "POL-2423",
     "customer_id": "CUS-3423",
     "claim_type": "trip_cancellation",
-    "submitted_on": "2026-05-18",
-    "incident_date": "2026-05-12",
+    "submitted_on": "2026-09-02",
+    "incident_date": "2026-08-20",
     "incident_location": "Columbus, Ohio, USA",
-    "summary": "Couple cancelled a trip to Calvera, Italy two days before departure over a respiratory illness outbreak in the region",
-    "story": "My wife and I were due to fly to Calvera on May 14 for eight days. Around the start of May the news started reporting a respiratory illness spreading in towns near Calvera, and the numbers kept going up every day. My wife has asthma and we are both in our sixties, so we were scared of catching it there and being stuck in a hospital far from home. On May 12 we decided we could not take the risk and cancelled. Neither of us was sick. The airline and the hotel both said our bookings were non-refundable, so we lost $1,720. We have paid for insurance for years and this is exactly the kind of thing we thought it was for.",
+    "summary": "Couple cancelled a week in Cancun, Mexico after the airline stopped all flights to Cancun ahead of a hurricane",
+    "story": "My wife and I were booked to fly to Cancun on August 21 for a week at the beach. On August 20 Skylark Airways emailed to say every flight to Cancun was cancelled because of the hurricane, and nothing would fly there for days. There was no way to get there, so we cancelled the trip. The airline would not give us anything back because we were on their basic fare, and the hotel only refunded part of what we paid. Altogether we are out a lot of money for a vacation we never got to take. We have kept every email and receipt, and they are all attached.",
     "items": [
       {
-        "description": "Return flights for two, Columbus to Calvera, Bluewing Air, non-refundable",
+        "description": "Return flights for two, Columbus to Cancun, Skylark Airways, basic fare",
         "category": "transport",
-        "amount": 980.0
+        "amount": 1180.0
       },
       {
-        "description": "Eight nights at Albergo Ponte Lino, Calvera, prepaid non-refundable rate",
+        "description": "Seven nights at Hotel Arena Turquesa, Cancun, prepaid",
         "category": "accommodation",
-        "amount": 740.0
+        "amount": 1260.0
       }
     ],
-    "amount_claimed": 1720.0,
+    "amount_claimed": 2440.0,
     "documents": [
       {
-        "name": "Bluewing Air booking and cancellation confirmation",
+        "name": "Skylark Airways flight cancellation notice",
         "type": "supplier_confirmation",
-        "content": "Booking BW7Q2K for Harold Wrenfield and Diane Wrenfield. Flight BW412 Columbus to Calvera, May 14, 2026, returning BW413 May 22, 2026. Fare paid by card: $980.00. Cancelled by the passenger on May 12, 2026. Fare type Saver, no refund and no credit. Flight BW412 on May 14 operated as scheduled."
+        "content": "Booking SK4R8M for Harold Wrenfield and Diane Wrenfield. Flight SK1187 Columbus to Cancun, August 21, 2026, returning SK1188 August 28, 2026. Fare paid by card: $1,180.00, fare type Basic. Notice issued August 20, 2026: Skylark Airways has suspended all service to and from Cancun International Airport from August 20 through August 23, 2026. The suspension follows the National Hurricane Center advisory of 11:00 a.m. EDT on August 18, 2026, which named Tropical Storm Tobias and forecast its arrival on the Cancun coast on August 21, and the storm's upgrade to a hurricane on August 20. Customers on Basic fares who choose not to rebook are not eligible for a refund or a travel credit. The passengers did not rebook, and the booking was cancelled on August 20, 2026."
       },
       {
-        "name": "Albergo Ponte Lino cancellation letter",
+        "name": "Hotel Arena Turquesa cancellation letter",
         "type": "supplier_confirmation",
-        "content": "Reservation for Mr and Mrs Wrenfield, May 14 to May 22, 2026, double room, prepaid non-refundable rate, $740.00 charged on March 9, 2026. Cancelled by the guest on May 12, 2026. The hotel remained open throughout the period and no refund is due under the rate conditions."
+        "content": "Reservation for Mr and Mrs Wrenfield, August 21 to August 28, 2026, ocean-view double room, prepaid rate, $1,260.00 charged on July 5, 2026. Cancelled by the guest on August 20, 2026. Under the hotel's weather policy, a refund of $520.00 has been returned to the original card. The remaining $740.00 is non-refundable under the rate conditions."
       },
       {
         "name": "Card statement",
         "type": "receipt",
-        "content": "Visa ending 3318. March 6, 2026: Bluewing Air $980.00. March 9, 2026: Albergo Ponte Lino $740.00."
-      },
-      {
-        "name": "Regional health authority notice",
-        "type": "other",
-        "content": "Regional Health Office, Lino Valley, bulletin of May 11, 2026. Cases of a respiratory illness are being reported in several towns of the valley. Residents and visitors are advised to wash hands often and to see a doctor if they develop a fever or cough. There are no restrictions on travel into or within the region, and public transport, hotels and businesses are operating normally."
+        "content": "Visa ending 3318. July 2, 2026: Skylark Airways $1,180.00. July 5, 2026: Hotel Arena Turquesa $1,260.00. August 24, 2026: Hotel Arena Turquesa refund -$520.00."
       }
     ],
     "status": "open"
@@ -1204,70 +1274,55 @@
     "incident_date": "2026-09-12",
     "incident_location": "Valencia, Spain",
     "summary": "Cabin bag snatched at Valencia train station on the last day of the trip",
-    "story": "On September 12, the day I was due to fly home, I was standing at the ticket machines in the main train station in Valencia with my cabin bag on my shoulder. A man on a scooter rode past, grabbed the strap and pulled it off me, and he was gone before I could do anything. The bag had my laptop, my camera and its lens, my tablet, three shirts and my passport in it. I reported it to the police at the station office within the hour. Then I went to the US consulate and got an emergency passport so I could still take my flight that night. I am claiming for everything in the bag and the passport fee.",
+    "story": "On September 12, the day I was due to fly home, I was standing at the ticket machines in the main train station in Valencia with my cabin bag on my shoulder. A man on a scooter rode past, grabbed the strap and pulled it off me, and he was gone before I could do anything. I had packed my gadgets in that bag so they would not go in the hold, along with a couple of t-shirts. I went straight to the police office in the station and made a report. I flew home that evening as planned. I am claiming for everything that was in the bag.",
     "items": [
       {
-        "description": "Laptop, in the stolen cabin bag",
-        "category": "electronics",
-        "amount": 900.0
+        "description": "Corvane Lumen X2, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 649.0
       },
       {
-        "description": "Camera with its lens, bought together, in the stolen cabin bag",
-        "category": "electronics",
-        "amount": 1100.0
+        "description": "Vantor Halo, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 449.0
       },
       {
-        "description": "Tablet, in the stolen cabin bag",
-        "category": "electronics",
-        "amount": 420.0
+        "description": "Quillon Wayfinder 5, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 599.0
       },
       {
-        "description": "Shirt, in the stolen cabin bag",
+        "description": "Brisa Pocket 2, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 1099.0
+      },
+      {
+        "description": "T-shirt, in the stolen cabin bag",
         "category": "clothing",
-        "amount": 60.0
+        "amount": 40.0
       },
       {
-        "description": "Shirt, in the stolen cabin bag",
+        "description": "T-shirt, in the stolen cabin bag",
         "category": "clothing",
-        "amount": 60.0
-      },
-      {
-        "description": "Shirt, in the stolen cabin bag",
-        "category": "clothing",
-        "amount": 60.0
-      },
-      {
-        "description": "Emergency passport fee at the US consulate",
-        "category": "documents",
-        "amount": 110.0
+        "amount": 40.0
       }
     ],
-    "amount_claimed": 2710.0,
+    "amount_claimed": 2876.0,
     "documents": [
       {
         "name": "Police report",
         "type": "police_report",
-        "content": "Policia Nacional, Valencia, Estacion del Norte office. Report made September 12, 2026 at 10:25 by Renata Okafor. At about 09:40 at the ticket machines, a man on a scooter pulled a cabin bag from the complainant's shoulder and rode off. Contents reported: laptop, camera with lens, tablet, three shirts, US passport. No arrest."
+        "content": "Policia Nacional, Valencia, Estacion del Norte office. Report made September 12, 2026 at 10:25 by Renata Okafor. At about 09:40 at the ticket machines, a man on a scooter pulled a cabin bag from the complainant's shoulder and rode off. Contents reported: Corvane Lumen X2, Vantor Halo, Quillon Wayfinder 5, Brisa Pocket 2, two t-shirts. No arrest."
       },
       {
         "name": "Receipts",
         "type": "receipt",
-        "content": "Laptop, Brightline Computers, bought March 2025: $900.00. Camera body and zoom lens, sold together as a kit, Halden Photo, bought November 2025: $1,100.00. Tablet, Brightline Computers, bought January 2026: $420.00."
+        "content": "Corvane store, order 55120, bought April 2026: Corvane Lumen X2, $649.00. Vantor online store, order VH-88213, bought April 2026: Vantor Halo, $449.00. Trailhead Outfitters, bought May 2026: Quillon Wayfinder 5, $599.00. Halden Photo, bought June 2026: Brisa Pocket 2, $1,099.00."
       },
       {
         "name": "Customer's list of clothing",
         "type": "other",
-        "content": "Three cotton shirts, about $60.00 each, $180.00 in all."
-      },
-      {
-        "name": "Consulate fee receipt",
-        "type": "receipt",
-        "content": "US Consular Agency, Valencia. September 12, 2026. Emergency passport issued to Renata Okafor. Fee paid: $110.00."
-      },
-      {
-        "name": "Customer's account of the passport loss",
-        "type": "other",
-        "content": "My passport was in the cabin bag that was snatched at the train station on the morning of September 12. I went to the consular agency that afternoon with the police report and was issued an emergency passport the same day, so I could fly home that evening."
+        "content": "Two cotton t-shirts, $40.00 each, $80.00 in all."
       }
     ],
     "status": "open"
@@ -1278,10 +1333,10 @@
     "customer_id": "CUS-3425",
     "claim_type": "trip_cancellation",
     "submitted_on": "2026-05-26",
-    "incident_date": "2026-05-19",
+    "incident_date": "2026-05-01",
     "incident_location": "Columbus, Ohio, USA",
-    "summary": "Trip to Costa Rica canceled after both passports could not be found at home three days before departure",
-    "story": "We were flying to Costa Rica on May 22. On the evening of May 19 I went to get our passports out of the drawer where we always keep them, and they were not there. Ren\u00e9e's was gone too. We searched the whole house and the car and never found them. I called the passport agency the next morning but the earliest appointment they had was in June, so there was no way to travel. I canceled the flights and the resort that day. The airline and the resort would not give us anything back. We paid $1,900 for a trip we could not take, and I would like that covered.",
+    "summary": "Trip to Costa Rica canceled after the policyholder was laid off in a company restructuring three weeks before departure",
+    "story": "We were flying to Costa Rica on May 22. On May 1 my manager called me in and told me my job was being eliminated as part of a restructuring of the regional operations team. It had nothing to do with my work, and the letter they gave me says so. With no income coming in and two weeks of severance, I could not justify spending another week away and the money on the resort, so on May 4 I canceled everything. The airline would not refund anything. The resort kept most of what we paid but sent back a small part. Ren\u00e9e and I paid $1,900 for a trip we did not take, and I would like that covered.",
     "items": [
       {
         "description": "Round-trip flights for two travelers, Columbus to Liberia, non-refundable",
@@ -1289,7 +1344,7 @@
         "amount": 1100.0
       },
       {
-        "description": "Seven nights at the resort, non-refundable",
+        "description": "Seven nights at the resort, prepaid",
         "category": "accommodation",
         "amount": 800.0
       }
@@ -1299,22 +1354,22 @@
       {
         "name": "Airline cancellation confirmation",
         "type": "supplier_confirmation",
-        "content": "Pacifica Air. Booking PQ7RZ4, passengers Daniel Okafor and Renee Lindqvist, Columbus (CMH) to Liberia (LIR) May 22, 2026, returning May 29, 2026. Canceled by the customer on May 20, 2026. Fare type Saver, non-refundable. Amount paid $1,100.00. Refund $0.00. No travel credit issued."
+        "content": "Pacifica Air. Booking PQ7RZ4, passengers Daniel Okafor and Renee Lindqvist, Columbus (CMH) to Liberia (LIR) May 22, 2026, returning May 29, 2026. Canceled by the customer on May 4, 2026. Fare type Saver, non-refundable. Amount paid $1,100.00. Refund $0.00. No travel credit issued."
       },
       {
         "name": "Resort cancellation confirmation",
         "type": "supplier_confirmation",
-        "content": "Casa Brisa Resort, Tamarindo. Reservation 55813 for two guests, May 22 to May 29, 2026. Canceled May 20, 2026. Prepaid rate, non-refundable under the terms accepted at booking. Amount paid $800.00. Refund $0.00."
+        "content": "Casa Brisa Resort, Tamarindo. Reservation 55813 for two guests, May 22 to May 29, 2026. Canceled May 4, 2026, more than 14 days before arrival. Prepaid rate, refundable at 25% when canceled 14 or more days before arrival. Amount paid $800.00. Refund issued to original card $200.00."
       },
       {
         "name": "Card statement",
         "type": "receipt",
-        "content": "Statement for Daniel Okafor. March 9, 2026: Pacifica Air $1,100.00. March 9, 2026: Casa Brisa Resort $800.00."
+        "content": "Statement for Daniel Okafor. March 9, 2026: Pacifica Air $1,100.00. March 9, 2026: Casa Brisa Resort $800.00. May 7, 2026: Casa Brisa Resort refund -$200.00."
       },
       {
-        "name": "Passport agency appointment record",
+        "name": "Letter from employer",
         "type": "other",
-        "content": "Regional Passport Office, appointment request from Daniel Okafor received May 20, 2026 for two replacement passports reported lost. Earliest available appointment: June 11, 2026."
+        "content": "Hartwell Logistics, 400 West Broad Street, Columbus, OH. April 30, 2026. Dear Daniel, As discussed, the regional operations team is being restructured and your position as Operations Coordinator will be eliminated effective May 1, 2026. This decision is part of a wider reorganization and is not related to your performance or conduct. You will receive two weeks of base pay as severance, paid with your final paycheck on May 15, 2026. Your health coverage continues through May 31, 2026. Our records show your employment with Hartwell Logistics began on June 15, 2025, and your accrued but unused vacation days will be paid out in full. Please return your badge and laptop to the front desk by May 1. We thank you for your contributions and wish you well. Signed, Marisol Grant, Human Resources."
       }
     ],
     "status": "open"

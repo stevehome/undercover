@@ -136,7 +136,7 @@
     "claim_id": "CLM-1420",
     "fos": "DRN-4617569",
     "fos_outcome": "Upheld",
-    "ours": "decline",
+    "ours": "approve",
     "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
   },
   {

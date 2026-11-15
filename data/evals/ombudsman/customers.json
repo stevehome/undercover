@@ -239,14 +239,19 @@
     "customer_since": "2025-06-03",
     "previous_claims": [
       {
+        "claim_id": "CLM-0915",
+        "filed_on": "2025-08-21",
+        "summary": "Baggage delay claim for a suitcase delivered late on a trip to Chicago, approved"
+      },
+      {
         "claim_id": "CLM-0982",
-        "filed_on": "2025-11-18",
-        "summary": "Baggage claim for a suitcase damaged by the airline on a trip to Montreal"
+        "filed_on": "2025-09-14",
+        "summary": "Trip delay claim for a flight to Montreal held by a mechanical problem, declined because the delay was shorter than the waiting period"
       },
       {
         "claim_id": "CLM-1197",
         "filed_on": "2026-03-04",
-        "summary": "Trip delay claim for a flight held overnight by a crew problem on a trip to Denver"
+        "summary": "Trip delay claim for a flight held overnight by a crew problem on a trip to Denver, approved"
       }
     ]
   },
@@ -307,7 +312,7 @@
       "state": "ME",
       "zip": "04101"
     },
-    "customer_since": "2026-08-06",
+    "customer_since": "2026-09-01",
     "previous_claims": []
   },
   {
