@@ -1,7 +1,8 @@
 """The agent's saved progress: the one module that talks to Postgres.
 
 LangGraph saves a claim's state here after every step, in the same Supabase
-database as the backend, in the `undercover` schema. Claims worked at once
+database as the backend, in the `undercover` schema (or the one named by
+UNDERCOVER_SCHEMA, as for a scratch copy). Claims worked at once
 share the process's few connections and wait for one rather than fail. The
 database closes connections left idle, as while a round waits for a handler, so
 the pool tests a connection before handing it out.
@@ -13,10 +14,11 @@ from threading import Lock
 from typing import Any
 
 from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg import sql
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
-SCHEMA = "undercover"
+SCHEMA = os.environ.get("UNDERCOVER_SCHEMA", "undercover")
 CONNECTIONS_PER_PROCESS = 4
 WAIT_FOR_CONNECTION_SECONDS = 600
 TEST_BEFORE_USE = ConnectionPool.check_connection
@@ -59,6 +61,8 @@ def _make_pool() -> ConnectionPool[Any]:
     )
     pool.open()
     with pool.connection() as connection:
-        connection.execute(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}")
+        connection.execute(
+            sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(SCHEMA))
+        )
     PostgresSaver(pool).setup()  # pyright: ignore[reportArgumentType]
     return pool

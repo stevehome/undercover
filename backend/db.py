@@ -13,7 +13,7 @@ from sqlalchemy import Connection, Engine, create_engine, func, insert, select, 
 from backend import money, seed_data, tables
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "undercover.db"
-SCHEMA = "undercover"
+SCHEMA = os.environ.get("UNDERCOVER_SCHEMA", "undercover")
 CONNECTIONS_PER_PROCESS = 4
 WAIT_FOR_CONNECTION_SECONDS = 600
 RECYCLE_CONNECTION_SECONDS = 300
