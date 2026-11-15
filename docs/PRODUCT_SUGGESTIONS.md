@@ -306,7 +306,7 @@ A prompt-only check with the whole knowledge base in the prompt overstates the a
 **How it was run.** The app seeds only an `evaluation` and a `held_out` set, so the 25 claims were loaded as the held-out set into a separate Postgres schema, `scratch_eval`, with their own backend and agent on ports 8100 and 8102. This needed one small change, a `UNDERCOVER_SCHEMA` setting (default `undercover`, so nothing changes unless it is set). Ed's `even_harder` set can be loaded the same way. Every run used the starting prompt (version 1), so these numbers will move after an improver round.
 
 **Limits.**
-- Seven claims have moved away from their FOS case; `sources.json` marks them "starting point only". Only 9 of the 25 still share the FOS outcome's direction.
+- Seven claims have moved away from their FOS case; `sources.json` marks them "starting point only". Only 6 of the 25 still share the FOS outcome's direction; 9 differ or have changed facts, 3 are referrals with no FOS equivalent, and 7 are marked starting point only.
 - The labels were set and checked by models. A person has not yet reviewed them, and a spot-check of about 10 claims is still needed.
 - The set is tuned to Luna at low effort, and may not hold for other models.
 - Keep it out of any prompt or rule that is written while improving the agent, as with the course's held-out sets.
