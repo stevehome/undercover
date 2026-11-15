@@ -32,21 +32,21 @@
     "fos": "DRN-2875228",
     "fos_outcome": "Not upheld",
     "ours": "decline",
-    "relation": "same outcome; the reason for cancelling is a different listed-reason test"
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1406",
     "fos": "DRN-3036106",
     "fos_outcome": "Upheld",
     "ours": "approve",
-    "relation": "same direction as the FOS outcome"
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1407",
     "fos": "DRN-5535197",
     "fos_outcome": "Not upheld",
     "ours": "decline",
-    "relation": "same direction as the FOS outcome"
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1408",
@@ -95,7 +95,7 @@
     "fos": "DRN-5633884",
     "fos_outcome": "Not upheld",
     "ours": "decline",
-    "relation": "same direction as the FOS outcome"
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1415",
@@ -116,7 +116,7 @@
     "fos": "DRN-1988167",
     "fos_outcome": "Upheld",
     "ours": "approve",
-    "relation": "same direction as the FOS outcome"
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1418",
@@ -129,7 +129,7 @@
     "claim_id": "CLM-1419",
     "fos": "DRN-4504426",
     "fos_outcome": "Not upheld",
-    "ours": "approve",
+    "ours": "refer",
     "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
   },
   {
@@ -143,8 +143,8 @@
     "claim_id": "CLM-1421",
     "fos": "DRN-4667223",
     "fos_outcome": "Not upheld",
-    "ours": "approve",
-    "relation": "differs from the FOS outcome: the facts or UnderCover's rules point the other way"
+    "ours": "decline",
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   },
   {
     "claim_id": "CLM-1422",
@@ -171,7 +171,7 @@
     "claim_id": "CLM-1425",
     "fos": "DRN-5546213",
     "fos_outcome": "Not upheld",
-    "ours": "decline",
-    "relation": "same direction as the FOS outcome"
+    "ours": "refer",
+    "relation": "starting point only: the claim was reworked around a knowledge-base fact, so the FOS outcome no longer applies"
   }
 ]

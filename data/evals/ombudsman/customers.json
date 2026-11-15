@@ -132,7 +132,22 @@
       "zip": "43201"
     },
     "customer_since": "2025-03-14",
-    "previous_claims": []
+    "previous_claims": [
+      {
+        "claim_id": "CLM-0731",
+        "policy_id": "POL-1872",
+        "claim_type": "baggage",
+        "filed_on": "2025-08-02",
+        "outcome": "paid"
+      },
+      {
+        "claim_id": "CLM-0988",
+        "policy_id": "POL-2015",
+        "claim_type": "trip_delay",
+        "filed_on": "2025-12-14",
+        "outcome": "declined"
+      }
+    ]
   },
   {
     "customer_id": "CUS-3410",
@@ -267,7 +282,7 @@
       "state": "AZ",
       "zip": "85719"
     },
-    "customer_since": "2026-03-14",
+    "customer_since": "2026-04-20",
     "previous_claims": []
   },
   {
@@ -297,8 +312,23 @@
       "state": "OR",
       "zip": "97214"
     },
-    "customer_since": "2026-03-14",
-    "previous_claims": []
+    "customer_since": "2025-06-10",
+    "previous_claims": [
+      {
+        "claim_id": "CLM-0862",
+        "policy_id": "POL-1862",
+        "claim_type": "baggage",
+        "filed_on": "2026-01-22",
+        "status": "declined"
+      },
+      {
+        "claim_id": "CLM-1391",
+        "policy_id": "POL-2297",
+        "claim_type": "trip_delay",
+        "filed_on": "2026-05-09",
+        "status": "open"
+      }
+    ]
   },
   {
     "customer_id": "CUS-3420",

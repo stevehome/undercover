@@ -82,13 +82,15 @@
     "purchased_on": "2026-07-01",
     "sold_through": "Skylark Airways checkout",
     "trip": {
-      "destination": "Hanoi, Vietnam",
+      "destination": "Costa Rica",
       "departs_on": "2026-08-20",
       "returns_on": "2026-09-03",
-      "trip_cost": 2500.0
+      "trip_cost": 4800.0
     },
     "travelers": [
-      "Rafael Ortiz"
+      "Rafael Ortiz",
+      "Lucia Ortiz",
+      "Mateo Ortiz"
     ],
     "status": "active"
   },
@@ -97,13 +99,13 @@
     "customer_id": "CUS-3406",
     "plan": "premium",
     "add_ons": [],
-    "purchased_on": "2026-06-15",
+    "purchased_on": "2026-05-20",
     "sold_through": "UnderCover website",
     "trip": {
-      "destination": "Valletta, Malta",
-      "departs_on": "2026-08-03",
-      "returns_on": "2026-08-17",
-      "trip_cost": 1850.0
+      "destination": "Interlaken, Switzerland",
+      "departs_on": "2026-07-18",
+      "returns_on": "2026-07-30",
+      "trip_cost": 3200.0
     },
     "travelers": [
       "Delia Fenwick"
@@ -113,15 +115,15 @@
   {
     "policy_id": "POL-2407",
     "customer_id": "CUS-3407",
-    "plan": "premium",
+    "plan": "economy",
     "add_ons": [],
-    "purchased_on": "2026-01-09",
+    "purchased_on": "2026-07-08",
     "sold_through": "SkyRoute Travel website",
     "trip": {
-      "destination": "Valbrenna, Switzerland",
-      "departs_on": "2026-02-13",
-      "returns_on": "2026-02-21",
-      "trip_cost": 3400.0
+      "destination": "Italy",
+      "departs_on": "2026-07-12",
+      "returns_on": "2026-07-29",
+      "trip_cost": 2900.0
     },
     "travelers": [
       "Marcus Oyelaran"
@@ -240,15 +242,15 @@
   {
     "policy_id": "POL-2414",
     "customer_id": "CUS-3414",
-    "plan": "economy",
+    "plan": "premium",
     "add_ons": [],
-    "purchased_on": "2026-07-05",
+    "purchased_on": "2026-02-10",
     "sold_through": "UnderCover website",
     "trip": {
-      "destination": "Southern Italy",
-      "departs_on": "2026-08-08",
-      "returns_on": "2026-08-22",
-      "trip_cost": 2100.0
+      "destination": "Cayo Brava, Honduras",
+      "departs_on": "2026-03-14",
+      "returns_on": "2026-03-24",
+      "trip_cost": 2900.0
     },
     "travelers": [
       "Dario Pelletier"
@@ -296,16 +298,19 @@
     "customer_id": "CUS-3417",
     "plan": "economy",
     "add_ons": [],
-    "purchased_on": "2026-03-14",
+    "purchased_on": "2026-04-20",
     "sold_through": "UnderCover website",
     "trip": {
-      "destination": "Reykjavik, Iceland",
-      "departs_on": "2026-05-15",
-      "returns_on": "2026-05-25",
-      "trip_cost": 3100.0
+      "destination": "La Fortuna, Costa Rica",
+      "departs_on": "2026-06-06",
+      "returns_on": "2026-06-16",
+      "trip_cost": 6400.0
     },
     "travelers": [
-      "Delia Marchetti"
+      "Delia Marchetti",
+      "Marco Marchetti",
+      "Luca Marchetti",
+      "Sofia Marchetti"
     ],
     "status": "active"
   },
@@ -340,7 +345,7 @@
       "destination": "Reykjavik, Iceland",
       "departs_on": "2026-05-14",
       "returns_on": "2026-05-21",
-      "trip_cost": 1150.0
+      "trip_cost": 1900.0
     },
     "travelers": [
       "Marisol Venn"
@@ -368,15 +373,15 @@
   {
     "policy_id": "POL-2421",
     "customer_id": "CUS-3421",
-    "plan": "first",
+    "plan": "economy",
     "add_ons": [],
-    "purchased_on": "2026-06-20",
+    "purchased_on": "2026-08-21",
     "sold_through": "SkyFare checkout",
     "trip": {
-      "destination": "Athens, Greece",
-      "departs_on": "2026-08-03",
-      "returns_on": "2026-08-12",
-      "trip_cost": 2150.0
+      "destination": "Greece",
+      "departs_on": "2026-08-24",
+      "returns_on": "2026-09-03",
+      "trip_cost": 1840.0
     },
     "travelers": [
       "Renata Okafor"
@@ -443,15 +448,15 @@
   {
     "policy_id": "POL-2425",
     "customer_id": "CUS-3425",
-    "plan": "economy",
+    "plan": "premium",
     "add_ons": [],
-    "purchased_on": "2026-03-10",
+    "purchased_on": "2026-08-10",
     "sold_through": "Wayfarely checkout",
     "trip": {
-      "destination": "Tamarindo, Costa Rica",
-      "departs_on": "2026-05-22",
-      "returns_on": "2026-05-29",
-      "trip_cost": 2300.0
+      "destination": "Seattle, Washington, USA",
+      "departs_on": "2026-09-03",
+      "returns_on": "2026-09-10",
+      "trip_cost": 2400.0
     },
     "travelers": [
       "Daniel Okafor",

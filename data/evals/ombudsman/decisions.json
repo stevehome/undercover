@@ -128,11 +128,11 @@
     "payout": 0.0,
     "over_approval_limit": false,
     "handler_id": "HND-03",
-    "decided_on": "2026-08-29",
-    "reason": "Losing a job through no fault of your own is a covered reason under section 2, but only after at least one year with the employer. The employer's separation letter gives a continuous service date of September 8, 2025, and the job ended on August 14, 2026. That is about eleven months, 25 days short of a year, so the condition is not met. The claim is declined under section 2.",
-    "reference": "Policy wording, section 2",
+    "decided_on": "2026-09-14",
+    "reason": "The broken collarbone happened when you fell from the raft on the Tallow Gorge run. The rafting company's booking confirmation rates that run at grade 4 from put-in to take-out. White-water rafting above grade 3 is one of the adventure sports listed in section 8. Section 7 says Emergency Medical does not pay for injuries from adventure sports unless the Adventure Sports add-on was bought, and this Economy policy has no add-ons. The claim is declined under sections 7 and 8.",
+    "reference": "Policy wording, sections 7 and 8",
     "calculation": [],
-    "tests": "Whether the reader finds the one-year tenure condition for job loss failing on a service date buried in the records block of a separation letter, instead of working out a refund-adjusted and plan-capped payout.",
+    "tests": "Whether the reader recognizes a family guided raft trip as an excluded adventure sport by finding the grade 4 rating of the run buried in the safety notes of the rafting operator's booking confirmation, and checks that the policy lacks the Adventure Sports add-on, rather than working out a deductible-adjusted payout from clean medical records.",
     "difficulty": "hard",
     "tempts": "approve",
     "needs": [],
@@ -142,37 +142,37 @@
   {
     "claim_id": "CLM-1406",
     "decision": "approve",
-    "payout": 82.4,
-    "over_approval_limit": false,
+    "payout": 2125.0,
+    "over_approval_limit": true,
     "handler_id": "HND-01",
-    "decided_on": "2026-08-26",
-    "reason": "The carrier's report shows the flight arrived at 22:40 on August 3 and the suitcase was delivered at 13:05 on August 4. That is a delay of 14 hours 25 minutes, which meets the 12-hour Premium waiting period. Baggage Delay pays for essential clothing and toiletries bought while you wait. The toiletries ($23.00) and the clothes bought at 09:38 on August 4 ($109.40) are eligible, a total of $132.40. The sandals were bought at 16:52, after the suitcase had been delivered, so they were not bought while waiting and are not covered. The carrier's report shows Azura Wings paid a $50.00 interim expense payment for the same delay, and this is taken off first, leaving $82.40. That is under the $300 Premium Baggage Delay maximum, and no deductible applies to this benefit, so the payout is $82.40.",
-    "reference": "Policy wording, sections 1, 4 and 10; claims manual, sections 6 and 7 (waiting periods)",
+    "decided_on": "2026-09-16",
+    "reason": "You fractured your wrist on July 22, inside your covered trip, and you filed within 90 days. Glacier Air runs helicopter sightseeing flights over the Jungfrau region. A sightseeing flight is not heli-skiing or any other listed adventure sport, so the Adventure Sports add-on was not needed and the adventure sports exclusion does not apply. The hospital record shows no relevant past history and no regular medications, so there is no pre-existing condition. The emergency treatment in Interlaken is covered: the assessment ($640.00), the X-ray ($310.00), the reduction and cast ($1,180.00) and the medication ($45.00), a total of $2,175.00. The physiotherapy invoice shows four sessions in Pittsburgh between September 1 and September 8, after your trip ended on July 30. That is follow-up care at home, which could wait until you were home, so the $480.00 is not covered. The Premium deductible of $50.00 comes off once, leaving $2,125.00. This is within the $100,000 Premium Emergency Medical maximum. Because the payout is above $1,000, a claims handler must sign off before payment.",
+    "reference": "Policy wording, sections 1, 7, 8 and 10; claims manual, sections 3, 6 and 7 (adventure sports, pre-existing conditions, treatment that can wait)",
     "calculation": [
       {
-        "step": "Toiletries",
-        "amount": 23.0
+        "step": "Emergency department assessment",
+        "amount": 640.0
       },
       {
-        "step": "Two T-shirts",
-        "amount": 38.5
+        "step": "X-ray of right wrist",
+        "amount": 310.0
       },
       {
-        "step": "Underwear and socks",
-        "amount": 29.9
+        "step": "Closed reduction and cast",
+        "amount": 1180.0
       },
       {
-        "step": "Lightweight trousers",
-        "amount": 41.0
+        "step": "Pain medication",
+        "amount": 45.0
       },
       {
-        "step": "Less Azura Wings interim expense payment",
+        "step": "Less Premium deductible",
         "amount": -50.0
       }
     ],
-    "tests": "A Premium baggage delay that crosses midnight and meets the 12-hour wait, where a purchase timestamped after delivery is excluded and a carrier interim payment that appears only in the carrier report must come off before the payout.",
+    "tests": "A Premium emergency medical claim with no add-ons, where an injury at a helicopter operator's landing pad must be recognised as a sightseeing flight and not heli-skiing, home physiotherapy dated after the return date must be left out, and the $50 deductible comes off before an over-limit payout.",
     "difficulty": "hard",
-    "tempts": "payout",
+    "tempts": "decline",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -183,16 +183,16 @@
     "payout": 0.0,
     "over_approval_limit": false,
     "handler_id": "HND-02",
-    "decided_on": "2026-03-04",
-    "reason": "Baggage Delay pays only when the carrier delivers the bag at least the plan's waiting period after the customer arrives, and on Premium that is 12 hours. The airline's report shows the flight actually arrived at 21:50 on February 14 and the bag was delivered to the hotel at 08:40 on February 15. That is a delay of 10 hours and 50 minutes. The delay runs from the actual arrival, not the scheduled 20:15, and the manual says to use the carrier's times. The waiting period was not met, so the clothes are not covered, even though the receipt is in order and the bag arrived on a different day. The airline's $50 advance does not change this.",
-    "reference": "Policy wording, sections 1 and 4; claims manual, section 7 (waiting periods)",
+    "decided_on": "2026-08-10",
+    "reason": "No benefit pays for events that were publicly known before the policy was bought, such as an announced strike. The railway's notice shows that the unions filed the strike notice on July 3, 2026, and the policy was bought on July 8, 2026, five days later, so the strike was already publicly known. The delay of nearly 24 hours is well past the 12-hour Economy waiting period and the receipts are in order, but the exclusion applies to the whole claim, so the hotel, taxi and meals cannot be paid. Without the exclusion the payout would have been capped at the $300 Economy maximum, but that calculation is not reached.",
+    "reference": "Policy wording, section 9 (events publicly known before purchase), section 3",
     "calculation": [
       {
-        "step": "No eligible amount: the delay from actual arrival (21:50 Feb 14) to delivery (08:40 Feb 15) is 10 hours 50 minutes, under the 12-hour Premium waiting period",
+        "step": "No eligible amount: the strike was announced on July 3, 2026 (railway notice), before the policy was bought on July 8, 2026, so the general exclusion for publicly known events applies",
         "amount": 0.0
       }
     ],
-    "tests": "Whether the reader works out an overnight baggage delay across midnight from the carrier's actual arrival time rather than the scheduled time (which would give 12 hours 25 minutes) and finds it falls short of the Premium 12-hour waiting period, despite a story about the bag arriving the next day and a carrier advance that invites a payout calculation.",
+    "tests": "Whether the reader finds the July 3 strike-notice date buried at the end of the railway's notice, compares it with the July 8 purchase date and applies the publicly-known-event exclusion, instead of working through the waiting period, the $350 accommodation cap and the $300 Economy maximum.",
     "difficulty": "hard",
     "tempts": "approve",
     "needs": [],
@@ -235,9 +235,9 @@
     "payout": 145.0,
     "over_approval_limit": false,
     "handler_id": "HND-01",
-    "decided_on": "2026-08-28",
-    "reason": "The passport was lost during the covered trip, and the consulate fee ($95.00), the photos ($12.00) and the taxi to the consulate ($38.00) are receipted and are exactly what the passport benefit pays, with no deductible. The missed Montserrat excursion is a loss that followed indirectly from the lost passport, so it is a consequential loss and is excluded. The eligible total of $145.00 is inside the $150 Economy maximum for passport and travel documents, so $145.00 is paid.",
-    "reference": "Policy wording, sections 1, 6, 9 and 10; claims manual, consequential losses and section 6",
+    "decided_on": "2026-08-14",
+    "reason": "The passport was lost during the covered trip, and the consulate fee ($95.00), the photos ($12.00) and the taxi to the consulate ($38.00) are receipted. These are exactly what the passport benefit pays, and no deductible applies. The missed Montserrat excursion followed indirectly from the lost passport, so it is a consequential loss and is excluded. The eligible total of $145.00 is inside the $150 Economy maximum for passport and travel documents, so $145.00 is paid. The customer has two earlier claims. The baggage claim filed on 2025-08-02 falls outside the 12 months before this claim was filed on 2026-08-10, so only the trip delay claim filed on 2025-12-14 counts. This is the customer's second claim in 12 months, not the third, and it is decided in the normal way.",
+    "reference": "Policy wording, sections 1, 6, 9 and 10; claims manual, consequential losses and sections 6 and 9",
     "calculation": [
       {
         "step": "Consulate fee for the emergency passport",
@@ -256,9 +256,9 @@
         "amount": 145.0
       }
     ],
-    "tests": "A lost passport: the replacement costs are paid up to the Economy passport maximum with no deductible, and the missed prepaid excursion is an excluded consequential loss",
+    "tests": "Whether the reader counts the 12-month repeat-claim window by filing date, so that the claim filed on 2025-08-02 drops out and this is a second claim to approve at $145 with the consequential excursion left out, rather than a third claim to refer.",
     "difficulty": "hard",
-    "tempts": "payout",
+    "tempts": "refer",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -421,18 +421,18 @@
     "payout": 0.0,
     "over_approval_limit": false,
     "handler_id": "HND-03",
-    "decided_on": "2026-08-26",
-    "reason": "If the bag was stolen, section 5 of the wording requires the theft to be reported to the local police within 24 hours. The customer states that he never reported it, so the condition of the benefit was not met. Under section 5 of the claims manual, this claim is declined rather than referred for a missing document. If the bag was instead left on the pavement outside the hotel, it was out of his sight and reach in a public place, which makes it unattended and excluded under section 5 either way.",
-    "reference": "Policy wording, section 5; claims manual, sections 5 and 7 (unattended belongings)",
+    "decided_on": "2026-04-07",
+    "reason": "The medical record shows that the eardrum ruptured during the descent on the first dive of the trip. The dive operator's receipt shows that this dive was at Sentinel Wall, where the top of the wall lies at 14 meters, so the dive went deeper than 10 meters. Scuba diving deeper than 10 meters is a listed adventure sport under section 8 of the wording. Section 7 excludes injuries from adventure sports unless the Adventure Sports add-on was bought, and this policy has no add-ons. The customer's certification and the shallow second dive do not change this, and the injury is excluded.",
+    "reference": "Policy wording, sections 7 and 8; claims manual, section 7 (adventure sports)",
     "calculation": [
       {
-        "step": "Phone, laptop and cash: not payable, theft never reported to the police (or belongings left unattended)",
+        "step": "Clinic costs for the dive injury ($854): not payable, injury from scuba diving deeper than 10 meters without the Adventure Sports add-on",
         "amount": 0.0
       }
     ],
-    "tests": "Whether the handler declines when the customer says the theft was never reported to the police, instead of referring the claim to request a police report that cannot exist.",
+    "tests": "Whether the handler uses the dive operator's site guide to establish that the Sentinel Wall dive went deeper than 10 meters, and declines the injury as an adventure sport on a policy with no add-on, even though the story calls it an easy dive and the medical record gives no depth.",
     "difficulty": "hard",
-    "tempts": "refer",
+    "tempts": "payout",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -496,33 +496,37 @@
   {
     "claim_id": "CLM-1417",
     "decision": "approve",
-    "payout": 1500.0,
-    "over_approval_limit": true,
+    "payout": 855.0,
+    "over_approval_limit": false,
     "handler_id": "HND-03",
-    "decided_on": "2026-05-14",
-    "reason": "The death of a parent, confirmed by a physician's letter and the death certificate, is a covered reason for cancellation, and the supplier letters and card statement prove the non-refundable costs of $1,900.00 for flights and $900.00 for the hotel. The airline's $210.00 credit voucher is taken off first, leaving $2,590.00 unrefunded. Cancellation pays up to the trip cost of $3,100.00 or the Economy maximum of $1,500.00, whichever is lower, so the payout is $1,500.00, which needs a handler's sign-off before payment.",
-    "reference": "Policy wording, sections 1, 2 and 10; claims manual, sections 3 and 6",
+    "decided_on": "2026-07-03",
+    "reason": "The ankle sprain and knee cut were a sudden injury during the covered trip. Lantern Run is a family rafting trip with grade 2 rapids from start to finish, so it is not white-water rafting above grade 3 and the Adventure Sports add-on is not needed. The hospital record shows no earlier problem with the ankle or knee, and the itemized bill and records are on file, so the hospital charges of $955.00 are covered. The $340.00 of physiotherapy in Tucson was follow-up care after the customer got home, so it is not covered. The Economy deductible of $100.00 comes off, leaving a payout of $855.00, which is under the $25,000 maximum and needs no sign-off.",
+    "reference": "Policy wording, sections 1, 7, 8 and 10; claims manual, sections 6 and 7",
     "calculation": [
       {
-        "step": "Non-refundable flights",
-        "amount": 1900.0
+        "step": "Emergency room visit and examination",
+        "amount": 420.0
       },
       {
-        "step": "Non-refundable hotel",
-        "amount": 900.0
+        "step": "Ankle X-ray",
+        "amount": 180.0
       },
       {
-        "step": "Less the airline's travel credit voucher",
-        "amount": -210.0
+        "step": "Wound cleaning and sutures",
+        "amount": 260.0
       },
       {
-        "step": "Capped at the Economy maximum of $1,500, lower than the $3,100 trip cost",
-        "amount": -1090.0
+        "step": "Ankle brace and crutches",
+        "amount": 95.0
+      },
+      {
+        "step": "Less the Economy deductible (physiotherapy at home excluded as follow-up care)",
+        "amount": -100.0
       }
     ],
-    "tests": "A covered cancellation where the supplier credit must be taken off and the Economy maximum, lower than the trip cost, caps the payout, which then needs sign-off",
+    "tests": "Whether a rafting injury on Lantern Run, a run described as wild but actually grade 2, is covered without the Adventure Sports add-on, with the home physiotherapy left out as follow-up care and the Economy deductible taken off.",
     "difficulty": "hard",
-    "tempts": "payout",
+    "tempts": "decline",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -551,35 +555,20 @@
   },
   {
     "claim_id": "CLM-1419",
-    "decision": "approve",
-    "payout": 1150.0,
-    "over_approval_limit": true,
+    "decision": "refer",
+    "payout": 0.0,
+    "over_approval_limit": false,
     "handler_id": "HND-02",
     "decided_on": "2026-05-19",
-    "reason": "A sibling is a family member, and her terminal diagnosis is confirmed in writing by her consultant, so the cancellation is for a covered reason under section 2. The non-refundable prepaid costs are the $1,150.00 flights and the $210.00 the hotel kept, a total of $1,360.00. The hotel's $150.00 refund is already out of that figure and is not taken off again. The airline issued a $150.00 travel credit, and section 2 says supplier credits come off first, which leaves $1,210.00. Cover is capped at the lower of the $1,150.00 trip cost on the policy record and the $1,500 Economy maximum, so the payout is $1,150.00. There is no deductible on this benefit. The payout is above $1,000, so the payment needs a handler's sign-off.",
-    "reference": "Policy wording, sections 2 and 10; claims manual, sections 3, 5 and 6",
-    "calculation": [
-      {
-        "step": "Non-refundable flights",
-        "amount": 1150.0
-      },
-      {
-        "step": "Hotel prepayment not refunded ($360.00 paid less the $150.00 the hotel refunded)",
-        "amount": 210.0
-      },
-      {
-        "step": "Less Northgale Air travel credit issued for the cancelled booking",
-        "amount": -150.0
-      },
-      {
-        "step": "Reduction to the cap: $1,210.00 limited to the $1,150.00 trip cost on the policy record, which is lower than the $1,500 Economy maximum",
-        "amount": -60.0
-      }
-    ],
-    "tests": "A covered cancellation where an airline travel credit mentioned only in the supplier confirmation must be deducted before the result is capped at a policy trip cost lower than the plan maximum.",
+    "reason": "The customer's history shows two earlier claims: a baggage claim filed on January 22, 2026, which was declined, and a trip delay claim filed on May 9, 2026, which is still open. This claim was filed on May 12, 2026, so it is her third claim within 12 months. Under the claims manual it goes to the Special Investigations Unit for review before payment, whatever its merits. On its merits the claim appears payable. A sibling is a family member, and her consultant oncologist has confirmed the terminal diagnosis in writing, so the cancellation is for a covered reason under section 2. The non-refundable costs are the $1,150.00 flights and the $210.00 the hotel kept, a total of $1,360.00. No supplier credit is due, because the hotel's refund is already out of that figure and the airline issued no credit. The total is below both the $1,900.00 trip cost and the $1,500 Economy maximum, and there is no deductible on this benefit. The claim therefore appears payable at $1,360.00. If it is approved after review, the payment will need a handler's sign-off because it is above $1,000.",
+    "reference": "Policy wording, sections 2 and 10; claims manual, sections 2, 3, 6 and 9",
+    "calculation": [],
+    "tests": "A clearly covered cancellation that must still be referred because the customer record, and not the story, shows it is her third claim filed within 12 months.",
     "difficulty": "hard",
-    "tempts": "payout",
-    "needs": [],
+    "tempts": "approve",
+    "needs": [
+      "Special Investigations Unit review of the customer's claim history before payment"
+    ],
     "tone": "plain",
     "tiny": false
   },
@@ -627,42 +616,17 @@
   },
   {
     "claim_id": "CLM-1421",
-    "decision": "approve",
-    "payout": 990.6,
+    "decision": "decline",
+    "payout": 0.0,
     "over_approval_limit": false,
     "handler_id": "HND-01",
-    "decided_on": "2026-08-31",
-    "reason": "The airline confirms the flight was canceled, which is a covered cause. The delay of more than three days is well past the 3-hour First waiting period, and because it happened on the way home, cover continued past the August 12 return date until she got home. Reasonable accommodation for one traveler is up to $350 a night, so the three hotel nights count at $1,050 rather than $1,230. The receipted meals and taxis are covered in full. The missed concert ticket is a consequential loss and is excluded. The airline has already reimbursed $300 toward the same hotel nights, and that comes off. Trip Delay has no deductible. The result of $990.60 is under the $1,500 First maximum, so the payout is $990.60. That does not need sign-off.",
-    "reference": "Policy wording, sections 1, 3, 9 and 10; claims manual, waiting periods, delay on the way home, reasonable accommodation and consequential losses",
-    "calculation": [
-      {
-        "step": "Hotel, three nights at $410",
-        "amount": 1230.0
-      },
-      {
-        "step": "Reduced to the reasonable accommodation limit of $350 a night for one room",
-        "amount": -180.0
-      },
-      {
-        "step": "Meals, with receipts",
-        "amount": 188.6
-      },
-      {
-        "step": "Taxis to and from the airport",
-        "amount": 52.0
-      },
-      {
-        "step": "Concert ticket, consequential loss, excluded",
-        "amount": 0.0
-      },
-      {
-        "step": "Less Halcyon Air accommodation reimbursement",
-        "amount": -300.0
-      }
-    ],
-    "tests": "Whether the reader applies the $350-a-night accommodation cap, removes the excluded consequential ticket and deducts the airline's $300 reimbursement buried at the end of the rebooking notice before checking the First maximum.",
+    "decided_on": "2026-09-14",
+    "reason": "The ferry was canceled because of a strike by ferry workers, and the 24-hour delay is past the 12-hour Economy waiting period. However, Greek ferry workers announced the 24-hour strike for August 27 on August 19, 2026, two days before this policy was bought on August 21. A strike that was publicly known before the policy was bought is excluded under the general exclusions, so no part of the hotel, meal or taxi costs can be paid.",
+    "reference": "Policy wording, sections 3 and 9 (events that were publicly known before you bought the policy, such as an announced strike)",
+    "calculation": [],
+    "tests": "Whether the reader checks the knowledge base for when the ferry strike was announced and compares that date with the policy purchase date, instead of relying on a claim file that names only 'a strike by ferry workers' and otherwise meets every Trip Delay condition.",
     "difficulty": "hard",
-    "tempts": "payout",
+    "tempts": "approve",
     "needs": [],
     "tone": "plain",
     "tiny": false
@@ -767,23 +731,25 @@
   },
   {
     "claim_id": "CLM-1425",
-    "decision": "decline",
+    "decision": "refer",
     "payout": 0.0,
     "over_approval_limit": false,
     "handler_id": "HND-02",
-    "decided_on": "2026-06-02",
-    "reason": "Section 2 of the wording covers cancellation when you \"lose your job through no fault of your own after at least one year with the employer.\" Your employer's letter confirms the layoff was not your fault. It also shows that your employment began on June 15, 2025, and it ended on May 1, 2026, which is about ten and a half months. That is short of the one year the wording requires. Because no other listed reason applies, and the wording states \"We do not pay for cancellation or interruption for any other reason,\" the non-refundable flights and the unrefunded part of the resort booking cannot be paid. The supplier and payment documents are all in order. We are sorry this comes on top of losing your job.",
-    "reference": "Policy wording, section 2; claims manual, sections 2 and 4",
+    "decided_on": "2026-09-21",
+    "reason": "The delay itself appears covered under section 4 of the wording. The carrier's report shows arrival in Seattle on September 3 at 21:10 and delivery on September 4 at 17:05, which is 19 hours 55 minutes and more than the 12-hour Premium waiting period. The claimed amount of $211.50 is also within the $300 maximum. However, the documents do not line up with the story. The Cascade Drug & Apparel receipt for $118.40 is dated September 2, 2026 at 19:52, which is the day before the flight landed and the day before the covered trip began. The story says the purchases were made 'as soon as we landed' on September 3. The Pine Street Outfitters receipt for $93.10, dated September 3 at 22:40, is consistent with the report. Under manual section 8, a receipt dated before the incident it is meant to follow is referred to the Special Investigations Unit, and no view is formed on the cause. The customer should only be told that the claim is being reviewed.",
+    "reference": "Policy wording, section 4; claims manual, sections 4, 5 and 8",
     "calculation": [
       {
-        "step": "Flights $1,100 and resort $800 less $200 resort refund; cancellation reason (job loss after under one year with the employer) not covered under section 2",
+        "step": "Claim referred to Special Investigations before payment; no amount released pending review (receipts total $118.40 + $93.10 = $211.50, within the $300 Premium maximum)",
         "amount": 0.0
       }
     ],
-    "tests": "A layoff that matches the job-loss reason in every respect except tenure, where the employment start date buried mid-letter shows under one year with the employer, alongside a supplier refund and a plan cap that invite a payout calculation.",
+    "tests": "Whether the reader checks the date on each receipt against the carrier's arrival time and spots a purchase dated the day before landing, which conflicts with the story and requires a Special Investigations referral, rather than paying a delay that clearly meets the waiting period and the cap.",
     "difficulty": "hard",
     "tempts": "approve",
-    "needs": [],
+    "needs": [
+      "Special Investigations Unit review of the Cascade Drug & Apparel receipt dated September 2, 2026 19:52, before the September 3 21:10 arrival and the trip start, against the story's statement that purchases were made after landing"
+    ],
     "tone": "plain",
     "tiny": false
   }
