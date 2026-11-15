@@ -305,6 +305,14 @@ A single run varies by about 4 points.
 
 **The knowledge-base facts are now in the claims.** Because the agent cannot read the knowledge base, each of our 12 knowledge-dependent claims now carries one extra document with the fact it needs (an operator's booking confirmation or site sheet, a strike announcement, a weather bulletin, a product sheet), so every claim can be decided from what the agent can see. The decisions and payouts did not change. Luna on the prompt alone, with no knowledge base, scored 83% (62 of 75). The real agent scored 18 of 25 (72%) in one run, up from 63% before; the misses are on the refer-versus-decline boundary, claim counting and date logic, not on missing facts. A second and third run did not finish because the scratch stack and the live app together exceeded Supabase's 15-connection limit, so this is one run. The earlier paragraph describes the set as it was before this change, and Ed's `even_harder` set still has the ceiling.
 
+**Detail of the real-agent run on the facts-in-claim set.**
+- **Wrong claims (run 1, 18 of 25 right):** CLM-1404, 1413, 1415, 1416, 1419, 1420 and 1422.
+- **Shared with the prompt-only check (Luna, no knowledge base):** 1413, 1416, 1420 and 1422. There Luna referred 1413 and 1422 where the key declines, approved 1416 where the key refers, and declined 1420 where the key approves, because it treated Storm Ysolde as publicly known although the bulletin is dated the day after purchase.
+- **Extra for the real agent:** 1404, 1415 and 1419.
+- **Prompt-only misses spread across single runs:** payout arithmetic on 1402 ($650 for $750) and 1424 ($1,450 for $1,500), and one-off wrong decisions on 1404, 1408 and 1418.
+- **Why there is one run:** Supabase allows 15 connections in session mode. The live backend and agent plus the scratch backend and agent exceeded that, the scratch backend answered 500 ("max clients reached"), and run 2 stalled with 18 of 25 decided. To get three runs, stop the live app first.
+- **Next step:** repeat the real-agent run three times with the live app stopped, to confirm the 68-76% range.
+
 **How it was run.** The app seeds only an `evaluation` and a `held_out` set, so the 25 claims were loaded as the held-out set into a separate Postgres schema, `scratch_eval`, with their own backend and agent on ports 8100 and 8102. This needed one small change, a `UNDERCOVER_SCHEMA` setting (default `undercover`, so nothing changes unless it is set). Ed's `even_harder` set can be loaded the same way. Every run used the starting prompt (version 1), so these numbers will move after an improver round.
 
 **Limits.**
