@@ -83,6 +83,7 @@ def judge(handler: dict[str, str], agent: dict[str, str]) -> Judgement:
         model=JEV,
         state={"handler": handler, "agent": agent},
         questions=QUESTIONS,
+        provider={"data_collection": "deny", "zdr": True},
         server_url=ORIGIN,
         timeout_ms=TIMEOUT_MS,
         retries=None,

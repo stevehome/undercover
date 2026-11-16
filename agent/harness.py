@@ -13,6 +13,7 @@ from pydantic import SecretStr
 from agent import deadline
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+PRIVATE_PROVIDERS = {"data_collection": "deny", "zdr": True}
 NO_EFFORT = "default"
 MODEL_TIMEOUT_SECONDS = 120
 MODEL_DEADLINE_SECONDS = 120
@@ -52,6 +53,7 @@ def model(settings: ModelSettings) -> ChatOpenAI:
         ),
         timeout=MODEL_TIMEOUT_SECONDS,
         max_retries=MODEL_RETRIES,
+        extra_body={"provider": PRIVATE_PROVIDERS},
         http_client=deadline.client(MODEL_DEADLINE_SECONDS),
     )
 
@@ -80,4 +82,5 @@ def improver_model(settings: ModelSettings) -> ChatOpenAI:
         ),
         timeout=IMPROVER_TIMEOUT_SECONDS,
         model_kwargs={"parallel_tool_calls": False},
+        extra_body={"provider": PRIVATE_PROVIDERS},
     )
