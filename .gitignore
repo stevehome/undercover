@@ -76,3 +76,6 @@ customer_notes/
 
 # Ombudsman decisions: reuse terms not checked, keep local
 data/ombudsman/
+
+# AWS access keys downloaded from IAM
+undercover_accessKeys.csv
