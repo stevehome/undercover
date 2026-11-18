@@ -30,14 +30,10 @@ def key_client() -> PyJWKClient:
     return PyJWKClient(f"{url}/auth/v1/.well-known/jwks.json")
 
 
-def signed_in_handler(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
-    keys: Annotated[PyJWKClient, Depends(key_client)],
-) -> dict[str, Any]:
-    """Return the handler whose valid token came with the request, or Unauthorized."""
-    if credentials is None:
+def handler_for_token(token: str | None, keys: PyJWKClient) -> dict[str, Any]:
+    """Return the handler whose valid token this is, or Unauthorized."""
+    if token is None:
         raise Unauthorized("Sign in to do this")
-    token = credentials.credentials
     try:
         claims = jwt.decode(
             token,
@@ -51,6 +47,15 @@ def signed_in_handler(
     if handler is None:
         raise Unauthorized("This account is not a claims handler")
     return handler
+
+
+def signed_in_handler(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
+    keys: Annotated[PyJWKClient, Depends(key_client)],
+) -> dict[str, Any]:
+    """Return the handler whose valid token came with the request, or Unauthorized."""
+    token = credentials.credentials if credentials else None
+    return handler_for_token(token, keys)
 
 
 def senior_handler(

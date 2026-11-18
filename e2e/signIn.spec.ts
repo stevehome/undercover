@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { password, signIn } from "./signIn";
+import { agentHeaders } from "./agentKey";
 
 test("a page without a session goes to sign-in", async ({ page }) => {
   await page.goto("/scoreboard");
@@ -41,6 +42,7 @@ test("a handler who can't sign off is told why on a held payout", async ({
 }) => {
   const claimId = "CLM-1008";
   await request.post(`/api/claims/${claimId}/decision`, {
+    headers: agentHeaders,
     data: {
       decision: "approve",
       payout: "1300.00",

@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
+import { agentHeaders } from "./agentKey";
 
 test("a decided claim's page shows its decision, payout and reason", async ({
   page,
@@ -7,6 +8,7 @@ test("a decided claim's page shows its decision, payout and reason", async ({
 }) => {
   const claimId = "CLM-1006";
   await request.post(`/api/claims/${claimId}/decision`, {
+    headers: agentHeaders,
     data: {
       decision: "approve",
       payout: "425.00",
@@ -50,6 +52,7 @@ test("a sign-off reaches the agent, and the claim shows as paid once it pays", a
 }) => {
   const claimId = "CLM-1007";
   await request.post(`/api/claims/${claimId}/decision`, {
+    headers: agentHeaders,
     data: {
       decision: "approve",
       payout: "1200.00",
@@ -76,6 +79,7 @@ test("a sign-off reaches the agent, and the claim shows as paid once it pays", a
     .toEqual([`/api/claims/${claimId}/resume`]);
 
   await request.post(`/api/claims/${claimId}/payment`, {
+    headers: agentHeaders,
     data: { amount: "1200.00" },
   });
 

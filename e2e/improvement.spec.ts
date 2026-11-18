@@ -1,6 +1,7 @@
 import { expect, test as unsigned } from "@playwright/test";
 import type { APIRequestContext } from "@playwright/test";
 import { signIn, test } from "./signIn";
+import { agentHeaders } from "./agentKey";
 
 const standIn = "http://127.0.0.1:8003";
 const IMPROVER = { model: "openai/gpt-6-luna", reasoning_effort: "medium" };
@@ -20,6 +21,7 @@ class PlayedRound {
 
   static async start(request: APIRequestContext) {
     const created = await request.post("/api/improver/rounds", {
+      headers: agentHeaders,
       data: { handler_id: "HND-01", ...IMPROVER },
     });
     const round = (await created.json()) as {
@@ -33,6 +35,7 @@ class PlayedRound {
     await this.request.post(
       `/api/improver/rounds/${String(this.roundId)}/stage`,
       {
+        headers: agentHeaders,
         data: { stage, progress },
       },
     );
@@ -43,6 +46,7 @@ class PlayedRound {
     const proposal = await this.request.post(
       `/api/improver/rounds/${String(this.roundId)}/proposals`,
       {
+        headers: agentHeaders,
         data: {
           kind: "change",
           content: CHANGE,
@@ -56,7 +60,9 @@ class PlayedRound {
 
   /** Let go of the one-run rule, so the other specs' runs are not refused. */
   async endStretch() {
-    await this.request.post(`/api/runs/${String(this.runId)}/finish`);
+    await this.request.post(`/api/runs/${String(this.runId)}/finish`, {
+      headers: agentHeaders,
+    });
   }
 
   async finish() {

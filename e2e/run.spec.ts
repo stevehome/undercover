@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
+import { agentHeaders } from "./agentKey";
 
 const standIn = "http://127.0.0.1:8003";
 
@@ -22,6 +23,7 @@ test("the scoreboard shows an evaluation played out through the API", async ({
 }) => {
   const run = (await (
     await request.post("/api/runs/evaluation", {
+      headers: agentHeaders,
       data: {
         concurrency: 5,
         eval_set: "held_out",
@@ -35,6 +37,7 @@ test("the scoreboard shows an evaluation played out through the API", async ({
   expect(run.claims).toHaveLength(5);
   for (const claim of run.claims) {
     await request.post(`/api/claims/${claim.claim_id}/decision`, {
+      headers: agentHeaders,
       data: {
         decision: "decline",
         payout: "0.00",
@@ -43,7 +46,9 @@ test("the scoreboard shows an evaluation played out through the API", async ({
       },
     });
   }
-  await request.post(`/api/runs/${String(run.run_id)}/finish`);
+  await request.post(`/api/runs/${String(run.run_id)}/finish`, {
+    headers: agentHeaders,
+  });
 
   await page.goto("/scoreboard");
 
@@ -87,6 +92,7 @@ test("the queue is as it was after an evaluation", async ({
 
   const run = (await (
     await request.post("/api/runs/evaluation", {
+      headers: agentHeaders,
       data: {
         concurrency: 5,
         eval_set: "evaluation",
@@ -97,7 +103,9 @@ test("the queue is as it was after an evaluation", async ({
       },
     })
   ).json()) as { run_id: number };
-  await request.post(`/api/runs/${String(run.run_id)}/finish`);
+  await request.post(`/api/runs/${String(run.run_id)}/finish`, {
+    headers: agentHeaders,
+  });
   await page.goto("/");
 
   await expect(page.getByRole("row")).toHaveCount(before);

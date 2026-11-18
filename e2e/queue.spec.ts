@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { handlerHeaders, test } from "./signIn";
+import { agentHeaders } from "./agentKey";
 
 test("the queue page lists the claims", async ({ page }) => {
   await page.goto("/");
@@ -22,6 +23,7 @@ test("the queue shows a claim's status as it moves through the four states", asy
   await expect(row()).toContainText("waiting");
 
   await request.post(`/api/claims/${claimId}/steps`, {
+    headers: agentHeaders,
     data: {
       text: "Read the claim, its policy and the customer's claim history",
     },
@@ -30,6 +32,7 @@ test("the queue shows a claim's status as it moves through the four states", asy
   await expect(row()).toContainText("in progress");
 
   await request.post(`/api/claims/${claimId}/decision`, {
+    headers: agentHeaders,
     data: {
       decision: "approve",
       payout: "1250.00",
@@ -47,6 +50,7 @@ test("the queue shows a claim's status as it moves through the four states", asy
   await expect(row()).toContainText("in progress");
 
   await request.post(`/api/claims/${claimId}/payment`, {
+    headers: agentHeaders,
     data: { amount: "1250.00" },
   });
   await page.goto("/");

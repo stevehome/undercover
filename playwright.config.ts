@@ -2,6 +2,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { defineConfig } from "@playwright/test";
+import { agentKey } from "./e2e/agentKey";
 
 /** A fresh database for each run, so the backend never holds a deleted file. */
 const databasePath = path.join(
@@ -35,6 +36,7 @@ export default defineConfig({
       command: "uv run -m uvicorn backend.main:app --port 8010",
       url: "http://127.0.0.1:8010/api/health",
       env: {
+        UNDERCOVER_API_KEY: agentKey,
         UNDERCOVER_AGENT: "http://127.0.0.1:8003",
         VITE_SUPABASE_URL: authStandIn,
         OPENROUTER_ORIGIN: "http://127.0.0.1:8005",

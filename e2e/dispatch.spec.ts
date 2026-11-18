@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
+import { agentHeaders } from "./agentKey";
 
 const standIn = "http://127.0.0.1:8003";
 
@@ -52,6 +53,7 @@ test("the queue page shows a dispatch's claims, cost, time and summary", async (
 }) => {
   const run = (await (
     await request.post("/api/runs/dispatch", {
+      headers: agentHeaders,
       data: {
         concurrency: 3,
         model: "stub/model",
@@ -62,12 +64,15 @@ test("the queue page shows a dispatch's claims, cost, time and summary", async (
   ).json()) as { run_id: number; claims: { claim_id: string }[] };
   const [first, second] = run.claims.map((claim) => claim.claim_id);
   await request.post(`/api/runs/${String(run.run_id)}/claims/${first}`, {
+    headers: agentHeaders,
     data: { status: "done", note: "Declined" },
   });
   await request.post(`/api/runs/${String(run.run_id)}/claims/${second}`, {
+    headers: agentHeaders,
     data: { status: "still in progress", note: "Left in progress" },
   });
   await request.post(`/api/claims/${first}/model-calls`, {
+    headers: agentHeaders,
     data: {
       run_id: run.run_id,
       model: "stub/model",
@@ -78,13 +83,16 @@ test("the queue page shows a dispatch's claims, cost, time and summary", async (
     },
   });
   await request.post(`/api/claims/${first}/work-segments`, {
+    headers: agentHeaders,
     data: {
       run_id: run.run_id,
       started_on: "2026-01-01T00:00:00+00:00",
       finished_on: "2026-01-01T00:00:12+00:00",
     },
   });
-  await request.post(`/api/runs/${String(run.run_id)}/finish`);
+  await request.post(`/api/runs/${String(run.run_id)}/finish`, {
+    headers: agentHeaders,
+  });
 
   await page.goto("/");
 

@@ -26,6 +26,7 @@ from agent import (
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    backend_http.require_key()
     checkpoint.saver()
     api.stop_unfinished_runs()
     yield

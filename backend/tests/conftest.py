@@ -8,13 +8,28 @@ from sqlalchemy import event
 
 from backend import db
 from backend.main import app
+from conftest import API_KEY
 
 
 @pytest.fixture
 def client(tmp_path, monkeypatch, as_handler):
-    """A TestClient against a fresh, temporary claim database, signed in as Dana."""
+    """A TestClient against a fresh, temporary claim database, with the key and Dana."""
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
-    return TestClient(app, headers=as_handler())
+    return TestClient(app, headers={**as_handler(), "X-API-Key": API_KEY})
+
+
+@pytest.fixture
+def anonymous(tmp_path, monkeypatch):
+    """A client with no key and no sign-in, on the test's own database."""
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
+    return TestClient(app)
+
+
+@pytest.fixture
+def agent(tmp_path, monkeypatch):
+    """A client holding only the agent's API key, on the test's own database."""
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
+    return TestClient(app, headers={"X-API-Key": API_KEY})
 
 
 @pytest.fixture

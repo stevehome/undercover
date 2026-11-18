@@ -160,3 +160,9 @@ def test_only_the_improvers_client_calls_the_improvers_operations():
             p.startswith("/api/improver") for p in _paths(ROOT / "agent" / client)
         ), client
     assert _paths(ROOT / "agent" / "improver_api.py")
+
+
+def test_only_backend_http_names_the_api_key_header():
+    for path in (ROOT / "agent").glob("*.py"):
+        if path.name != "backend_http.py":
+            assert "X-API-Key" not in path.read_text(), path.name

@@ -12,8 +12,24 @@ import httpx
 
 BACKEND_URL = os.environ.get("UNDERCOVER_BACKEND", "http://localhost:8000")
 TIMEOUT_SECONDS = 30
+API_KEY_VARIABLE = "UNDERCOVER_API_KEY"
+API_KEY_HEADER = "X-API-Key"
 
 client = httpx.Client(base_url=BACKEND_URL, timeout=TIMEOUT_SECONDS)
+
+
+def require_key() -> str:
+    """Return the backend's API key from the environment, or say it is missing."""
+    key = os.environ.get(API_KEY_VARIABLE)
+    if not key:
+        raise RuntimeError(f"{API_KEY_VARIABLE} is missing: set it in .env")
+    return key
+
+
+def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
+    """Send one request to the backend with the API key, read as it is sent."""
+    headers = {**kwargs.pop("headers", {}), API_KEY_HEADER: require_key()}
+    return client.request(method, path, headers=headers, **kwargs)
 
 
 class ApiRefusal(Exception):  # noqa: N818 - a refusal, not a failure
@@ -42,7 +58,7 @@ def call(method: str, path: str, attempts: int = 1, **kwargs: Any) -> Any:
     """
     for _ in range(attempts - 1):
         try:
-            return _answer(client.request(method, path, **kwargs))
+            return _answer(send(method, path, **kwargs))
         except httpx.TimeoutException:
             continue
-    return _answer(client.request(method, path, **kwargs))
+    return _answer(send(method, path, **kwargs))

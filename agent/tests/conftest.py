@@ -6,6 +6,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from agent import api, backend_http
 from backend.main import app
+from conftest import API_KEY
 
 REPLY_USAGE = {
     "model_name": "stub/model",
@@ -26,10 +27,14 @@ class StubModel(GenericFakeChatModel):
 
 
 @pytest.fixture(autouse=True)
-def backend(tmp_path, monkeypatch):
-    """Point the agent at the backend in-process, on a throwaway database."""
+def backend(tmp_path, monkeypatch, as_handler):
+    """Point the agent at the backend in-process, on a throwaway database.
+
+    The test's own calls hold the key and a handler's sign-in, so it can play
+    the agent or read what only a handler may. The agent's calls add the key.
+    """
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
-    client = TestClient(app)
+    client = TestClient(app, headers={**as_handler(), "X-API-Key": API_KEY})
     monkeypatch.setattr(backend_http, "client", client)
     return client
 

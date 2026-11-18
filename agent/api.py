@@ -156,8 +156,8 @@ def record_work_segment(
 
 def acquire_lease(claim_id: str, owner: str) -> int | None:
     """Lease a claim, or renew the lease: its length in seconds, or None if held."""
-    response = backend_http.client.post(
-        f"/api/claims/{claim_id}/lease", json={"owner": owner}
+    response = backend_http.send(
+        "POST", f"/api/claims/{claim_id}/lease", json={"owner": owner}
     )
     if response.status_code == HTTPStatus.CONFLICT:
         return None
