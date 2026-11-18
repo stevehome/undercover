@@ -93,14 +93,14 @@ Adds `backend/api_key.py` (the check of the `X-API-Key` header, one job), `backe
 
 **Success criteria**
 
-- [ ] The document's operations are exactly the six `operation_id`s above, it has no `servers` entry, no header or key parameter, and no security scheme (test).
-- [ ] Each operation keeps its `operation_id` and one-line description, and `pay_claim`'s input is `amount` (test).
-- [ ] The document returns 200 with the key, 200 with a handler and 401 with neither (test).
-- [ ] A payment of $1,000.01 on a claim that was never approved returns 403 naming the limit; one of exactly $1,000.00 on that claim gets the claim's own refusal; with the limit changed to $300, a $400 payment is refused (tests).
-- [ ] A sign-off pays the claim in the one request, records the handler and the time on both the sign-off and the payment, and leaves it `decided`; repeating it by the same handler pays nothing twice (tests).
-- [ ] An agent paused at its sign-off and resumed afterwards finishes without calling the payment operation (test with the client recording the paths it is asked for).
-- [ ] An under-the-limit approval is still paid by the agent, as before (test).
-- [ ] `npm run check` passes with `.env` moved out of the way. Documents updated. Commit.
+- [x] The document's operations are exactly the six `operation_id`s above, it has no `servers` entry, no header or key parameter, and no security scheme (test).
+- [x] Each operation keeps its `operation_id` and one-line description, and `pay_claim`'s input is `amount` (test).
+- [x] The document returns 200 with the key, 200 with a handler and 401 with neither (test).
+- [x] A payment of $1,000.01 on a claim that was never approved returns 403 naming the limit; one of exactly $1,000.00 on that claim gets the claim's own refusal; with the limit changed to $300, a $400 payment is refused (tests).
+- [x] A sign-off pays the claim in the one request, records the handler and the time on both the sign-off and the payment, and leaves it `decided`; repeating it by the same handler pays nothing twice (tests).
+- [x] An agent paused at its sign-off and resumed afterwards finishes without calling the payment operation (test with the client recording the paths it is asked for).
+- [x] An under-the-limit approval is still paid by the agent, as before (test).
+- [x] `npm run check` passes with `.env` moved out of the way. Documents updated. Commit.
 
 ## Phase 4: Ready for Lambda
 

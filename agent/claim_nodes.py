@@ -90,7 +90,7 @@ def settle(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
 
 
 def approval(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
-    """Wait for a handler's sign-off. Anything before `interrupt` runs twice."""
+    """Wait for a handler's sign-off, which pays. Code before `interrupt` runs twice."""
     answer = interrupt(
         {"claim_id": runtime.context.claim_id, "payout": state["payout"]}
     )

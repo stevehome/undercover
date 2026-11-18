@@ -46,7 +46,7 @@ test("the configuration page shows version 1 and what it changed", async ({
   ).toContainText("the starting instructions");
 });
 
-test("a sign-off reaches the agent, and the claim shows as paid once it pays", async ({
+test("a sign-off pays the claim, with the handler and the time", async ({
   page,
   request,
 }) => {
@@ -68,21 +68,10 @@ test("a sign-off reaches the agent, and the claim shows as paid once it pays", a
     .getByRole("button", { name: "Sign off as Dana Whitfield" })
     .click();
 
-  await expect(page.getByText("Payment in progress.")).toBeVisible();
-  await expect
-    .poll(async () => {
-      const calls = await request.get("http://127.0.0.1:8003/calls");
-      return ((await calls.json()) as string[]).filter((path) =>
-        path.includes(claimId),
-      );
-    })
-    .toEqual([`/api/claims/${claimId}/resume`]);
-
-  await request.post(`/api/claims/${claimId}/payment`, {
-    headers: agentHeaders,
-    data: { amount: "1200.00" },
-  });
-
   await expect(page.getByText("Paid $1,200.00.")).toBeVisible();
   await expect(page.getByText(/Signed off by Dana Whitfield on/)).toBeVisible();
+
+  const calls = await request.get("http://127.0.0.1:8003/calls");
+  const paths = (await calls.json()) as string[];
+  expect(paths.filter((path) => path.includes(claimId))).toEqual([]);
 });

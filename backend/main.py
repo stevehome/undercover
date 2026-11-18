@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, model_validator
 
 from backend import (
+    agent_api,
     agent_process,
     agent_service,
     claims,
@@ -206,6 +207,16 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get(
+    "/api/agent/openapi.json",
+    operation_id="get_agent_openapi",
+    dependencies=SHARED,
+)
+def get_agent_openapi() -> dict[str, Any]:
+    """Return the OpenAPI document of the operations the claim agent is given."""
+    return agent_api.agent_openapi(app.routes)
+
+
 @app.get("/api/me", operation_id="get_me")
 def get_me(handler: SignedIn) -> dict[str, Any]:
     """Return the signed-in handler, and whether they can sign off over the limit."""
@@ -373,20 +384,16 @@ def list_claim_steps(claim_id: str) -> list[dict[str, Any]]:
 
 
 @app.post("/api/claims/{claim_id}/sign-off", operation_id="sign_off_claim")
-def sign_off_claim(
-    claim_id: str, handler: Senior, background: BackgroundTasks
-) -> dict[str, Any]:
-    """Sign off an over-limit approved claim's payout as the signed-in handler."""
-    signed = claims.sign_off(claim_id, handler["handler_id"])
-    background.add_task(agent_service.notify_sign_off, claim_id)
-    return signed
+def sign_off_claim(claim_id: str, handler: Senior) -> dict[str, Any]:
+    """Sign off an over-limit approved claim as the signed-in handler, which pays it."""
+    return claims.sign_off(claim_id, handler["handler_id"])
 
 
 @app.post(
     "/api/claims/{claim_id}/payment", operation_id="pay_claim", dependencies=AGENT
 )
 def pay_claim(claim_id: str, payment: Payment) -> dict[str, Any]:
-    """Pay a claim's approved payout, blocked until any required sign-off is given."""
+    """Pay a claim's approved payout, up to the approval limit; a sign-off pays more."""
     return claims.pay(claim_id, payment.amount)
 
 

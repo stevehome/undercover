@@ -1,7 +1,7 @@
 import pytest
 from langchain_core.messages import AIMessage
 
-from agent import agents, api
+from agent import agents, api, backend_http
 from agent.claim_nodes import MAX_MODEL_CALLS, ModelCallLimit
 from agent.tests.conftest import REPLY_USAGE, StubModel
 
@@ -24,7 +24,7 @@ def sign_off(backend, as_handler):
     return backend.post(f"/api/claims/{CLAIM}/sign-off", headers=as_handler())
 
 
-def test_an_approval_over_the_limit_waits_then_is_paid_once(
+def test_an_approval_over_the_limit_waits_and_a_sign_off_pays_it(
     backend, script, saver, as_handler
 ):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Approved."), saver)
@@ -35,20 +35,37 @@ def test_an_approval_over_the_limit_waits_then_is_paid_once(
     assert "waiting for a handler" in agents.decide_claim(CLAIM, script(), saver)
 
     sign_off(backend, as_handler)
-    assert api.get_claim(CLAIM)["paid_amount"] is None
-    agents.decide_claim(CLAIM, script(), saver)
 
     paid = api.get_claim(CLAIM)
     assert (paid["status"], paid["paid_amount"]) == ("decided", "1200.00")
     assert paid["signed_off_by"] == "HND-01"
-    agents.decide_claim(CLAIM, script(), saver)
-    assert api.get_claim(CLAIM)["paid_on"] == paid["paid_on"]
     texts = [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
-    assert texts[-3:] == [
+    assert texts[-2:] == [
         "Waiting for a handler to sign off $1200.00",
-        "Signed off by HND-01",
         "Paid $1200.00",
     ]
+
+
+def test_an_agent_resumed_after_a_sign_off_finishes_without_paying(
+    backend, script, saver, as_handler, monkeypatch
+):
+    agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Approved."), saver)
+    sign_off(backend, as_handler)
+    paid = api.get_claim(CLAIM)["paid_on"]
+    asked = []
+    send = backend_http.send
+    monkeypatch.setattr(
+        backend_http,
+        "send",
+        lambda method, path, **kw: asked.append(path) or send(method, path, **kw),
+    )
+
+    agents.decide_claim(CLAIM, script(), saver)
+
+    assert not any(path.endswith("/payment") for path in asked)
+    assert api.get_claim(CLAIM)["paid_on"] == paid
+    texts = [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    assert "Signed off by HND-01" in texts
 
 
 @pytest.mark.parametrize("kind", ["decline", "refer"])

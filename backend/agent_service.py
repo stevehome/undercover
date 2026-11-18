@@ -1,4 +1,4 @@
-"""Asking the agent's service to do something: pick a claim up, or start a dispatch."""
+"""Asking the agent's service to start a dispatch, an evaluation or a round."""
 
 import logging
 import os
@@ -23,17 +23,6 @@ def _post(
 ) -> httpx.Response:
     base_url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
     return httpx.post(f"{base_url}{path}", json=body, timeout=timeout)
-
-
-def notify_sign_off(claim_id: str) -> None:
-    """Ask the agent to pick a signed-off claim back up."""
-    try:
-        _post(f"/api/claims/{claim_id}/resume")
-    except httpx.HTTPError:
-        logger.warning(
-            "The agent could not be reached; it will pick up %s on its next run",
-            claim_id,
-        )
 
 
 def _start(path: str, body: dict[str, Any], key: str = "run_id") -> int:

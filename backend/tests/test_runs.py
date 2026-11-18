@@ -40,7 +40,7 @@ def test_a_dispatch_takes_waiting_and_in_progress_claims_oldest_first(client):
     assert (run["model"], run["reasoning_effort"]) == ("stub/model", "low")
 
 
-def test_a_dispatch_takes_an_approval_a_restart_left_unpaid(client):
+def test_a_dispatch_leaves_a_signed_off_claim_alone(client):
     decide(client, "CLM-1001", "420.00")
     decide(client, "CLM-1002", "1200.00")
     decide(client, "CLM-1003", "1200.00")
@@ -50,7 +50,7 @@ def test_a_dispatch_takes_an_approval_a_restart_left_unpaid(client):
 
     assert "CLM-1001" in claims
     assert "CLM-1002" not in claims
-    assert "CLM-1003" in claims
+    assert "CLM-1003" not in claims
 
 
 def test_a_second_dispatch_is_refused_while_one_is_running(client):

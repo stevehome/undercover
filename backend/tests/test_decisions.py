@@ -1,5 +1,8 @@
 import pytest
 
+from backend import claims
+from backend.errors import Conflict
+
 
 def decide(client, payout, decision="approve"):
     return client.post(
@@ -46,45 +49,61 @@ def test_approve_within_limit_is_decided(client):
 
 
 def test_approve_over_limit_waits_for_sign_off(client):
-    response = client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
-            "decision": "approve",
-            "payout": "1200.00",
-            "reason": "Large emergency medical claim.",
-            "policy_reference": "Section 7",
-        },
-    )
-    claim = response.json()
+    claim = decide(client, "1200.00").json()
     assert claim["status"] == "waiting for sign-off"
     assert claim["over_approval_limit"] == 1
 
-    payment = client.post("/api/claims/CLM-1001/payment", json={"amount": "1200.00"})
-    assert payment.status_code == 409
+    assert pay(client, "1200.00").status_code == 403
 
 
-def test_sign_off_then_pay(client):
-    client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
-            "decision": "approve",
-            "payout": "1200.00",
-            "reason": "Large emergency medical claim.",
-            "policy_reference": "Section 7",
-        },
-    )
-    sign_off = client.post("/api/claims/CLM-1001/sign-off")
-    assert sign_off.status_code == 200
-    signed = sign_off.json()
-    assert signed["status"] == "in progress"
-    assert signed["signed_off_by"] == "HND-01"
-    assert signed["signed_off_on"] is not None
-    assert signed["paid_amount"] is None
+def test_a_sign_off_pays_the_claim_in_one_request(client):
+    decide(client, "1200.00")
 
-    payment = client.post("/api/claims/CLM-1001/payment", json={"amount": "1200.00"})
-    assert payment.status_code == 200
-    assert payment.json()["paid_amount"] == "1200.00"
-    assert payment.json()["status"] == "decided"
+    signed = client.post("/api/claims/CLM-1001/sign-off")
+
+    assert signed.status_code == 200
+    claim = signed.json()
+    assert claim["status"] == "decided"
+    assert claim["signed_off_by"] == "HND-01"
+    assert claim["paid_amount"] == "1200.00"
+    assert claim["paid_on"] == claim["signed_off_on"]
+
+
+def test_signing_off_again_pays_nothing_twice(client):
+    decide(client, "1200.00")
+    first = client.post("/api/claims/CLM-1001/sign-off").json()
+
+    again = client.post("/api/claims/CLM-1001/sign-off")
+
+    assert again.status_code == 200
+    assert again.json()["paid_on"] == first["paid_on"]
+    steps = client.get("/api/claims/CLM-1001/steps").json()
+    assert [step["text"] for step in steps].count("Paid $1200.00") == 1
+
+
+def test_another_handler_cannot_sign_off_a_claim_already_paid(client):
+    decide(client, "1200.00")
+    client.post("/api/claims/CLM-1001/sign-off")
+
+    with pytest.raises(Conflict):
+        claims.sign_off("CLM-1001", "HND-02")
+
+
+def test_a_payment_over_the_limit_is_refused_before_the_claim_is_looked_at(client):
+    refused = pay(client, "1000.01")
+
+    assert refused.status_code == 403
+    assert "1000.00" in refused.json()["detail"]
+
+
+def test_a_payment_at_the_limit_gets_the_claims_own_answer(client):
+    assert pay(client, "1000.00").status_code == 409
+
+
+def test_the_limit_is_the_current_setting(client):
+    client.post("/api/settings/payout_approval_limit", json={"value": "300"})
+
+    assert pay(client, "400.00").status_code == 403
 
 
 def test_sign_off_when_not_waiting_is_blocked(client):
@@ -202,23 +221,6 @@ def test_record_step_moves_claim_in_progress_and_lists_in_order(client):
         "Read the claim and policy",
         "Read the policy wording",
     ]
-
-
-def test_a_sign_off_tells_the_agent_once_after_it_is_saved(client, agent_stub):
-    decide(client, "1200.00")
-
-    client.post("/api/claims/CLM-1001/sign-off")
-
-    assert agent_stub.calls == ["/api/claims/CLM-1001/resume"]
-
-
-def test_the_sign_off_stands_when_the_agent_is_unreachable(client):
-    decide(client, "1200.00")
-
-    response = client.post("/api/claims/CLM-1001/sign-off")
-
-    assert response.status_code == 200
-    assert client.get("/api/claims/CLM-1001").json()["signed_off_by"] == "HND-01"
 
 
 @pytest.mark.parametrize("decision", ["decline", "refer"])

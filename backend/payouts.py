@@ -11,6 +11,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from backend import money, platform_settings, reference
+from backend.errors import Forbidden
 from backend.money import Amount
 
 CASH_LIMIT = Decimal(100)
@@ -49,6 +50,16 @@ class Line(BaseModel):
     ]
     nights: int = Field(ge=0)
     hours: int = Field(ge=0)
+
+
+def require_within_limit(amount: Decimal) -> None:
+    """Refuse a payment over the approval limit: only a sign-off pays more."""
+    limit = platform_settings.get("payout_approval_limit")
+    if amount > limit:
+        raise Forbidden(
+            f"A payment of {amount} is over the approval limit of {limit}: "
+            "only a handler's sign-off pays more"
+        )
 
 
 def needs_sign_off(payout: Decimal) -> bool:

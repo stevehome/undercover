@@ -12,7 +12,7 @@ test("the queue page lists the claims", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("the queue shows a claim's status as it moves through the four states", async ({
+test("the queue shows a claim's status as it moves through its states", async ({
   page,
   request,
 }) => {
@@ -45,13 +45,6 @@ test("the queue shows a claim's status as it moves through the four states", asy
 
   await request.post(`/api/claims/${claimId}/sign-off`, {
     headers: await handlerHeaders(request),
-  });
-  await page.goto("/");
-  await expect(row()).toContainText("in progress");
-
-  await request.post(`/api/claims/${claimId}/payment`, {
-    headers: agentHeaders,
-    data: { amount: "1250.00" },
   });
   await page.goto("/");
   await expect(row()).toContainText("decided");

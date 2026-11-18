@@ -138,25 +138,36 @@ def list_steps(claim_id: str) -> list[dict[str, Any]]:
 
 
 def sign_off(claim_id: str, handler_id: str) -> dict[str, Any]:
-    """Have a handler sign off an over-limit approval; the agent then pays it."""
+    """Have a handler sign off an over-limit approval; the sign-off pays it."""
     row = get_row(claim_id)
     if row["evaluation_run_id"] is not None:
         raise Conflict("An evaluation's claim can't be signed off")
     if row["signed_off_by"] == handler_id:
         return row
-    if row["status"] != ClaimStatus.WAITING_FOR_SIGN_OFF:
-        raise Conflict("Claim is not waiting for sign-off")
+    now = db.now()
+    columns = tables.claims.c
     with db.connection() as conn:
-        conn.execute(
+        signed = conn.execute(
             update(tables.claims)
-            .where(tables.claims.c.claim_id == claim_id)
+            .where(
+                columns.claim_id == claim_id,
+                columns.status == ClaimStatus.WAITING_FOR_SIGN_OFF,
+                columns.decision == "approve",
+                columns.paid_cents.is_(None),
+            )
             .values(
-                status=ClaimStatus.IN_PROGRESS,
+                status=ClaimStatus.DECIDED,
                 signed_off_by=handler_id,
-                signed_off_on=db.now(),
+                signed_off_on=now,
+                paid_cents=columns.payout_cents,
+                paid_on=now,
             )
         )
-    return get_row(claim_id)
+    if signed.rowcount == 0:
+        raise Conflict("Claim is not waiting for sign-off")
+    paid = get_row(claim_id)
+    record_step(claim_id, f"Paid ${paid['paid_amount']}")
+    return paid
 
 
 def _why_not_payable(row: dict[str, Any], amount: Decimal) -> str:
@@ -172,8 +183,10 @@ def _why_not_payable(row: dict[str, Any], amount: Decimal) -> str:
 def pay(claim_id: str, amount: Decimal) -> dict[str, Any]:
     """Pay an approved claim its payout, once, after any required sign-off.
 
+    A payment over the approval limit is refused: a sign-off pays those.
     Repeating a payment already made is done, not an error.
     """
+    payouts.require_within_limit(amount)
     row = get_row(claim_id)
     if row["paid_amount"] == amount:
         return row

@@ -2,7 +2,7 @@
 
 START -> screen -> agent <-> tools, or refer_flagged -> END for a flagged claim.
 agent -> settle; settle -> agent (no decision yet), END (decline or referral),
-approval -> pay (over the limit) or pay.
+pay (at or under the limit) or approval, which ends the graph: a sign-off pays.
 """
 
 from functools import partial
@@ -71,6 +71,6 @@ def build_graph(
     builder.add_conditional_edges(
         "settle", after_settle, ["agent", "approval", "pay", END]
     )
-    builder.add_edge("approval", "pay")
+    builder.add_edge("approval", END)
     builder.add_edge("pay", END)
     return builder.compile(checkpointer=checkpointer)
