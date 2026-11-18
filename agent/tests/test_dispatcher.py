@@ -62,9 +62,9 @@ def test_never_more_than_n_claims_are_worked_at_once(backend, n):
 
     rows = run(start(n), decide, n)
 
-    assert len(rows) == 25
+    assert len(rows) == 26
     assert {r["status"] for r in rows.values()} == {"done"}
-    assert most == min(n, 25)
+    assert most == min(n, 26)
 
 
 def test_every_claim_in_progress_or_waiting_is_worked_oldest_first(backend):
@@ -169,7 +169,7 @@ def test_no_claim_is_decided_twice(backend):
 
     run(start(), decide)
 
-    assert len(decisions) == len(set(decisions)) == 25
+    assert len(decisions) == len(set(decisions)) == 26
 
 
 def test_a_held_approval_in_an_evaluation_is_finished_and_its_progress_cleared(

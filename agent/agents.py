@@ -19,6 +19,7 @@ def decide_claim(
     llm: BaseChatModel | None = None,
     checkpointer: BaseCheckpointSaver | None = None,
     run_id: int | None = None,
+    screening_llm: BaseChatModel | None = None,
 ) -> str:
     """Work a claim through its graph: from the start, or from where it stopped.
 
@@ -28,6 +29,9 @@ def decide_claim(
 
     It runs in a fresh context, so a claim worked in a dispatch has a trace of
     its own, tagged with the run.
+
+    The claim is checked for hidden instructions first, by `screening_llm` (the
+    check's own model when there is none), and one that has any goes to a handler.
 
     A claim waiting at its sign-off carries on only once a handler has signed off.
     A claim another agent is working is left to that agent.
@@ -47,7 +51,12 @@ def decide_claim(
             else api.run_configuration(run_id)
         )
         llm = llm or harness.model(harness.model_settings(configuration))
-        graph = build_graph(saver, llm, configuration["instructions"])
+        graph = build_graph(
+            saver,
+            llm,
+            configuration["instructions"],
+            screening_llm or harness.screening_model(),
+        )
         tags = _tags(run_id, configuration["round_id"])
         outcome = Context().run(_work_traced, graph, claim, thread_id, run_id, tags)
         if claim["evaluation_run_id"] is not None:

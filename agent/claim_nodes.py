@@ -3,22 +3,49 @@
 from decimal import Decimal
 from typing import Any
 
-from langchain_core.language_models import LanguageModelInput
+from langchain_core.language_models import BaseChatModel, LanguageModelInput
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import Runnable
 from langgraph.runtime import Runtime
 from langgraph.types import interrupt
 
-from agent import api
+from agent import api, screening
 from agent.api import WAITING_FOR_SIGN_OFF
 from agent.claim_state import ClaimState
 from agent.contexts import ClaimContext
 
 MAX_MODEL_CALLS = 30
+SECURITY_CHECK = "Security check"
 
 
 class ModelCallLimit(Exception):  # noqa: N818 - a failure of the claim
     """The model was called more times than a claim should ever need."""
+
+
+def screen(
+    state: ClaimState, runtime: Runtime[ClaimContext], *, model: BaseChatModel
+) -> dict[str, Any]:
+    """Check the claim for instructions hidden in it, and record what was found.
+
+    A node saves when it finishes, so a claim carried on later is not checked again.
+    """
+    claim_id = runtime.context.claim_id
+    claim = api.get_claim(claim_id)
+    found = screening.screen(model, claim, runtime.context.run_id)
+    if found.instructions_found:
+        api.record_step(claim_id, f"Security check: {found.reason}")
+        return {"flagged": found.reason}
+    api.record_step(claim_id, "Security check: no instructions found")
+    return {"flagged": ""}
+
+
+def refer_flagged(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
+    """Refer a flagged claim to a handler without the claim agent seeing it."""
+    claim_id = runtime.context.claim_id
+    reason = f"The security check found an instruction in the claim. {state['flagged']}"
+    api.decide_claim(claim_id, "refer", Decimal(0), reason, SECURITY_CHECK)
+    api.record_step(claim_id, f"Referred to a handler: {reason}")
+    return {"messages": [AIMessage(reason)]}
 
 
 def agent(

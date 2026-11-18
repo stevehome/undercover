@@ -1,7 +1,8 @@
 """The claim agent's graph: its nodes joined by edges, and the checkpointer.
 
-START -> agent <-> tools; agent -> settle; settle -> agent (no decision yet),
-END (decline or referral), approval -> pay (over the limit) or pay.
+START -> screen -> agent <-> tools, or refer_flagged -> END for a flagged claim.
+agent -> settle; settle -> agent (no decision yet), END (decline or referral),
+approval -> pay (over the limit) or pay.
 """
 
 from functools import partial
@@ -20,6 +21,11 @@ from agent.contexts import ClaimContext
 from agent.tools import CLAIM_TOOLS
 
 
+def after_screen(state: ClaimState) -> Literal["agent", "refer_flagged"]:
+    """Refer a claim the check flagged; otherwise the claim agent works it."""
+    return "refer_flagged" if state["flagged"] else "agent"
+
+
 def after_agent(state: ClaimState) -> Literal["tools", "settle"]:
     """Run the tools the model asked for, or move on to the decision."""
     return "tools" if state["messages"][-1].tool_calls else "settle"
@@ -35,10 +41,15 @@ def after_settle(state: ClaimState) -> str:
 
 
 def build_graph(
-    checkpointer: BaseCheckpointSaver, model: BaseChatModel, instructions: str
+    checkpointer: BaseCheckpointSaver,
+    model: BaseChatModel,
+    instructions: str,
+    screening_model: BaseChatModel,
 ) -> CompiledStateGraph[ClaimState, ClaimContext, ClaimState, ClaimState]:
     """Build the claim graph on a checkpointer."""
     builder = StateGraph(ClaimState, context_schema=ClaimContext)
+    builder.add_node("screen", partial(claim_nodes.screen, model=screening_model))
+    builder.add_node("refer_flagged", claim_nodes.refer_flagged)
     builder.add_node(
         "agent",
         partial(
@@ -52,7 +63,9 @@ def build_graph(
     builder.add_node("approval", claim_nodes.approval)
     builder.add_node("pay", claim_nodes.pay)
 
-    builder.add_edge(START, "agent")
+    builder.add_edge(START, "screen")
+    builder.add_conditional_edges("screen", after_screen, ["agent", "refer_flagged"])
+    builder.add_edge("refer_flagged", END)
     builder.add_conditional_edges("agent", after_agent, ["tools", "settle"])
     builder.add_edge("tools", "agent")
     builder.add_conditional_edges(

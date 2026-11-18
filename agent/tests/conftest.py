@@ -1,10 +1,14 @@
+from typing import Any
+
 import pytest
 from fastapi.testclient import TestClient
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import api, backend_http
+from agent import api, backend_http, harness
+from agent.screening import Screening
 from backend.main import app
 from conftest import API_KEY
 
@@ -24,6 +28,47 @@ class StubModel(GenericFakeChatModel):
 
     def bind_tools(self, tools, **kwargs):
         return self
+
+
+PASSED = Screening(reason="Nothing found.", instructions_found=False)
+
+
+class ScreeningStub(StubModel):
+    """The check's model, scripted: each answer is a Screening, None (one that can't
+    be read) or an exception to raise. With no answers it passes every claim.
+    """
+
+    answers: Any = None
+    asked: int = 0
+
+    def with_structured_output(self, schema, **kwargs):
+        def answer(_):
+            self.asked += 1
+            reply = next(self.answers) if self.answers else PASSED
+            if isinstance(reply, Exception):
+                raise reply
+            raw = AIMessage(content="", response_metadata=REPLY_USAGE)
+            return {"raw": raw, "parsed": reply, "parsing_error": None}
+
+        return RunnableLambda(answer)
+
+
+@pytest.fixture
+def screener():
+    """Build a check's model from answers, and keep count of how often it is asked."""
+
+    def build(*answers):
+        return ScreeningStub(
+            messages=iter([]), answers=iter(answers) if answers else None
+        )
+
+    return build
+
+
+@pytest.fixture(autouse=True)
+def checks_nothing(monkeypatch, screener):
+    """A claim passes the check unless a test gives its own model."""
+    monkeypatch.setattr(harness, "screening_model", screener)
 
 
 @pytest.fixture(autouse=True)

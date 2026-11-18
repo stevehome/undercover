@@ -22,6 +22,8 @@ IMPROVER_MODEL = "openai/gpt-6-luna"
 IMPROVER_EFFORT = "medium"
 IMPROVER_TIMEOUT_SECONDS = 300
 MAX_IMPROVER_CALLS = 40
+SCREENING_MODEL = "openai/gpt-6-luna"
+SCREENING_EFFORT = "none"
 
 
 @dataclass(frozen=True)
@@ -32,16 +34,21 @@ class ModelSettings:
     reasoning_effort: str
 
 
+def _named_model() -> ModelSettings | None:
+    """Return MODEL_NAME, with no effort set, when it is set."""
+    name = os.getenv("MODEL_NAME")
+    return ModelSettings(name, NO_EFFORT) if name else None
+
+
 def model_settings(configuration: dict[str, Any]) -> ModelSettings:
     """Return a version's model and effort, or MODEL_NAME with no effort set."""
-    name = os.getenv("MODEL_NAME")
-    if name:
-        return ModelSettings(name, NO_EFFORT)
-    return ModelSettings(configuration["model"], configuration["reasoning_effort"])
+    return _named_model() or ModelSettings(
+        configuration["model"], configuration["reasoning_effort"]
+    )
 
 
-def model(settings: ModelSettings) -> ChatOpenAI:
-    """Return the model, set up for OpenRouter, that these settings name."""
+def _chat_model(settings: ModelSettings, timeout: int, **options: Any) -> ChatOpenAI:
+    """Return a model set up for OpenRouter, on providers that keep no data."""
     return ChatOpenAI(
         model=settings.name,
         base_url=OPENROUTER_BASE_URL,
@@ -51,19 +58,25 @@ def model(settings: ModelSettings) -> ChatOpenAI:
             if settings.reasoning_effort == NO_EFFORT
             else settings.reasoning_effort
         ),
-        timeout=MODEL_TIMEOUT_SECONDS,
-        max_retries=MODEL_RETRIES,
+        timeout=timeout,
         extra_body={"provider": PRIVATE_PROVIDERS},
+        **options,
+    )
+
+
+def model(settings: ModelSettings) -> ChatOpenAI:
+    """Return the model that these settings name."""
+    return _chat_model(
+        settings,
+        MODEL_TIMEOUT_SECONDS,
+        max_retries=MODEL_RETRIES,
         http_client=deadline.client(MODEL_DEADLINE_SECONDS),
     )
 
 
 def improver_settings() -> ModelSettings:
     """Return the improver's model: GPT-6 Luna at medium effort, or MODEL_NAME."""
-    name = os.getenv("MODEL_NAME")
-    if name:
-        return ModelSettings(name, NO_EFFORT)
-    return ModelSettings(IMPROVER_MODEL, IMPROVER_EFFORT)
+    return _named_model() or ModelSettings(IMPROVER_MODEL, IMPROVER_EFFORT)
 
 
 def improver_model(settings: ModelSettings) -> ChatOpenAI:
@@ -71,16 +84,13 @@ def improver_model(settings: ModelSettings) -> ChatOpenAI:
 
     A reply then never holds two proposals.
     """
-    return ChatOpenAI(
-        model=settings.name,
-        base_url=OPENROUTER_BASE_URL,
-        api_key=SecretStr(os.environ["OPENROUTER_API_KEY"]),
-        reasoning_effort=(
-            None
-            if settings.reasoning_effort == NO_EFFORT
-            else settings.reasoning_effort
-        ),
-        timeout=IMPROVER_TIMEOUT_SECONDS,
+    return _chat_model(
+        settings,
+        IMPROVER_TIMEOUT_SECONDS,
         model_kwargs={"parallel_tool_calls": False},
-        extra_body={"provider": PRIVATE_PROVIDERS},
     )
+
+
+def screening_model() -> ChatOpenAI:
+    """Return the claim check's model: GPT-6 Luna with no reasoning, or MODEL_NAME."""
+    return model(_named_model() or ModelSettings(SCREENING_MODEL, SCREENING_EFFORT))

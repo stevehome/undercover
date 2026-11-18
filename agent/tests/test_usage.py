@@ -14,9 +14,9 @@ def test_each_model_reply_is_recorded_with_its_run(backend, script, saver):
     agents.decide_claim(CLAIM, script(decision(), "Done."), saver, run_id=run_id)
 
     totals = usage.run_totals(run_id)
-    assert totals["model_calls"] == 2
-    assert totals["total_tokens"] == 240
-    assert totals["cost"] == Decimal("0.000624")
+    assert totals["model_calls"] == 3
+    assert totals["total_tokens"] == 360
+    assert totals["cost"] == Decimal("0.000936")
 
 
 def test_work_with_no_run_belongs_to_no_run(backend, script, saver):
@@ -31,8 +31,8 @@ def test_two_runs_have_separate_totals(backend, script, saver):
     agents.decide_claim("CLM-1001", script(decision(), "Done."), saver, run_id=first)
     agents.decide_claim("CLM-1002", script(decision(), "Done."), saver, run_id=second)
 
-    assert usage.run_totals(first)["model_calls"] == 2
-    assert usage.run_totals(second)["model_calls"] == 2
+    assert usage.run_totals(first)["model_calls"] == 3
+    assert usage.run_totals(second)["model_calls"] == 3
 
 
 def test_a_wait_for_sign_off_is_not_counted(backend, script, saver, as_handler):

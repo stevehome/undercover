@@ -166,3 +166,22 @@ def test_only_backend_http_names_the_api_key_header():
     for path in (ROOT / "agent").glob("*.py"):
         if path.name != "backend_http.py":
             assert "X-API-Key" not in path.read_text(), path.name
+
+
+def test_model_name_is_read_in_one_place():
+    uses = [
+        path.name
+        for path in (ROOT / "agent").glob("*.py")
+        for node in ast.walk(ast.parse(path.read_text()))
+        if isinstance(node, ast.Constant) and node.value == "MODEL_NAME"
+    ]
+    assert uses == ["harness.py"]
+
+
+def test_only_screening_holds_the_checks_instructions():
+    """The check isn't configuration, so the improver can't reach it."""
+    modules = [*(ROOT / "agent").glob("*.py"), *(ROOT / "backend").glob("*.py")]
+    holders = [p.name for p in modules if "SCREEN_INSTRUCTIONS" in p.read_text()]
+    assert holders == ["screening.py"]
+    for name in ("improver.py", "improver_tools.py", "improver_api.py", "tools.py"):
+        assert "screening" not in (ROOT / "agent" / name).read_text(), name

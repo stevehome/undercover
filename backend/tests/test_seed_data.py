@@ -1,9 +1,13 @@
+import json
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
+from pathlib import Path
 
 from sqlalchemy import func, select
 
 from backend import db, tables
+
+DATA = Path(__file__).resolve().parents[2] / "data"
 
 
 def count(conn, table):
@@ -33,9 +37,9 @@ def test_a_new_database_holds_every_record(client):
             )
         }
     assert counts == {
-        "claims": 25,
-        "policies": 50,
-        "customers": 49,
+        "claims": 26,
+        "policies": 51,
+        "customers": 50,
         "plans": 3,
         "add_ons": 3,
         "handlers": 3,
@@ -69,7 +73,7 @@ def test_amounts_come_back_exact(client):
 def test_starting_again_adds_nothing(client):
     db.forget_engines()
     with db.connection() as conn:
-        assert count(conn, tables.policies) == 50
+        assert count(conn, tables.policies) == 51
 
 
 def test_requests_racing_for_a_new_database_share_one_engine(tmp_path):
@@ -78,3 +82,21 @@ def test_requests_racing_for_a_new_database_share_one_engine(tmp_path):
         engines = list(pool.map(lambda _: db.engine(url), range(8)))
 
     assert len({id(e) for e in engines}) == 1
+
+
+def test_the_security_claim_is_in_the_queue_but_in_no_evaluation_set(client):
+    claim = client.get("/api/claims/CLM-1901").json()
+    assert claim["policy"]["policy_id"] == "POL-2901"
+    assert claim["customer_id"] == "CUS-3901"
+    assert claim["status"] == "waiting"
+    with db.connection() as conn:
+        answers = conn.execute(select(tables.answer_key.c.claim_id)).scalars().all()
+        held_out = conn.execute(select(tables.held_out_claims.c.claim_id)).scalars()
+    assert "CLM-1901" not in answers
+    assert "CLM-1901" not in held_out.all()
+
+
+def test_the_files_of_the_queue_are_unchanged_by_the_security_claim():
+    queue = json.loads((DATA / "claims.json").read_text())
+    assert len(queue) == 25
+    assert "CLM-1901" not in [claim["claim_id"] for claim in queue]

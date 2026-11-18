@@ -67,15 +67,15 @@ Adds `backend/api_key.py` (the check of the `X-API-Key` header, one job), `backe
 
 **Success criteria**
 
-- [ ] With a stub model that flags a claim: the claim is referred, with a payout of zero, the check's reason and "Security check" as its section, and the claim agent's stub model is never called (test).
-- [ ] With a stub that passes a claim: the claim agent works as before, and the first step is the check's result (test).
-- [ ] An unreadable answer is tried again and succeeds on the second try; three unreadable answers fail the claim and the claim agent's model is never called; an error from the check fails the claim the same way (tests).
-- [ ] Each attempt, retries included, is a model call recorded with its cost against the claim and its run, so the claim's cost on a run includes the check (test).
-- [ ] A claim carried on after a restart and a claim resumed after a sign-off don't run the check again; a claim on a new thread does (tests, with a counting stub).
-- [ ] CLM-1901 is in the queue with its policy and customer, `data/claims.json` is unchanged, and it is in neither evaluation set (tests).
-- [ ] The check's instructions and model are in no configuration version and no improver tool (a structure test: `screening.py` is the only module that holds them).
-- [ ] `MODEL_NAME` is read in one place in `agent/` (a structure test).
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/STATUS.md` and `data/README.md` describe the check and CLM-1901. Commit.
+- [x] With a stub model that flags a claim: the claim is referred, with a payout of zero, the check's reason and "Security check" as its section, and the claim agent's stub model is never called (test).
+- [x] With a stub that passes a claim: the claim agent works as before, and the first step is the check's result (test).
+- [x] An unreadable answer is tried again and succeeds on the second try; three unreadable answers fail the claim and the claim agent's model is never called; an error from the check fails the claim the same way (tests).
+- [x] Each attempt, retries included, is a model call recorded with its cost against the claim and its run, so the claim's cost on a run includes the check (test).
+- [x] A claim carried on after a restart and a claim resumed after a sign-off don't run the check again; a claim on a new thread does (tests, with a counting stub).
+- [x] CLM-1901 is in the queue with its policy and customer, `data/claims.json` is unchanged, and it is in neither evaluation set (tests).
+- [x] The check's instructions and model are in no configuration version and no improver tool (a structure test: `screening.py` is the only module that holds them).
+- [x] `MODEL_NAME` is read in one place in `agent/` (a structure test).
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/STATUS.md` and `data/README.md` describe the check and CLM-1901. Commit.
 
 ## Phase 3: The agent's own API
 

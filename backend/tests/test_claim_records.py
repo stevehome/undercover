@@ -4,7 +4,10 @@ from pathlib import Path
 from backend import money
 
 DATA = Path(__file__).resolve().parents[2] / "data"
-FILE_CLAIMS = json.loads((DATA / "claims.json").read_text())
+FILE_CLAIMS = [
+    *json.loads((DATA / "claims.json").read_text()),
+    *json.loads((DATA / "security/claims.json").read_text()),
+]
 TEXT_FIELDS = [
     "claim_id",
     "policy_id",

@@ -7,12 +7,13 @@ from langgraph.graph.message import add_messages
 
 
 class ClaimState(TypedDict):
-    """The conversation, the decision once there is one, and the model calls so far."""
+    """The conversation, the check's finding, the decision and the calls so far."""
 
     messages: Annotated[list, add_messages]
     decision: str
     payout: str
     needs_sign_off: bool
+    flagged: str
     model_calls: int
 
 
@@ -23,5 +24,6 @@ def new_claim(claim_id: str) -> ClaimState:
         "decision": "",
         "payout": "",
         "needs_sign_off": False,
+        "flagged": "",
         "model_calls": 0,
     }

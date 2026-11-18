@@ -7,7 +7,7 @@ def test_list_claims(client):
     response = client.get("/api/claims")
     assert response.status_code == 200
     claims = response.json()
-    assert len(claims) == 25
+    assert len(claims) == 26
     assert all(claim["status"] == "waiting" for claim in claims)
     assert claims[0]["claim_id"] == "CLM-1001"
 
@@ -76,7 +76,7 @@ def test_seeding_is_idempotent(monkeypatch, tmp_path):
     for _ in range(2):
         with db.connection() as conn:
             count = conn.execute(select(func.count()).select_from(tables.claims))
-            assert count.scalar_one() == 25
+            assert count.scalar_one() == 26
         db.forget_engines()
 
 

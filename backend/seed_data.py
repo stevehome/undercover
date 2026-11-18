@@ -20,6 +20,15 @@ def _load_json(name: str) -> Any:
     return money.convert(json.loads(text, parse_float=Decimal))
 
 
+def _with_security(name: str) -> Any:
+    """A file's records, and the security claim's beside them.
+
+    `security/decisions.json` is never read, so CLM-1901 has no decision in the
+    answer key and is in neither evaluation set.
+    """
+    return [*_load_json(name), *_load_json(f"security/{name}")]
+
+
 def _sections(text: str) -> list[tuple[str, str]]:
     """Split a Markdown document into its ``##``-headed sections, in order."""
     sections: list[tuple[str, str]] = []
@@ -124,11 +133,11 @@ def records() -> dict[Table, list[dict[str, Any]]]:
         tables.deductible_benefits: [
             {"benefit": benefit} for benefit in plan_data["deductible_applies_to"]
         ],
-        tables.policies: _load_json("policies.json"),
-        tables.customers: _load_json("customers.json"),
+        tables.policies: _with_security("policies.json"),
+        tables.customers: _with_security("customers.json"),
         tables.handlers: _load_json("handlers.json"),
         tables.document_sections: _document_rows(),
-        tables.claims: [_claim_row(claim) for claim in _load_json("claims.json")],
+        tables.claims: [_claim_row(claim) for claim in _with_security("claims.json")],
         tables.held_out_claims: [
             _held_out_row(claim) for claim in _load_json("evals/held_out_claims.json")
         ],
