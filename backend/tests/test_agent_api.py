@@ -69,3 +69,19 @@ def test_a_payment_may_still_be_sent_as_a_number_or_a_string_of_cents(agent):
     for amount in (400.0, "400.00"):
         response = agent.post("/api/claims/CLM-1001/payment", json={"amount": amount})
         assert response.status_code != 422
+
+
+def test_the_decision_is_a_string_so_a_policy_can_compare_it(document):
+    """An enum becomes its own Cedar type on the Gateway, which a string can't match."""
+    decision = document["components"]["schemas"]["Decision"]["properties"]["decision"]
+    assert decision["type"] == "string"
+    assert "enum" not in decision
+    assert "approve" in decision["description"]
+
+
+def test_a_decision_other_than_the_three_is_still_refused(agent):
+    response = agent.post(
+        "/api/claims/CLM-1001/decision",
+        json={"decision": "maybe", "payout": 0, "reason": "x", "policy_reference": "S"},
+    )
+    assert response.status_code == 422

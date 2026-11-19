@@ -6,7 +6,7 @@ from typing import Annotated, Any, Literal, Self
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from mangum import Mangum
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, WithJsonSchema, model_validator
 
 from backend import (
     agent_api,
@@ -87,8 +87,19 @@ MAX_CONCURRENCY = 25
 Concurrency = Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
 
 
+DecisionKind = Annotated[
+    Literal["approve", "decline", "refer"],
+    WithJsonSchema(
+        {"type": "string", "description": "approve, decline or refer"},
+        mode="validation",
+    ),
+]
+"""The Gateway makes an enum its own Cedar type, which a policy can't compare with a
+string; the document says `string`, and the check still allows only the three."""
+
+
 class Decision(BaseModel):
-    decision: Literal["approve", "decline", "refer"]
+    decision: DecisionKind
     payout: Amount
     reason: str
     policy_reference: str
