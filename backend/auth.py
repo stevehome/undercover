@@ -17,6 +17,7 @@ from backend.errors import Forbidden, ServiceUnavailable, Unauthorized
 
 AUDIENCE = "authenticated"
 ALGORITHMS = ["ES256", "RS256"]
+CLOCK_LEEWAY_SECONDS = 10
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -40,6 +41,7 @@ def handler_for_token(token: str | None, keys: PyJWKClient) -> dict[str, Any]:
             keys.get_signing_key_from_jwt(token).key,
             algorithms=ALGORITHMS,
             audience=AUDIENCE,
+            leeway=CLOCK_LEEWAY_SECONDS,
         )
     except jwt.PyJWTError as error:
         raise Unauthorized("Your sign-in isn't valid; sign in again") from error

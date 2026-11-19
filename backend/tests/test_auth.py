@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
 
@@ -29,6 +31,17 @@ def test_me_says_when_a_handler_cannot_sign_off(anonymous, token_for):
 
 def test_the_email_may_be_in_any_case(anonymous, token_for):
     assert get_me(anonymous, f"Bearer {token_for('DANA.Whitfield@undercover.example')}")
+
+
+def test_a_token_issued_a_moment_ahead_of_our_clock_is_accepted(anonymous, token_for):
+    """A clock a little behind Supabase's makes a fresh token look like the future."""
+    ahead = token_for(iat=int(time.time()) + 3)
+    assert get_me(anonymous, f"Bearer {ahead}").status_code == 200
+
+
+def test_a_token_issued_far_ahead_of_our_clock_is_refused(anonymous, token_for):
+    far_ahead = token_for(iat=int(time.time()) + 3600)
+    assert get_me(anonymous, f"Bearer {far_ahead}").status_code == 401
 
 
 def test_no_token_is_refused(anonymous):

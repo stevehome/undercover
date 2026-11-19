@@ -53,7 +53,7 @@ We don't use Azure ourselves. The claim agent, the improver and the hidden-instr
 ## Found in the live checks
 
 - `openrouter/free` has no endpoint under the zero-retention setting: the check fails with a 404. The live checks ran on the configured models.
-- About 6 of 40 reads signed in as Dana by script, each with a fresh token, got 401 "Your sign-in isn't valid" while a dispatch or an evaluation had just run. 34 later sign-ins and 120 reads with one token did not repeat it, and the backend does not log the reason. Not understood.
+- About 6 of 40 reads signed in as Dana by script, each with a fresh token, got 401 "Your sign-in isn't valid". The cause: this Mac's clock runs a little behind Supabase's, so a fresh token's `iat` was ahead of it in 5 of 25 sign-ins (by 0.05 to 0.18 s), and PyJWT refuses such a token as not yet valid. Fixed with 10 s of leeway in `backend/auth.py`. A real handler could have met it too, as a failed first load right after signing in.
 - Supabase rate-limits password sign-ins (429 `over_request_rate_limit`) when a script signs in too often. That is a limit of the scripts, not of the product.
 - The dashboard's "Payment in progress" state can no longer be reached, because a sign-off pays in the one request.
 - The Mangum deprecation warning in pytest comes from a third-party library.
