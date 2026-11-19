@@ -3,12 +3,18 @@
 from decimal import Decimal
 from typing import Annotated, Any
 
-from pydantic import Field
+from pydantic import Field, WithJsonSchema
 
 CENT = Decimal("0.01")
 NANO = Decimal("0.000000001")
 
-Amount = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=2)]
+Amount = Annotated[
+    Decimal,
+    Field(ge=0, max_digits=12, decimal_places=2),
+    WithJsonSchema({"type": "number", "minimum": 0}, mode="validation"),
+]
+"""A dollar amount. A request's schema says `number`, since the Gateway can't take
+the `anyOf` that `Decimal` gives; the check still accepts a number or a string."""
 
 Cost = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=9)]
 

@@ -48,3 +48,24 @@ def test_the_document_takes_the_key_or_a_handler(agent, anonymous, as_handler):
     assert agent.get(PATH).status_code == 200
     assert anonymous.get(PATH, headers=as_handler()).status_code == 200
     assert anonymous.get(PATH).status_code == 401
+
+
+@pytest.mark.parametrize(
+    ("schema", "field"),
+    [
+        ("Payment", "amount"),
+        ("Decision", "payout"),
+        ("Line", "amount"),
+        ("PayoutRequest", "paid_by_others"),
+    ],
+)
+def test_a_money_input_is_a_plain_number_the_gateway_can_take(document, schema, field):
+    """The Gateway can't take an `anyOf`: it turns the input into an object."""
+    amount = document["components"]["schemas"][schema]["properties"][field]
+    assert amount == {"type": "number", "minimum": 0, "title": amount["title"]}
+
+
+def test_a_payment_may_still_be_sent_as_a_number_or_a_string_of_cents(agent):
+    for amount in (400.0, "400.00"):
+        response = agent.post("/api/claims/CLM-1001/payment", json={"amount": amount})
+        assert response.status_code != 422
