@@ -116,14 +116,14 @@ Adds `backend/api_key.py` (the check of the `X-API-Key` header, one job), `backe
 
 **Success criteria**
 
-- [ ] `npm run build` writes `dashboard/dist` and prints no warnings, with `.env` present, and with `.env` moved away and `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the environment, where the built files hold those values.
-- [ ] The Lambda handler, called with a Function URL event, answers `/api/health` with 200 (test); with a stand-in build, answers `/` and a dashboard page with `index.html`, a file at its own path, and an unknown `/api/` path with a JSON 404 (tests).
-- [ ] With no `dashboard/dist` the backend behaves as today, and `npm run dev` is unchanged (tests).
-- [ ] With `AWS_LAMBDA_FUNCTION_NAME` set the engine uses `NullPool`, `prepare_threshold=None`, and makes no schema, table or seed (test); without it the pool is as today.
-- [ ] `npm run check:server` passes, and fails if I add an import that the group lacks (tried once, then undone).
-- [ ] The backend starts with only the three variables set, and answers health, a claims read with the key, and a handler's read (tests, with a stand-in for sign-in).
-- [ ] The deployment package, built in a temporary folder the lab's way for Linux and Python 3.12, is under 50 MB zipped. I report its size. The build holds no tests and no `__pycache__`.
-- [ ] `npm run check` passes with `.env` moved out of the way, the server check included. Documents updated. Commit.
+- [x] `npm run build` writes `dashboard/dist` and prints no warnings, with `.env` present, and with `.env` moved away and `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the environment, where the built files hold those values.
+- [x] The Lambda handler, called with a Function URL event, answers `/api/health` with 200 (test); with a stand-in build, answers `/` and a dashboard page with `index.html`, a file at its own path, and an unknown `/api/` path with a JSON 404 (tests).
+- [x] With no `dashboard/dist` the backend behaves as today, and `npm run dev` is unchanged (tests).
+- [x] With `AWS_LAMBDA_FUNCTION_NAME` set the engine uses `NullPool`, `prepare_threshold=None`, and makes no schema, table or seed (test); without it the pool is as today.
+- [x] `npm run check:server` passes, and fails if I add an import that the group lacks (tried once, then undone).
+- [x] The backend starts with only the three variables set, and answers health, a claims read with the key, and a handler's read (tests, with a stand-in for sign-in).
+- [x] The deployment package, built in a temporary folder the lab's way for Linux and Python 3.12, is under 50 MB zipped. I report its size. The build holds no tests and no `__pycache__`.
+- [x] `npm run check` passes with `.env` moved out of the way, the server check included. Documents updated. Commit.
 
 ## Phase 5: Live checks and the last of the documents
 

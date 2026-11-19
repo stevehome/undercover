@@ -10,6 +10,13 @@ export default defineConfig(({ mode }) => ({
   plugins: [react()],
   // Found at once, so a first page load never reloads for a new dependency.
   optimizeDeps: { include: ["@supabase/supabase-js"] },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: { groups: [{ name: "vendor", test: /node_modules/ }] },
+      },
+    },
+  },
   server: {
     proxy: {
       "/api": process.env.UNDERCOVER_BACKEND ?? "http://127.0.0.1:8000",

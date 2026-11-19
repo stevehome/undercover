@@ -9,6 +9,7 @@ from pathlib import Path
 from threading import Lock
 
 from sqlalchemy import Connection, Engine, create_engine, func, insert, select, text
+from sqlalchemy.pool import NullPool
 
 from backend import money, seed_data, tables
 
@@ -36,14 +37,34 @@ _lock = Lock()
 _engines: dict[str, Engine] = {}
 
 
+def on_lambda() -> bool:
+    """Say whether this is AWS Lambda, which sets the name of the function."""
+    return bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
+
 def make_engine(url: str) -> Engine:
-    """Make an engine; Postgres keeps our tables in their own schema."""
+    """Make an engine; Postgres keeps our tables in their own schema.
+
+    On Lambda there is no pool, since each instance handles one request at a time
+    and Supabase's transaction pooler hands out a connection for each transaction,
+    and no prepared statements, which that pooler can't keep.
+    """
     json_options = {
         "json_serializer": lambda value: json.dumps(value, default=str),
         "json_deserializer": lambda text: money.convert(json.loads(text)),
     }
     if url.startswith("sqlite"):
         return create_engine(url, **json_options)
+    if on_lambda():
+        return create_engine(
+            url,
+            **json_options,
+            poolclass=NullPool,
+            connect_args={
+                "options": f"-c search_path={SCHEMA}",
+                "prepare_threshold": None,
+            },
+        )
     return create_engine(
         url,
         **json_options,
@@ -60,7 +81,8 @@ def engine(url: str) -> Engine:
     """Return the engine for a database, made once even when requests race for it."""
     with _lock:
         if url not in _engines:
-            _engines[url] = _prepare(make_engine(url), url)
+            made = make_engine(url)
+            _engines[url] = made if on_lambda() else _prepare(made, url)
         return _engines[url]
 
 
@@ -71,7 +93,10 @@ def forget_engines() -> None:
 
 
 def _prepare(made: Engine, url: str) -> Engine:
-    """Create a database's schema and tables, and seed them if they are empty."""
+    """Create a database's schema and tables, and seed them if they are empty.
+
+    On Lambda it isn't called: the database is made and seeded from a laptop.
+    """
     if not url.startswith("sqlite"):
         with made.begin() as conn:
             conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))

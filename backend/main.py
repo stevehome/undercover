@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal, Self
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
+from mangum import Mangum
 from pydantic import BaseModel, Field, model_validator
 
 from backend import (
@@ -12,6 +13,7 @@ from backend import (
     agent_process,
     agent_service,
     claims,
+    dashboard_files,
     evaluations,
     improver_view,
     payouts,
@@ -687,3 +689,8 @@ def record_proposal_decision(
 def may_start_claim(run_id: int) -> dict[str, bool]:
     """Say whether a run may start a claim: its round is open and within its limit."""
     return {"may_start": spending.may_start_claim(run_id)}
+
+
+dashboard_files.serve(app, dashboard_files.BUILD)
+
+handler = Mangum(app, lifespan="off")

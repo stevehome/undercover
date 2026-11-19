@@ -45,7 +45,11 @@ def test_with_no_key_set_a_handler_can_still_read_the_claims(
 
 
 def test_health_is_open_and_every_other_route_needs_credentials(anonymous):
-    routes = [route for route in app.routes if isinstance(route, APIRoute)]
+    routes = [
+        route
+        for route in app.routes
+        if isinstance(route, APIRoute) and route.include_in_schema
+    ]
     assert len(routes) > 40
     for route in routes:
         path = route.path.replace("{key}", "approval_limit")

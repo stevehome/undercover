@@ -7,3 +7,16 @@
 - `data/`: the business data the database is first filled from. The agent never sees `data/evals/`, which holds the answer key; only seeding reads it, into tables no claim operation reads.
 
 Python 3.12 with uv, all in the root `pyproject.toml`. Node 26. The OpenRouter key is `OPENROUTER_API_KEY` in `.env`, with `DATABASE_URL` (the Supabase session pooler) and the Langfuse keys.
+
+## Deployment
+
+The backend and the dashboard run as one app on AWS Lambda, and nothing on Lambda seeds or creates a table: the database is made and seeded from a laptop with `npm run seed`.
+
+- **Build:** `npm run build` (`vite build dashboard`) writes the dashboard to `dashboard/dist`. It reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the root `.env`, or from the environment when there is no `.env`, and bakes them into the files.
+- **Server check:** `npm run check:server` imports `backend.main` in a throwaway environment holding only the `server` dependency group, so a backend import the group lacks fails there and not in the cloud. `npm run check` runs it. Keep the group in step with what `backend/` imports.
+- **Package:** `uv export --only-group server`, installed for Linux and Python 3.12 (`uv pip install --python-platform x86_64-manylinux2014 --python-version 3.12 --only-binary :all:`), then `backend/`, `data/` (without `data/evals/`, the answer key, which nothing on Lambda reads) and `dashboard/dist/`, with no tests and no `__pycache__`. It zips to about 24 MB; Lambda takes up to 50 MB.
+- **Handler:** `backend.main.handler`, which is Mangum around the app with `lifespan="off"`. For a web server, `backend.main:app`.
+- **The dashboard** is served by the backend (`dashboard_files.py`): files at their own paths, `index.html` for any other page, and a JSON 404 for an unknown path under `/api/`. With no `dashboard/dist` the backend serves none, and `npm run dev` is unchanged.
+- **Database:** with `AWS_LAMBDA_FUNCTION_NAME` set (Lambda sets it), the engine has no pool (`NullPool`) and no prepared statements (`prepare_threshold=None`), for Supabase's transaction pooler on port 6543.
+- **Environment variables:** `DATABASE_URL`, `VITE_SUPABASE_URL` and `UNDERCOVER_API_KEY`.
+
