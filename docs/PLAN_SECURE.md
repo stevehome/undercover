@@ -131,16 +131,16 @@ Run after you reseed once. You stop `npm run dev` and run `npm run seed`, then s
 
 **Success criteria**
 
-- [ ] `curl` to an agent route (a decision on CLM-1001) without the key returns 401, and to `/api/health` returns 200.
-- [ ] Dana Whitfield signs in on the dashboard (Playwright MCP, `HANDLER_PASSWORD` kept out of the transcript) and sees the queue as before, now 26 claims.
-- [ ] `uv run -m agent CLM-1001` works the claim, with the check's result as its first step.
-- [ ] A dispatch with 5 claim agents at once works the rest. CLM-1901 is referred with the check's reason, which the dashboard shows on the claim and in its steps; the other claims are decided as before.
-- [ ] Dana signs off a held payout on the dashboard, and it is paid once, with her name and the time on the payment.
-- [ ] An evaluation of the evaluation set's tiny five flags none of the claims.
-- [ ] The backend started with `AWS_LAMBDA_FUNCTION_NAME` set and `DATABASE_URL` on port 6543 serves the claims to Dana, through the dashboard it serves at `http://127.0.0.1:8000` after `npm run build` (Playwright MCP); then the same with the variable unset. You stop `npm run dev` first, for port 8000.
-- [ ] I report what the live runs spent, from the dashboard's totals (the claim's model cost, with the check's calls in it).
-- [ ] `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md`, `docs/STATUS.md` and `data/README.md` describe the product as it now is.
-- [ ] `npm run check` is green with `.env` moved out of the way, with the tests from every phase. A final review of the whole change against the checklist in `docs/CODE_STANDARDS.md`. Commit. I don't push.
+- [x] `curl` to an agent route (a decision on CLM-1001) without the key returns 401, and to `/api/health` returns 200.
+- [x] Dana Whitfield signs in on the dashboard (Playwright MCP, `HANDLER_PASSWORD` kept out of the transcript) and sees the queue as before, now 26 claims.
+- [x] `uv run -m agent CLM-1001` works the claim, with the check's result as its first step.
+- [x] A dispatch with 5 claim agents at once works the rest. CLM-1901 is referred with the check's reason, which the dashboard shows on the claim and in its steps; the other claims are decided as before.
+- [x] Dana signs off a held payout on the dashboard, and it is paid once, with her name and the time on the payment.
+- [x] An evaluation of the evaluation set's tiny five flags none of the claims.
+- [x] The backend started with `AWS_LAMBDA_FUNCTION_NAME` set and `DATABASE_URL` on port 6543 serves the claims to Dana, through the dashboard it serves at `http://127.0.0.1:8000` after `npm run build` (Playwright MCP); then the same with the variable unset. You stop `npm run dev` first, for port 8000.
+- [x] I report what the live runs spent, from the dashboard's totals (the claim's model cost, with the check's calls in it).
+- [x] `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md`, `docs/STATUS.md` and `data/README.md` describe the product as it now is.
+- [x] `npm run check` is green with `.env` moved out of the way, with the tests from every phase. A final review of the whole change against the checklist in `docs/CODE_STANDARDS.md`. Commit. I don't push.
 
 ## Things I'd like you to look at
 
