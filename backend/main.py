@@ -41,7 +41,7 @@ from backend.errors import (
 from backend.money import Amount
 from backend.payouts import Benefit, Line
 from backend.runs import RunSettings
-from backend.statuses import ItemStatus, ProposalKind, Stage
+from backend.statuses import ItemStatus, ProposalKind, Stage, StepKind
 
 app = FastAPI(title="UnderCover")
 
@@ -88,7 +88,9 @@ Concurrency = Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
 
 
 class Step(BaseModel):
+    kind: StepKind
     text: str
+    details: dict[str, Any]
 
 
 class Lease(BaseModel):
@@ -345,7 +347,7 @@ def decide_claim(claim_id: str, decision: Decision) -> dict[str, Any]:
 )
 def record_step(claim_id: str, step: Step) -> dict[str, Any]:
     """Record one step of the agent's work on a claim."""
-    claims.record_step(claim_id, step.text)
+    claims.record_step(claim_id, step.kind, step.text, step.details)
     return {"claim_id": claim_id, "text": step.text}
 
 

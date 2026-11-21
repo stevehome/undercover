@@ -1,11 +1,14 @@
 import { useCallback, useState } from "react";
 import { useParams } from "react-router";
 import { fetchClaim, fetchSteps, runAgent } from "../api";
+import { ContextUsed } from "../components/ContextUsed";
+import { DecisionPanel } from "../components/DecisionPanel";
 import { LoadError } from "../components/LoadError";
 import { Loading } from "../components/Loading";
 import { PageHeader } from "../components/PageHeader";
 import { PaymentPanel } from "../components/PaymentPanel";
 import { StatusPill } from "../components/StatusPill";
+import { StepList } from "../components/StepList";
 import { formatMoney } from "../money";
 import type { Claim, Step } from "../types";
 import { usePolling } from "../usePolling";
@@ -58,16 +61,8 @@ export function ClaimPage() {
         </button>
       )}
 
-      {steps.length > 0 && (
-        <>
-          <h2>What the agent did</h2>
-          <ol>
-            {steps.map((step) => (
-              <li key={`${step.recorded_on} ${step.text}`}>{step.text}</li>
-            ))}
-          </ol>
-        </>
-      )}
+      <StepList steps={steps} />
+      <ContextUsed steps={steps} />
 
       <h2>The story</h2>
       <p>{claim.story}</p>
@@ -101,19 +96,7 @@ export function ClaimPage() {
         </ul>
       )}
 
-      {claim.decision && (
-        <>
-          <h2>The decision</h2>
-          <p>
-            {claim.decision}
-            {claim.payout !== null && claim.payout > 0
-              ? `, ${formatMoney(claim.payout)}`
-              : ""}
-          </p>
-          <p>{claim.reason}</p>
-          <p>{claim.policy_reference}</p>
-        </>
-      )}
+      <DecisionPanel claim={claim} />
 
       <PaymentPanel
         claim={claim}

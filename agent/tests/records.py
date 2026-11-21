@@ -29,3 +29,9 @@ def decide(claim_id: str, fields: dict[str, Any]) -> dict[str, Any]:
     if fields["decision"] == "approve":
         calculated(claim_id, fields["payout"])
     return api.decide_claim(claim_id, decided_by=MAKER, **fields)
+
+
+def step_texts(backend: Any, claim_id: str, *, calls: bool = False) -> list[str]:
+    """The texts of a claim's steps, without its tool calls unless `calls` is set."""
+    steps = backend.get(f"/api/claims/{claim_id}/steps").json()
+    return [s["text"] for s in steps if calls or s["kind"] != "tool_call"]

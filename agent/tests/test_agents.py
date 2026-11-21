@@ -30,8 +30,7 @@ def test_decide_claim_reads_then_decides(backend, script, saver):
     claim = api.get_claim("CLM-1001")
     assert claim["status"] == "decided"
     assert claim["decision"] == "approve"
-    steps = backend.get("/api/claims/CLM-1001/steps").json()
-    assert [step["text"] for step in steps] == [
+    assert records.step_texts(backend, "CLM-1001") == [
         "Security check: no instructions found",
         "Read the claim, its policy and the customer's claim history",
         "Searched the documents for trip delay",

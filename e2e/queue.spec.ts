@@ -26,7 +26,9 @@ test("the queue shows a claim's status as it moves through its states", async ({
   await request.post(`/api/claims/${claimId}/steps`, {
     headers: agentHeaders,
     data: {
+      kind: "note",
       text: "Read the claim, its policy and the customer's claim history",
+      details: {},
     },
   });
   await page.goto("/");

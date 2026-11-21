@@ -2,7 +2,8 @@
 
 Tools get their state from the run's context, never from closures or globals. The
 claim agent's tools take no id from the model: they fill in the claim and who
-makes the decision, so the model acts only on its own claim.
+makes the decision, so the model acts only on its own claim. They record nothing:
+`step_recording.py` records what each tool call did.
 """
 
 from decimal import Decimal
@@ -11,7 +12,6 @@ from typing import Any, Literal, cast
 from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
-from agent import api
 from agent.api import Amount, Benefit, Decision, Line
 from agent.claim_text import claim_text
 from agent.contexts import ClaimContext
@@ -22,37 +22,40 @@ Document = Literal["policy_wording", "claims_manual"]
 Record = Literal["claim", "policy", "previous_claim"]
 Plan = Literal["economy", "premium", "first"]
 
+TARGETS = {
+    "get_claim": APP,
+    "calculate_payout": APP,
+    "decide_claim": APP,
+    "lookup_term": CONTEXT,
+    "describe_fields": CONTEXT,
+    "get_plan": CONTEXT,
+    "get_claim_rules": CONTEXT,
+    "search_reference_data": CONTEXT,
+    "search_documents": CONTEXT,
+    "read_section": CONTEXT,
+}
+"""The service each of the model's tools reaches; the memory search reaches neither."""
+
 
 @tool
 def get_claim(runtime: ToolRuntime[ClaimContext]) -> str:
     """Read the claim, its policy, and the customer's claim history."""
     context = runtime.context
     claim = context.route.call(APP, "get_claim", {"claim_id": context.claim_id})
-    api.record_step(
-        context.claim_id, "Read the claim, its policy and the customer's claim history"
-    )
     return claim_text(claim)
 
 
 def _look_up(
-    runtime: ToolRuntime[ClaimContext],
-    operation: str,
-    arguments: dict[str, Any],
-    step: str,
+    runtime: ToolRuntime[ClaimContext], operation: str, arguments: dict[str, Any]
 ) -> dict[str, Any]:
-    """Ask the context layer, and record on the claim what was looked up."""
-    context = runtime.context
-    answer = context.route.call(CONTEXT, operation, arguments)
-    api.record_step(context.claim_id, step)
-    return answer
+    """Ask the context layer."""
+    return runtime.context.route.call(CONTEXT, operation, arguments)
 
 
 @tool
 def lookup_term(term: str, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
     """Look up a term the policy wording defines, with the sections it comes from."""
-    return _look_up(
-        runtime, "lookup_term", {"term": term}, f"Looked up the term {term}"
-    )
+    return _look_up(runtime, "lookup_term", {"term": term})
 
 
 @tool
@@ -60,20 +63,19 @@ def describe_fields(
     record: Record, runtime: ToolRuntime[ClaimContext]
 ) -> dict[str, Any]:
     """Say what each field of a claim, a policy or a previous claim means."""
-    step = f"Looked up the fields of a {record.replace('_', ' ')}"
-    return _look_up(runtime, "describe_fields", {"record": record}, step)
+    return _look_up(runtime, "describe_fields", {"record": record})
 
 
 @tool
 def get_plan(plan: Plan, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
     """Get one plan's limits, waiting periods and deductible, and the add-ons."""
-    return _look_up(runtime, "get_plan", {"plan": plan}, f"Looked up the {plan} plan")
+    return _look_up(runtime, "get_plan", {"plan": plan})
 
 
 @tool
 def get_claim_rules(runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
     """Get the rules claims operations applies to every claim."""
-    return _look_up(runtime, "get_claim_rules", {}, "Looked up the claim rules")
+    return _look_up(runtime, "get_claim_rules", {})
 
 
 @tool
@@ -81,15 +83,13 @@ def search_reference_data(
     query: str, runtime: ToolRuntime[ClaimContext]
 ) -> dict[str, Any]:
     """Search outside facts, such as storms, strikes and prices, for every word."""
-    step = f"Searched the reference data for {query}"
-    return _look_up(runtime, "search_reference_data", {"query": query}, step)
+    return _look_up(runtime, "search_reference_data", {"query": query})
 
 
 @tool
 def search_documents(query: str, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
     """Search the policy wording and the claims manual for sections with every word."""
-    step = f"Searched the documents for {query}"
-    return _look_up(runtime, "search_documents", {"query": query}, step)
+    return _look_up(runtime, "search_documents", {"query": query})
 
 
 @tool
@@ -98,11 +98,7 @@ def read_section(
 ) -> dict[str, Any]:
     """Read one numbered section of the policy wording or the claims manual."""
     arguments = {"document": document, "number": number}
-    name = document.replace("_", " ")
-    section = runtime.context.route.call(CONTEXT, "read_section", arguments)
-    title = section["answer"]["title"]
-    api.record_step(runtime.context.claim_id, f"Read {name} section {number}: {title}")
-    return section
+    return _look_up(runtime, "read_section", arguments)
 
 
 @tool
@@ -149,8 +145,6 @@ def decide_claim(
         "decided_by": context.decided_by,
     }
     context.route.call(APP, "decide_claim", arguments)
-    detail = f" for ${payout:,.2f}" if decision == "approve" else ""
-    api.record_step(context.claim_id, f"Decided: {decision}{detail}")
     return "Recorded"
 
 
@@ -159,9 +153,7 @@ def search_memory(query: str, runtime: ToolRuntime[ClaimContext]) -> list[str]:
     """Search what we remember about this claim's customer from their earlier claims."""
     context = runtime.context
     memory = cast(CustomerMemory, context.memory)  # only offered when memory is on
-    found = memory.search(context.customer_id, query, context.claim_id)
-    api.record_step(context.claim_id, f"Searched the customer's memory for {query}")
-    return found
+    return memory.search(context.customer_id, query, context.claim_id)
 
 
 CLAIM_TOOLS = [

@@ -444,6 +444,58 @@ table.data th.number {
   color: var(--midnight);
 }
 
+/* The agent's steps on a claim: a refusal stands out from the rest. */
+.agent-steps {
+  padding-inline-start: 1.5rem;
+}
+
+.agent-step {
+  margin-block: 0.35rem;
+}
+
+.agent-step .from,
+.context-file .from {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.agent-step.tool-call {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.step-items {
+  margin-block: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.agent-step.refusal {
+  list-style-position: inside;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  background: var(--raspberry);
+  color: #ffffff;
+  opacity: 1;
+}
+
+.context-file {
+  margin-block: 0.75rem;
+}
+
+.context-file h3 {
+  margin-block: 0.25rem;
+}
+
+dl.record {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+dl.record dd {
+  margin: 0;
+}
+
 /* Fits a laptop screen and narrower. */
 @media (max-width: 720px) {
   .panel {

@@ -68,6 +68,12 @@ export interface Claim {
   reason: string | null;
   policy_reference: string | null;
   decided_on: string | null;
+  /** Who or what made the decision, such as the agent with its version. */
+  decided_by: string | null;
+  /** How an approval's payout was worked out, line by line; null otherwise. */
+  calculation: CalculationLine[] | null;
+  /** The claims manual's version in force when the decision was made. */
+  manual_version: string | null;
   over_approval_limit: number | null;
   signed_off_by: string | null;
   signed_off_on: string | null;
@@ -81,10 +87,32 @@ export interface Claim {
   customer_previous_claims: PreviousClaim[];
 }
 
-export interface Step {
+/** One line of a payout's calculation, in whole cents. */
+export interface CalculationLine {
+  step: string;
+  amount: number;
+}
+
+/** The system, owner and review date a context file names for itself. */
+export interface FileSource {
+  system: string;
+  owner: string;
+  reviewed: string;
+}
+
+interface StepBase {
   recorded_on: string;
   text: string;
 }
+
+/** One step of the agent's work on a claim, by what kind of step it is. */
+export type Step =
+  | (StepBase & { kind: "note" })
+  | (StepBase & { kind: "tool_call"; tool: string })
+  | (StepBase & { kind: "lookup"; files: Record<string, FileSource> })
+  | (StepBase & { kind: "memory_search"; found: string[] })
+  | (StepBase & { kind: "memory_save"; saved: string[] })
+  | (StepBase & { kind: "refusal"; source: string; detail: string });
 
 export interface Handler {
   handler_id: string;

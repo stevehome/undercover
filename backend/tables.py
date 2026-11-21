@@ -190,7 +190,9 @@ claim_steps = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("claim_id", String, nullable=False),
     Column("recorded_on", String, nullable=False),
+    Column("kind", String, nullable=False),
     Column("text", String, nullable=False),
+    Column("details", JSON, nullable=False),
 )
 
 runs = Table(

@@ -113,9 +113,9 @@ Puts the app's tools on both routes. The context layer joins them in Phase 2.
 
 **Success criteria**
 
-- [ ] Tests cover each kind of step in the recorder, in the steps route and in `StepList`, and the Context used panel's grouping, and the decision panel with a calculation.
-- [ ] A Playwright end-to-end spec shows a claim's tool calls, a lookup with its file and source, a refusal standing out, the Context used panel and the decision with its calculation, with the data placed through the backend as the other specs do.
-- [ ] `npm run check` passes with `.env` away. `docs/SPEC.md` and `docs/STATUS.md` describe the page. Commit.
+- [x] Tests cover each kind of step in the recorder, in the steps route and in `StepList`, and the Context used panel's grouping, and the decision panel with a calculation.
+- [x] A Playwright end-to-end spec shows a claim's tool calls, a lookup with its file and source, a refusal standing out, the Context used panel and the decision with its calculation, with the data placed through the backend as the other specs do.
+- [x] `npm run check` passes with `.env` away. `docs/SPEC.md` and `docs/STATUS.md` describe the page. Commit.
 
 ## Phase 6: Live checks and the last of the documents
 

@@ -43,7 +43,7 @@ def test_an_approval_over_the_limit_waits_and_a_sign_off_pays_it(
     paid = api.get_claim(CLAIM)
     assert (paid["status"], paid["paid_amount"]) == ("decided", "1200.00")
     assert paid["signed_off_by"] == "HND-01"
-    texts = [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    texts = records.step_texts(backend, CLAIM)
     assert texts[-2:] == [
         "Waiting for a handler to sign off $1200.00",
         "Paid $1200.00",
@@ -68,7 +68,7 @@ def test_an_agent_resumed_after_a_sign_off_finishes_without_paying(
 
     assert not any(path.endswith("/payment") for path in asked)
     assert api.get_claim(CLAIM)["paid_on"] == paid
-    texts = [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    texts = records.step_texts(backend, CLAIM)
     assert "Signed off by HND-01" in texts
 
 
@@ -140,7 +140,7 @@ def test_a_stopped_claim_carries_on_from_its_last_step(backend, script, saver):
 
     claim = api.get_claim(CLAIM)
     assert (claim["thread"], claim["paid_amount"]) == (1, "420.00")
-    steps = [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    steps = records.step_texts(backend, CLAIM)
     assert steps.count("Decided: approve for $420.00") == 1
     assert (
         steps.count("Read the claim, its policy and the customer's claim history") == 1

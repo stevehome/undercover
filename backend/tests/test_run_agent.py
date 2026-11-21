@@ -27,7 +27,10 @@ def test_a_failed_launch_leaves_the_claim_waiting(client, monkeypatch):
 
 
 def test_run_agent_blocked_when_not_waiting(client):
-    client.post("/api/claims/CLM-1001/steps", json={"text": "started"})
+    client.post(
+        "/api/claims/CLM-1001/steps",
+        json={"kind": "note", "text": "started", "details": {}},
+    )
     response = client.post("/api/claims/CLM-1001/run")
     assert response.status_code == 409
 

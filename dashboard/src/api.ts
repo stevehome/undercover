@@ -7,6 +7,7 @@ import type {
   EvalSet,
   Evaluation,
   EvaluationClaim,
+  FileSource,
   Handler,
   Item,
   Run,
@@ -28,13 +29,21 @@ type WireSummary = Omit<ClaimSummary, "amount_claimed"> & {
 
 type WireClaim = Omit<
   Claim,
-  "amount_claimed" | "items" | "payout" | "paid_amount"
+  "amount_claimed" | "items" | "payout" | "paid_amount" | "calculation"
 > & {
   amount_claimed: string;
   items: (Omit<Item, "amount"> & { amount: string })[];
   payout: string | null;
   paid_amount: string | null;
+  calculation: { step: string; amount: string }[] | null;
 };
+
+interface WireStep {
+  recorded_on: string;
+  kind: string;
+  text: string;
+  details: Record<string, unknown>;
+}
 
 const optionalCents = (amount: string | null) =>
   amount === null ? null : parseCents(amount);
@@ -95,11 +104,53 @@ export async function fetchClaim(claimId: string): Promise<Claim> {
     })),
     payout: optionalCents(claim.payout),
     paid_amount: optionalCents(claim.paid_amount),
+    calculation:
+      claim.calculation?.map((line) => ({
+        ...line,
+        amount: parseCents(line.amount),
+      })) ?? null,
   };
 }
 
-export const fetchSteps = (claimId: string) =>
-  getJson<Step[]>(`/api/claims/${claimId}/steps`);
+/** Read a step as the API serves it, by its kind; a kind we don't know is an error. */
+function toStep(wire: WireStep): Step {
+  const base = { recorded_on: wire.recorded_on, text: wire.text };
+  const details = wire.details;
+  switch (wire.kind) {
+    case "note":
+      return { ...base, kind: "note" };
+    case "tool_call":
+      return { ...base, kind: "tool_call", tool: String(details.tool) };
+    case "lookup":
+      return {
+        ...base,
+        kind: "lookup",
+        files: details.files as Record<string, FileSource>,
+      };
+    case "memory_search":
+      return {
+        ...base,
+        kind: "memory_search",
+        found: details.found as string[],
+      };
+    case "memory_save":
+      return { ...base, kind: "memory_save", saved: details.saved as string[] };
+    case "refusal":
+      return {
+        ...base,
+        kind: "refusal",
+        source: String(details.source),
+        detail: String(details.detail),
+      };
+    default:
+      throw new Error(`A step of an unknown kind: ${wire.kind}`);
+  }
+}
+
+export async function fetchSteps(claimId: string): Promise<Step[]> {
+  const steps = await getJson<WireStep[]>(`/api/claims/${claimId}/steps`);
+  return steps.map(toStep);
+}
 
 export const fetchHandlers = () => getJson<Handler[]>("/api/handlers");
 

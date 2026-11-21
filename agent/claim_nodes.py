@@ -110,10 +110,10 @@ def remember(
     if memory is None:
         return {}
     claim_id = runtime.context.claim_id
-    if memory.save_claim(api.get_claim(claim_id)):
-        api.record_step(
-            claim_id, "Saved the claim and its decision to the customer's memory"
-        )
+    saved = memory.save_claim(api.get_claim(claim_id))
+    if saved:
+        text = "Saved the claim and its decision to the customer's memory"
+        api.record_step(claim_id, text, "memory_save", saved=saved)
     return {}
 
 
@@ -140,7 +140,13 @@ def pay(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
     except Refusal as refusal:
         if refusal.source != BY_GATEWAY:
             raise
-        api.record_step(claim_id, refusal.message)
+        api.record_step(
+            claim_id,
+            refusal.message,
+            "refusal",
+            source=refusal.source,
+            detail=refusal.detail,
+        )
         api.hold_for_sign_off(claim_id, GATEWAY_HOLD)
         api.record_step(claim_id, f"Waiting for a handler to sign off ${amount}")
         return {}

@@ -1,5 +1,5 @@
 import { toWireAmount } from "./money";
-import type { Claim, ClaimSummary } from "./types";
+import type { Claim, ClaimSummary, Step } from "./types";
 
 export type FetchInput = string | URL | Request;
 
@@ -21,7 +21,18 @@ export function claimToWire(claim: Claim) {
     payout: claim.payout === null ? null : toWireAmount(claim.payout),
     paid_amount:
       claim.paid_amount === null ? null : toWireAmount(claim.paid_amount),
+    calculation:
+      claim.calculation?.map((line) => ({
+        ...line,
+        amount: toWireAmount(line.amount),
+      })) ?? null,
   };
+}
+
+/** Serve a step as the API does: its kind's own parts under `details`. */
+export function stepToWire(step: Step) {
+  const { recorded_on, kind, text, ...details } = step;
+  return { recorded_on, kind, text, details };
 }
 
 export function summaryToWire(summary: ClaimSummary) {

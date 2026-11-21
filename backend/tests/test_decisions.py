@@ -210,9 +210,13 @@ def test_malformed_amounts_are_rejected(client, amount):
 
 def test_record_step_moves_claim_in_progress_and_lists_in_order(client):
     client.post(
-        "/api/claims/CLM-1001/steps", json={"text": "Read the claim and policy"}
+        "/api/claims/CLM-1001/steps",
+        json={"kind": "note", "text": "Read the claim and policy", "details": {}},
     )
-    client.post("/api/claims/CLM-1001/steps", json={"text": "Read the policy wording"})
+    client.post(
+        "/api/claims/CLM-1001/steps",
+        json={"kind": "note", "text": "Read the policy wording", "details": {}},
+    )
 
     claim = client.get("/api/claims/CLM-1001").json()
     assert claim["status"] == "in progress"

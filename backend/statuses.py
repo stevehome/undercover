@@ -12,6 +12,18 @@ class ClaimStatus(StrEnum):
     DECIDED = "decided"
 
 
+class StepKind(StrEnum):
+    """What a step of the agent's work is: a note, a tool call, a lookup in the
+    context layer, a memory search or save, or a refusal."""
+
+    NOTE = "note"
+    TOOL_CALL = "tool_call"
+    LOOKUP = "lookup"
+    MEMORY_SEARCH = "memory_search"
+    MEMORY_SAVE = "memory_save"
+    REFUSAL = "refusal"
+
+
 class RunKind(StrEnum):
     """What a run is for."""
 

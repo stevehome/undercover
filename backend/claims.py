@@ -8,7 +8,7 @@ from sqlalchemy import insert, or_, select, update
 
 from backend import calculations, db, decision_record, money, payouts, reference, tables
 from backend.errors import Conflict, NotFound
-from backend.statuses import ClaimStatus
+from backend.statuses import ClaimStatus, StepKind
 
 LEASE_SECONDS = 30
 
@@ -132,13 +132,19 @@ def decide(claim_id: str, record: decision_record.Decision) -> dict[str, Any]:
     return row
 
 
-def record_step(claim_id: str, text: str) -> None:
+def record_step(
+    claim_id: str, kind: StepKind, text: str, details: dict[str, Any]
+) -> None:
     """Record one step of the agent's work; a waiting claim becomes in progress."""
     get_row(claim_id)
     with db.connection() as conn:
         conn.execute(
             insert(tables.claim_steps).values(
-                claim_id=claim_id, recorded_on=db.now(), text=text
+                claim_id=claim_id,
+                recorded_on=db.now(),
+                kind=kind,
+                text=text,
+                details=details,
             )
         )
         conn.execute(
@@ -156,7 +162,12 @@ def list_steps(claim_id: str) -> list[dict[str, Any]]:
     get_row(claim_id)
     with db.connection() as conn:
         rows = conn.execute(
-            select(tables.claim_steps.c.recorded_on, tables.claim_steps.c.text)
+            select(
+                tables.claim_steps.c.recorded_on,
+                tables.claim_steps.c.kind,
+                tables.claim_steps.c.text,
+                tables.claim_steps.c.details,
+            )
             .where(tables.claim_steps.c.claim_id == claim_id)
             .order_by(tables.claim_steps.c.id)
         )
@@ -192,7 +203,7 @@ def sign_off(claim_id: str, handler_id: str) -> dict[str, Any]:
     if signed.rowcount == 0:
         raise Conflict("Claim is not waiting for sign-off")
     paid = get_row(claim_id)
-    record_step(claim_id, f"Paid ${paid['paid_amount']}")
+    record_step(claim_id, StepKind.NOTE, f"Paid ${paid['paid_amount']}", {})
     return paid
 
 

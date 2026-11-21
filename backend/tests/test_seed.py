@@ -2,7 +2,10 @@ from backend import db, seed
 
 
 def test_reset_puts_every_claim_back_to_waiting(client):
-    client.post("/api/claims/CLM-1001/steps", json={"text": "started"})
+    client.post(
+        "/api/claims/CLM-1001/steps",
+        json={"kind": "note", "text": "started", "details": {}},
+    )
     assert client.get("/api/claims/CLM-1001").json()["status"] == "in progress"
 
     seed.reset()

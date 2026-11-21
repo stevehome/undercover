@@ -14,6 +14,9 @@ from agent.backend_http import call as _call
 
 Decision = Literal["approve", "decline", "refer"]
 HoldReason = Literal["gateway"]
+StepKind = Literal[
+    "note", "tool_call", "lookup", "memory_search", "memory_save", "refusal"
+]
 GATEWAY_HOLD: HoldReason = "gateway"
 Amount = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=2)]
 Benefit = Literal[
@@ -93,9 +96,12 @@ def get_claim(claim_id: str) -> dict[str, Any]:
     return _call("GET", f"/api/claims/{claim_id}")
 
 
-def record_step(claim_id: str, text: str) -> None:
-    """Record one step of the agent's work on a claim."""
-    _call("POST", f"/api/claims/{claim_id}/steps", json={"text": text})
+def record_step(
+    claim_id: str, text: str, kind: StepKind = "note", **details: Any
+) -> None:
+    """Record one step of the agent's work on a claim, with its kind and details."""
+    body = {"kind": kind, "text": text, "details": details}
+    _call("POST", f"/api/claims/{claim_id}/steps", json=body)
 
 
 class DecisionFields(TypedDict):

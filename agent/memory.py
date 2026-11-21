@@ -69,8 +69,8 @@ class CustomerMemory:
     def __init__(self, store: MemoryStore) -> None:
         self.store = store
 
-    def save_claim(self, claim: dict[str, Any]) -> bool:
-        """Save the claim and its decision, and say whether it was saved.
+    def save_claim(self, claim: dict[str, Any]) -> list[str]:
+        """Save the claim and its decision, and return what was saved, or nothing.
 
         A claim keeps its decision when AgentCore can't be reached: the memory only
         adds what happened on a customer's earlier claims, so a failed save is
@@ -78,19 +78,16 @@ class CustomerMemory:
         where a failure is let go, and only for AWS's own errors.
         """
         namespace = (claim["customer_id"], claim["claim_id"])
+        asked, answered = _claim_text(claim), _decision_text(claim)
         try:
-            self.store.put(
-                namespace, "claim", {"message": HumanMessage(_claim_text(claim))}
-            )
-            self.store.put(
-                namespace, "decision", {"message": AIMessage(_decision_text(claim))}
-            )
+            self.store.put(namespace, "claim", {"message": HumanMessage(asked)})
+            self.store.put(namespace, "decision", {"message": AIMessage(answered)})
         except AWS_ERRORS:
             logger.warning(
                 "Could not save %s to the memory", claim["claim_id"], exc_info=True
             )
-            return False
-        return True
+            return []
+        return [asked, answered]
 
     def search(self, customer_id: str, query: str, claim_id: str) -> list[str]:
         """Return what we remember about the customer, leaving out the claim in hand.

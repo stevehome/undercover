@@ -4,6 +4,7 @@ import pytest
 
 from agent import agents, api, routes
 from agent.direct import DirectRoute
+from agent.tests import records
 from agent.tools import CLAIM_TOOLS
 
 CLAIM = "CLM-1001"
@@ -23,7 +24,7 @@ def decide(kind="approve", payout="420.00"):
 
 
 def steps(backend):
-    return [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    return records.step_texts(backend, CLAIM)
 
 
 @pytest.fixture(params=["direct", "gateway"])

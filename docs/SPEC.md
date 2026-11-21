@@ -49,7 +49,7 @@ A judge grades each explanation in an evaluation against the handler's reason, f
 
 - The queue, with where each claim stands: waiting, in progress, waiting for sign-off or decided.
 - Each claim in full, with the agent's decision and its reasons.
-- What the agent is doing on a claim while it works, step by step.
+- What the agent is doing on a claim while it works, step by step: each tool it calls, each lookup in the context layer with what was looked up and where it came from, each search or save in its memory, and each refusal, which stands out and says who refused it (the app, the context layer, the memory or the Gateway's Policy). A Context used panel lists everything the agent looked up in the context layer, once each, grouped by file, with each file's source. The decision shows its whole record: the payout's calculation line by line, who or what made the decision, when, and the claims manual's version.
 - What each claim cost to work, in model cost and time, and the totals for each dispatch.
 - How well the agent is doing: on a Scoreboard, evaluations on our two labelled sets, the evaluation set and the held-out set, each whole or just its five `tiny` claims. Each shows how often the agent agrees with our handlers, how much its mistakes would cost, how many claims go straight through, and what a claim costs and how long it takes, with each claim's decision beside the handler's.
 - The Improvement page: where a round has got to as it happens, the proposal waiting with what it changes, the rounds so far with their scores before and after, the verdict and the cost, a chart of each version's held-out accuracy and grade, and the recipe's versions.

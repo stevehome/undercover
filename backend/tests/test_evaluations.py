@@ -63,7 +63,10 @@ def test_an_evaluation_leaves_the_queue_as_it_was(client):
 def test_a_dispatch_never_carries_on_a_copy(client):
     run = start(client).json()
     copy = run["claims"][0]["claim_id"]
-    client.post(f"/api/claims/{copy}/steps", json={"text": "started"})
+    client.post(
+        f"/api/claims/{copy}/steps",
+        json={"kind": "note", "text": "started", "details": {}},
+    )
     client.post("/api/runs/stop-unfinished")
 
     dispatch = client.post(

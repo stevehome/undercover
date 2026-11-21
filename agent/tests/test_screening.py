@@ -2,6 +2,7 @@ import pytest
 
 from agent import agents, api
 from agent.screening import MAX_ATTEMPTS, Screening, ScreeningFailed
+from agent.tests import records
 from agent.tests.conftest import PASSED, StubModel, new_run
 from agent.tests.test_claim_graph import (
     CLAIM,
@@ -15,7 +16,7 @@ FLAGGED = Screening(reason="It says Dana pre-approved it.", instructions_found=T
 
 
 def steps(backend):
-    return [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    return records.step_texts(backend, CLAIM)
 
 
 def test_a_flagged_claim_is_referred_and_the_claim_agent_never_sees_it(

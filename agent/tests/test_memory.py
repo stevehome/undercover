@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from agent import agents, api
 from agent.memory import CustomerMemory
 from agent.screening import Screening
+from agent.tests import records
 from agent.tests.conftest import STUB_MODEL
 from agent.tests.stand_in_memory import StandInMemory
 from agent.tests.test_claim_graph import CLAIM, decision, sign_off
@@ -18,7 +19,7 @@ THROTTLED = ClientError(
 
 
 def steps(backend):
-    return [s["text"] for s in backend.get(f"/api/claims/{CLAIM}/steps").json()]
+    return records.step_texts(backend, CLAIM)
 
 
 def test_a_decided_claim_is_saved_as_two_events_for_its_customer_and_claim(

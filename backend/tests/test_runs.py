@@ -26,7 +26,10 @@ def decide(client, claim_id, payout):
 
 def test_a_dispatch_takes_waiting_and_in_progress_claims_oldest_first(client):
     queue = [c["claim_id"] for c in client.get("/api/claims").json()]
-    client.post(f"/api/claims/{queue[3]}/steps", json={"text": "started"})
+    client.post(
+        f"/api/claims/{queue[3]}/steps",
+        json={"kind": "note", "text": "started", "details": {}},
+    )
     decide(client, queue[1], "420.00")
     client.post(f"/api/claims/{queue[1]}/payment", json={"amount": "420.00"})
 
@@ -171,7 +174,10 @@ def test_an_unknown_run_is_404(client):
 
 
 def test_requeue_claim(client):
-    client.post("/api/claims/CLM-1001/steps", json={"text": "started"})
+    client.post(
+        "/api/claims/CLM-1001/steps",
+        json={"kind": "note", "text": "started", "details": {}},
+    )
     assert client.get("/api/claims/CLM-1001").json()["status"] == "in progress"
 
     response = client.post("/api/claims/CLM-1001/requeue")

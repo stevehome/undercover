@@ -1,21 +1,27 @@
 /** Amounts are whole cents inside the dashboard, and two-decimal strings on the wire. */
 
-/** Read a wire amount such as "1234.50" as whole cents. */
+/** Read a wire amount such as "1234.50", or "-50.00", as whole cents. */
 export function parseCents(amount: string): number {
-  const [dollars = "0", cents = ""] = amount.split(".");
-  return Number(dollars) * 100 + Number(cents.padEnd(2, "0"));
+  const negative = amount.startsWith("-");
+  const [dollars = "0", cents = ""] = amount.replace("-", "").split(".");
+  const value = Number(dollars) * 100 + Number(cents.padEnd(2, "0"));
+  return negative ? -value : value;
 }
 
 /** Write whole cents as a wire amount, such as 123450 as "1234.50". */
 export function toWireAmount(cents: number): string {
-  const rest = String(cents % 100).padStart(2, "0");
-  return `${String(Math.trunc(cents / 100))}.${rest}`;
+  const sign = cents < 0 ? "-" : "";
+  const size = Math.abs(cents);
+  const rest = String(size % 100).padStart(2, "0");
+  return `${sign}${String(Math.trunc(size / 100))}.${rest}`;
 }
 
 /** Format whole cents for people, such as 123450 as "$1,234.50". */
 export function formatMoney(cents: number): string {
-  const dollars = Math.trunc(cents / 100).toLocaleString("en-US");
-  return `$${dollars}.${String(cents % 100).padStart(2, "0")}`;
+  const sign = cents < 0 ? "-" : "";
+  const size = Math.abs(cents);
+  const dollars = Math.trunc(size / 100).toLocaleString("en-US");
+  return `${sign}$${dollars}.${String(size % 100).padStart(2, "0")}`;
 }
 
 /** Read a wire model cost such as "0.000138675" as whole billionths of a dollar. */

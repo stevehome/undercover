@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, expect, it, vi } from "vitest";
-import { claimToWire, requestUrl } from "../testHelpers";
+import { claimToWire, requestUrl, stepToWire } from "../testHelpers";
 import type { FetchInput } from "../testHelpers";
 import type { Claim, Step } from "../types";
 import { ClaimPage } from "./ClaimPage";
@@ -38,6 +38,9 @@ function makeClaim(overrides: Partial<Claim>): Claim {
     reason: null,
     policy_reference: null,
     decided_on: null,
+    decided_by: null,
+    calculation: null,
+    manual_version: null,
     over_approval_limit: null,
     signed_off_by: null,
     signed_off_on: null,
@@ -117,15 +120,17 @@ it("runs the agent and polls the step log as it works", async () => {
     [
       {
         recorded_on: "1",
+        kind: "note",
         text: "Read the claim, its policy and the customer's claim history",
       },
     ],
     [
       {
         recorded_on: "1",
+        kind: "note",
         text: "Read the claim, its policy and the customer's claim history",
       },
-      { recorded_on: "2", text: "Decided: approve for $245.00" },
+      { recorded_on: "2", kind: "note", text: "Decided: approve for $245.00" },
     ],
   ];
   let claimCalls = 0;
@@ -141,7 +146,9 @@ it("runs the agent and polls the step log as it works", async () => {
     if (url.endsWith("/steps")) {
       const body = stepLists[Math.min(stepsCalls, stepLists.length - 1)];
       stepsCalls += 1;
-      return Promise.resolve(new Response(JSON.stringify(body)));
+      return Promise.resolve(
+        new Response(JSON.stringify(body.map(stepToWire))),
+      );
     }
     const body =
       claimCalls === 0 ? makeClaim({ status: "waiting" }) : inProgress;
