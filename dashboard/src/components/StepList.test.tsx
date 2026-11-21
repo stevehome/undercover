@@ -79,6 +79,24 @@ it("shows what a lookup asked and the file it came from", () => {
   expect(screen.getByText("plans.yaml").className).toBe("mono");
 });
 
+it("says when a lookup found nothing, with no file to name", () => {
+  render(
+    <StepList
+      steps={[
+        {
+          recorded_on: "1",
+          kind: "lookup",
+          text: "Searched the documents for zebras",
+          files: {},
+        },
+      ]}
+    />,
+  );
+
+  expect(screen.getByText("found nothing")).toBeDefined();
+  expect(screen.queryByText("from")).toBeNull();
+});
+
 it("lists what a memory search found and what a save kept", () => {
   render(<StepList steps={steps} />);
 

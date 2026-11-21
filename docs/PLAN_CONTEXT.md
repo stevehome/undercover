@@ -123,14 +123,14 @@ Run after you reseed once. You stop `npm run dev` and run `npm run seed`, then s
 
 **Success criteria**
 
-- [ ] `npm run dev` starts the backend, the agent's service, the dashboard and the context layer; a `tools/list` call to `http://127.0.0.1:8006/mcp` returns the seven tools.
-- [ ] On the direct route with memory off, `uv run -m agent CLM-1001` decides as before, and `uv run -m agent CLM-1005` then `CLM-1006` each record a complete decision; I report what each decided.
-- [ ] A dispatch at N=25 works the rest of the queue as before, and CLM-1901 is referred by the check with the maker "Security check".
-- [ ] An evaluation of the evaluation set's five tiny claims runs as before and flags none.
-- [ ] Dana Whitfield signs in (Playwright MCP, `HANDLER_PASSWORD` kept out of the transcript) and sees on CLM-1005's and CLM-1006's pages the tool calls, the lookups with where each came from, the Context used panel and the decision with its calculation.
-- [ ] I report what the live runs spent, from the dashboard's totals.
-- [ ] `docs/SPEC.md`, `docs/TECH_STACK.md` (with the brief's Deployment section: the context layer's package, handler and Function URL, and the agent's three settings), `docs/PROCESS.md`, `docs/CODE_STANDARDS.md`, `docs/STATUS.md` and `data/README.md` describe the product as it now is.
-- [ ] `npm run check` is green with `.env` moved out of the way, with the tests from every phase. A final review of the whole change against the checklist in `docs/CODE_STANDARDS.md`. Commit. I don't push.
+- [x] `npm run dev` starts the backend, the agent's service, the dashboard and the context layer; a `tools/list` call to `http://127.0.0.1:8006/mcp` returns the seven tools.
+- [x] On the direct route with memory off, `uv run -m agent CLM-1001` decides as before, and `uv run -m agent CLM-1005` then `CLM-1006` each record a complete decision; I report what each decided.
+- [x] A dispatch at N=25 works the rest of the queue as before, and CLM-1901 is referred by the check with the maker "Security check".
+- [x] An evaluation of the evaluation set's five tiny claims runs as before and flags none.
+- [x] Dana Whitfield signs in (Playwright MCP, `HANDLER_PASSWORD` kept out of the transcript) and sees on CLM-1005's and CLM-1006's pages the tool calls, the lookups with where each came from, the Context used panel and the decision with its calculation.
+- [x] I report what the live runs spent, from the dashboard's totals.
+- [x] `docs/SPEC.md`, `docs/TECH_STACK.md` (with the brief's Deployment section: the context layer's package, handler and Function URL, and the agent's three settings), `docs/PROCESS.md`, `docs/CODE_STANDARDS.md`, `docs/STATUS.md` and `data/README.md` describe the product as it now is.
+- [x] `npm run check` is green with `.env` moved out of the way, with the tests from every phase. A final review of the whole change against the checklist in `docs/CODE_STANDARDS.md`. Commit. I don't push.
 
 ## Things I'd like you to look at
 

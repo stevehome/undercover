@@ -101,6 +101,7 @@ def decide(claim_id: str, record: decision_record.Decision) -> dict[str, Any]:
         kept = calculations.latest(claim_id, row["thread"])
         calculation = decision_record.require_calculation(kept, record.payout)
     over_limit = approval and payouts.needs_sign_off(record.payout)
+    manual_version = reference.document_version("claims_manual")
     with db.connection() as conn:
         decided = conn.execute(
             update(tables.claims)
@@ -119,7 +120,7 @@ def decide(claim_id: str, record: decision_record.Decision) -> dict[str, Any]:
                 decided_on=db.now(),
                 decided_by=record.decided_by,
                 calculation=calculation,
-                manual_version=reference.document_version("claims_manual"),
+                manual_version=manual_version,
                 over_approval_limit=int(over_limit),
             )
         )

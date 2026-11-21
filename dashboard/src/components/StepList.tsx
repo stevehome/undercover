@@ -24,7 +24,7 @@ function StepItem({ step }: Readonly<{ step: Step }>) {
         <li className="agent-step">
           <span>{step.text}</span>{" "}
           <span className="from">
-            from{" "}
+            {Object.keys(step.files).length === 0 ? "found nothing" : "from "}
             {Object.keys(step.files).map((file, index) => (
               <span key={file}>
                 {index > 0 && ", "}
