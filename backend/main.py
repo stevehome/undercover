@@ -123,6 +123,10 @@ class Payment(BaseModel):
     amount: Amount
 
 
+class Hold(BaseModel):
+    reason: Literal["gateway"]
+
+
 class PayoutRequest(BaseModel):
     policy_id: str
     benefit: Benefit
@@ -400,6 +404,14 @@ def list_claim_steps(claim_id: str) -> list[dict[str, Any]]:
 def sign_off_claim(claim_id: str, handler: Senior) -> dict[str, Any]:
     """Sign off an over-limit approved claim as the signed-in handler, which pays it."""
     return claims.sign_off(claim_id, handler["handler_id"])
+
+
+@app.post(
+    "/api/claims/{claim_id}/hold", operation_id="hold_for_sign_off", dependencies=AGENT
+)
+def hold_for_sign_off(claim_id: str, hold: Hold) -> dict[str, Any]:
+    """Hold an approved claim whose payment the Gateway refused for a sign-off."""
+    return claims.hold_for_sign_off(claim_id, hold.reason)
 
 
 @app.post(

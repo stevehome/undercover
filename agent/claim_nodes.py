@@ -10,9 +10,11 @@ from langgraph.runtime import Runtime
 from langgraph.types import interrupt
 
 from agent import api, screening
-from agent.api import WAITING_FOR_SIGN_OFF
+from agent.api import GATEWAY_HOLD, WAITING_FOR_SIGN_OFF
 from agent.claim_state import ClaimState
 from agent.contexts import ClaimContext
+from agent.refusals import BY_GATEWAY, Refusal
+from agent.tool_route import APP
 
 MAX_MODEL_CALLS = 30
 SECURITY_CHECK = "Security check"
@@ -99,8 +101,22 @@ def approval(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any
 
 
 def pay(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
-    """Pay the claim; the backend treats a repeat as done."""
-    claim_id = runtime.context.claim_id
-    api.pay_claim(claim_id, Decimal(state["payout"]))
+    """Pay the claim through the route; the backend treats a repeat as done.
+
+    A payment the Gateway's Policy refuses leaves the claim waiting for a handler's
+    sign-off, which pays it.
+    """
+    context = runtime.context
+    claim_id = context.claim_id
+    amount = Decimal(state["payout"])
+    try:
+        context.route.call(APP, "pay_claim", {"claim_id": claim_id, "amount": amount})
+    except Refusal as refusal:
+        if refusal.source != BY_GATEWAY:
+            raise
+        api.record_step(claim_id, refusal.message)
+        api.hold_for_sign_off(claim_id, GATEWAY_HOLD)
+        api.record_step(claim_id, f"Waiting for a handler to sign off ${amount}")
+        return {}
     api.record_step(claim_id, f"Paid ${state['payout']}")
     return {}

@@ -42,6 +42,7 @@ function makeClaim(overrides: Partial<Claim>): Claim {
     over_approval_limit: 1,
     signed_off_by: null,
     signed_off_on: null,
+    hold_reason: null,
     paid_amount: null,
     paid_on: null,
     evaluation_run_id: null,
@@ -104,6 +105,31 @@ it("lets a handler sign off an over-limit claim", async () => {
   });
 });
 
+it("says the Gateway refused a payment it holds for a sign-off", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => Promise.resolve(new Response(JSON.stringify(handlers)))),
+  );
+
+  render(
+    <MeContext.Provider value={handlers[0]}>
+      <PaymentPanel
+        claim={makeClaim({ payout: 40000, hold_reason: "gateway" })}
+        onUpdated={() => undefined}
+      />
+    </MeContext.Provider>,
+  );
+
+  expect(
+    await screen.findByText(
+      "The Gateway refused this payment, so it needs a handler's sign-off.",
+    ),
+  ).toBeTruthy();
+  expect(
+    screen.queryByText("This payout is over the approval limit."),
+  ).toBeNull();
+});
+
 it("shows a signed-off claim as awaiting payment", async () => {
   vi.stubGlobal(
     "fetch",
@@ -114,6 +140,7 @@ it("shows a signed-off claim as awaiting payment", async () => {
     status: "in progress",
     signed_off_by: "HND-01",
     signed_off_on: "2026-06-03T14:30:00+00:00",
+    hold_reason: null,
   });
   render(<PaymentPanel claim={claim} onUpdated={() => undefined} />);
 
@@ -135,6 +162,7 @@ it("shows the paid amount once a claim has been paid", async () => {
     paid_on: "2026-06-03T00:00:00+00:00",
     signed_off_by: "HND-01",
     signed_off_on: "2026-06-02T09:00:00+00:00",
+    hold_reason: null,
   });
 
   render(<PaymentPanel claim={claim} onUpdated={() => undefined} />);

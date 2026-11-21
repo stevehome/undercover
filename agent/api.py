@@ -14,6 +14,8 @@ from agent.backend_http import call as _call
 
 Document = Literal["policy_wording", "claims_manual"]
 Decision = Literal["approve", "decline", "refer"]
+HoldReason = Literal["gateway"]
+GATEWAY_HOLD: HoldReason = "gateway"
 Amount = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=2)]
 Benefit = Literal[
     "trip_cancellation",
@@ -97,10 +99,10 @@ def list_sections(document: Document) -> list[str]:
     return _call("GET", f"/api/documents/{document}/sections")
 
 
-def get_section(document: Document, heading: str) -> str:
-    """Return the text of one section of a document."""
+def get_section(document: Document, heading: str) -> dict[str, str]:
+    """Return one section of a document, as `{"text": ...}`."""
     params = {"heading": heading}
-    return _call("GET", f"/api/documents/{document}/section", params=params)["text"]
+    return _call("GET", f"/api/documents/{document}/section", params=params)
 
 
 def record_step(claim_id: str, text: str) -> None:
@@ -129,6 +131,11 @@ def pay_claim(claim_id: str, amount: Amount) -> dict[str, Any]:
     """Pay a claim its approved payout, and return the claim."""
     body = {"amount": str(amount)}
     return _call("POST", f"/api/claims/{claim_id}/payment", json=body)
+
+
+def hold_for_sign_off(claim_id: str, reason: HoldReason) -> dict[str, Any]:
+    """Hold an approved, unpaid claim for a handler's sign-off, and return the claim."""
+    return _call("POST", f"/api/claims/{claim_id}/hold", json={"reason": reason})
 
 
 def record_model_call(

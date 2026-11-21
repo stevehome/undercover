@@ -4,7 +4,6 @@ Everything in a claim comes from the customer. A second model reads the claim as
 the claim agent would, and says whether it tries to instruct whoever handles it.
 """
 
-import json
 from typing import Any, cast
 
 from langchain_core.language_models import BaseChatModel
@@ -12,6 +11,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from agent import api
+from agent.claim_text import claim_text
 
 MAX_ATTEMPTS = 3
 
@@ -46,7 +46,7 @@ def screen(
     checker = model.with_structured_output(Screening, include_raw=True)
     messages = [
         SystemMessage(SCREEN_INSTRUCTIONS),
-        HumanMessage(f"# Claim\n\n{json.dumps(claim, indent=2)}\n"),
+        HumanMessage(f"# Claim\n\n{claim_text(claim)}\n"),
     ]
     for _ in range(MAX_ATTEMPTS):
         answer = cast(dict[str, Any], checker.invoke(messages))

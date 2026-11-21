@@ -10,6 +10,8 @@ from typing import Any
 
 import httpx
 
+from agent.refusals import BY_APP, Refusal
+
 BACKEND_URL = os.environ.get("UNDERCOVER_BACKEND", "http://localhost:8000")
 TIMEOUT_SECONDS = 30
 API_KEY_VARIABLE = "UNDERCOVER_API_KEY"
@@ -32,13 +34,12 @@ def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
     return client.request(method, path, headers=headers, **kwargs)
 
 
-class ApiRefusal(Exception):  # noqa: N818 - a refusal, not a failure
+class ApiRefusal(Refusal):
     """The backend refused a request; the message says why, for the model to read."""
 
     def __init__(self, status_code: int, detail: str) -> None:
-        super().__init__(f"{status_code}: {detail}")
+        super().__init__(BY_APP, detail)
         self.status_code = status_code
-        self.detail = detail
 
 
 def _answer(response: httpx.Response) -> Any:

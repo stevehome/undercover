@@ -71,6 +71,8 @@ export interface Claim {
   over_approval_limit: number | null;
   signed_off_by: string | null;
   signed_off_on: string | null;
+  /** Why a payout waits for a sign-off besides its size: the Gateway refused it. */
+  hold_reason: "gateway" | null;
   paid_amount: number | null;
   paid_on: string | null;
   /** The evaluation this claim is a copy for, or null for a queue claim. */

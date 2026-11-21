@@ -54,7 +54,11 @@ export function PaymentPanel({
     return (
       <section>
         <h2>Sign off</h2>
-        <p>This payout is over the approval limit.</p>
+        <p>
+          {claim.hold_reason === "gateway"
+            ? "The Gateway refused this payment, so it needs a handler's sign-off."
+            : "This payout is over the approval limit."}
+        </p>
         <SignOff claimId={claim.claim_id} onUpdated={onUpdated} />
       </section>
     );

@@ -46,15 +46,15 @@ Puts the app's tools on both routes. The context layer joins them in Phase 2.
 
 **Success criteria**
 
-- [ ] Through the stand-in Gateway, `get_claim`, `calculate_payout`, `decide_claim` and the payment arrive as `undercover-app___<operation>`, signed with SigV4 for `bedrock-agentcore` (a test reads the request's credential scope).
-- [ ] On the direct route the same tools have the same names and inputs, and none of them has a claim, policy or customer id among the model's inputs (a test over the tools' schemas).
-- [ ] A refusal by the app reaches the model as a refusal with its reason on each route, and never as a success.
-- [ ] A refusal by the Gateway's Policy on a tool is recorded on the claim as the Gateway's, and the model's next call goes ahead.
-- [ ] A payment the Gateway refuses leaves the claim waiting for sign-off with reason `gateway`, and a handler's sign-off then pays it once, with their name and the time (graph test and backend test). `hold_for_sign_off` answers 409 for a claim that isn't approved and unpaid, and 401 to a handler's sign-in.
-- [ ] The three variables are read when a claim graph is built: a test sets them after the modules are imported.
-- [ ] After a Gateway call the main thread still has an event loop, so the Mangum tests pass in the same process.
-- [ ] `PaymentPanel` shows the right sentence for each reason (vitest).
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md`, `docs/CODE_STANDARDS.md` (the rule on how the agent reaches the backend: one module for each route) and `docs/STATUS.md` describe it. Commit.
+- [x] Through the stand-in Gateway, `get_claim`, `calculate_payout`, `decide_claim` and the payment arrive as `undercover-app___<operation>`, signed with SigV4 for `bedrock-agentcore` (a test reads the request's credential scope).
+- [x] On the direct route the same tools have the same names and inputs, and none of them has a claim, policy or customer id among the model's inputs (a test over the tools' schemas).
+- [x] A refusal by the app reaches the model as a refusal with its reason on each route, and never as a success.
+- [x] A refusal by the Gateway's Policy on a tool is recorded on the claim as the Gateway's, and the model's next call goes ahead.
+- [x] A payment the Gateway refuses leaves the claim waiting for sign-off with reason `gateway`, and a handler's sign-off then pays it once, with their name and the time (graph test and backend test). `hold_for_sign_off` answers 409 for a claim that isn't approved and unpaid, and 401 to a handler's sign-in.
+- [x] The three variables are read when a claim graph is built: a test sets them after the modules are imported.
+- [x] After a Gateway call the main thread still has an event loop, so the Mangum tests pass in the same process.
+- [x] `PaymentPanel` shows the right sentence for each reason (vitest).
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md`, `docs/CODE_STANDARDS.md` (the rule on how the agent reaches the backend: one module for each route) and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 2: The context layer
 

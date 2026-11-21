@@ -4,7 +4,15 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-HTTP_CLIENTS = {"api.py", "backend_http.py", "deadline.py", "improver_api.py"}
+HTTP_CLIENTS = {
+    "api.py",
+    "backend_http.py",
+    "deadline.py",
+    "improver_api.py",
+    "mcp_connection.py",
+    "sigv4.py",
+}
+GATEWAY = "gateway.py"
 AGENT_MODULES = [p for p in (ROOT / "agent").glob("*.py") if p.name not in HTTP_CLIENTS]
 
 
@@ -38,9 +46,17 @@ def test_backend_routes_hold_no_sql():
 
 
 def test_no_float_annotations_for_money():
+    """Never a float for an amount. The one exception is the wire to the Gateway,
+    whose schema says an amount is a number: `gateway.py` may call `float` on a
+    `Decimal` there, and nowhere else may.
+    """
     for path in [*AGENT_MODULES, *(ROOT / "backend").glob("*.py")]:
-        for node in ast.walk(ast.parse(path.read_text())):
-            assert not (isinstance(node, ast.Name) and node.id == "float"), path.name
+        tree = ast.parse(path.read_text())
+        calls = {id(n.func) for n in ast.walk(tree) if isinstance(n, ast.Call)}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id == "float":
+                assert path.name == GATEWAY, path.name
+                assert id(node) in calls, path.name
 
 
 def test_backend_never_imports_the_agent():

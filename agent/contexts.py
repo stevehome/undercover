@@ -2,13 +2,18 @@
 
 from dataclasses import dataclass
 
+from agent.tool_route import ToolRoute
+
 
 @dataclass
 class ClaimContext:
-    """The claim an agent is deciding, and the run it is worked in, if any."""
+    """The claim an agent is deciding, its policy, the run it is worked in if any, and
+    the route its tools take. The model acts only on this claim."""
 
     claim_id: str
     run_id: int | None
+    policy_id: str
+    route: ToolRoute
 
 
 @dataclass

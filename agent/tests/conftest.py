@@ -1,5 +1,7 @@
 from typing import Any
 
+import boto3
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
@@ -8,7 +10,11 @@ from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import InMemorySaver
 
 from agent import api, backend_http, harness
+from agent.gateway import GatewayRoute
+from agent.mcp_connection import McpConnection
 from agent.screening import Screening
+from agent.sigv4 import SigV4Auth
+from agent.tests.gateway_stand_in import StandInGateway, answer
 from backend.main import app
 from conftest import API_KEY
 
@@ -120,3 +126,49 @@ def script():
 def saver():
     """Saved progress in memory; reuse it across two runs to stand for a restart."""
     return InMemorySaver()
+
+
+@pytest.fixture
+def gateway(backend):
+    """A stand-in Gateway whose app tools are the backend's operations."""
+    stand_in = StandInGateway()
+    app = "undercover-app___"
+    tools = stand_in.tools
+    tools[app + "get_claim"] = lambda a: answer(
+        backend.get(f"/api/claims/{a['claim_id']}")
+    )
+    tools[app + "list_sections"] = lambda a: answer(
+        backend.get(f"/api/documents/{a['document']}/sections")
+    )
+    tools[app + "get_section"] = lambda a: answer(
+        backend.get(
+            f"/api/documents/{a['document']}/section", params={"heading": a["heading"]}
+        )
+    )
+    tools[app + "calculate_payout"] = lambda a: answer(
+        backend.post("/api/payouts", json=a)
+    )
+    tools[app + "decide_claim"] = lambda a: answer(
+        backend.post(f"/api/claims/{a['claim_id']}/decision", json=a)
+    )
+    tools[app + "pay_claim"] = lambda a: answer(
+        backend.post(f"/api/claims/{a['claim_id']}/payment", json=a)
+    )
+    return stand_in
+
+
+@pytest.fixture
+def signed_gateway_route(gateway):
+    """A route to the stand-in Gateway, signing as the real one is signed."""
+    session = boto3.Session(
+        aws_access_key_id="AKIATESTKEY",
+        aws_secret_access_key="secret",  # noqa: S106 - a made-up test key
+        region_name="us-east-1",
+    )
+    url = "http://gateway.test/mcp"
+    connection = McpConnection(
+        url,
+        auth=SigV4Auth("bedrock-agentcore", session),
+        transport=httpx.ASGITransport(app=gateway.app),
+    )
+    return GatewayRoute(url, connection)

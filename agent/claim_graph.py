@@ -14,8 +14,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 
-from agent import claim_nodes
-from agent.backend_http import ApiRefusal
+from agent import claim_nodes, step_recording
 from agent.claim_state import ClaimState
 from agent.contexts import ClaimContext
 from agent.tools import CLAIM_TOOLS
@@ -58,7 +57,14 @@ def build_graph(
             instructions=instructions,
         ),
     )
-    builder.add_node("tools", ToolNode(CLAIM_TOOLS, handle_tool_errors=ApiRefusal))
+    builder.add_node(
+        "tools",
+        ToolNode(
+            CLAIM_TOOLS,
+            handle_tool_errors=False,
+            wrap_tool_call=step_recording.record_tool_call,
+        ),
+    )
     builder.add_node("settle", claim_nodes.settle)
     builder.add_node("approval", claim_nodes.approval)
     builder.add_node("pay", claim_nodes.pay)

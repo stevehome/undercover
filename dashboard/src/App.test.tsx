@@ -49,6 +49,7 @@ const claim: Claim = {
   over_approval_limit: null,
   signed_off_by: null,
   signed_off_on: null,
+  hold_reason: null,
   paid_amount: null,
   paid_on: null,
   evaluation_run_id: null,

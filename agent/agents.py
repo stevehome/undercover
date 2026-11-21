@@ -8,7 +8,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 
-from agent import api, checkpoint, harness, lease, timing, tracing
+from agent import api, checkpoint, harness, lease, routes, timing, tracing
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
@@ -32,6 +32,9 @@ def decide_claim(
 
     The claim is checked for hidden instructions first, by `screening_llm` (the
     check's own model when there is none), and one that has any goes to a handler.
+
+    The model's tools and the payment take the route chosen when the claim's context
+    is built: the Gateway's when `UNDERCOVER_GATEWAY_URL` is set, else direct.
 
     A claim waiting at its sign-off carries on only once a handler has signed off.
     A claim another agent is working is left to that agent.
@@ -84,7 +87,10 @@ def _work_traced(
 
 
 def _work(
-    graph: Any, config: RunnableConfig, claim: dict[str, Any], run_id: int | None
+    graph: Any,
+    config: RunnableConfig,
+    claim: dict[str, Any],
+    run_id: int | None,
 ) -> str:
     """Start the claim's graph, carry it on, or answer a sign-off."""
     claim_id = claim["claim_id"]
@@ -97,7 +103,7 @@ def _work(
         start = Command(resume={"handler": claim["signed_off_by"]})
     else:
         start = None if state.next else new_claim(claim_id)
-    context = ClaimContext(claim_id, run_id)
+    context = ClaimContext(claim_id, run_id, claim["policy_id"], routes.choose())
     with timing.segment(claim_id, run_id):
         result = graph.invoke(start, config, context=context, durability="sync")
     return result["messages"][-1].text

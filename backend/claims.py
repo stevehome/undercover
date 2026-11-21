@@ -170,6 +170,40 @@ def sign_off(claim_id: str, handler_id: str) -> dict[str, Any]:
     return paid
 
 
+def hold_for_sign_off(claim_id: str, reason: str) -> dict[str, Any]:
+    """Hold an approved, unpaid claim for a handler's sign-off, which then pays it.
+
+    The agent's payment was refused where the app can't see: by the Gateway's
+    Policy. Repeating the hold is done, not an error.
+    """
+    row = get_row(claim_id)
+    if (
+        row["status"] == ClaimStatus.WAITING_FOR_SIGN_OFF
+        and row["hold_reason"] == reason
+    ):
+        return row
+    columns = tables.claims.c
+    with db.connection() as conn:
+        held = conn.execute(
+            update(tables.claims)
+            .where(
+                columns.claim_id == claim_id,
+                columns.status == ClaimStatus.DECIDED,
+                columns.decision == "approve",
+                columns.paid_cents.is_(None),
+                columns.signed_off_by.is_(None),
+            )
+            .values(
+                status=ClaimStatus.WAITING_FOR_SIGN_OFF,
+                over_approval_limit=1,
+                hold_reason=reason,
+            )
+        )
+    if held.rowcount == 0:
+        raise Conflict("Claim is not an approved claim waiting to be paid")
+    return get_row(claim_id)
+
+
 def _why_not_payable(row: dict[str, Any], amount: Decimal) -> str:
     if row["paid_amount"] is not None:
         return "Claim has already been paid"
