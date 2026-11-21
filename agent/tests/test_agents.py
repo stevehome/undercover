@@ -6,10 +6,9 @@ from agent import agents, api
 def test_decide_claim_reads_then_decides(backend, script, saver):
     llm = script(
         ("get_claim", {}),
-        ("list_sections", {"document": "policy_wording"}),
-        ("read_section", {"document": "policy_wording", "heading": "3. Trip Delay"}),
-        ("list_sections", {"document": "claims_manual"}),
-        ("read_section", {"document": "claims_manual", "heading": "9. Repeat claims"}),
+        ("search_documents", {"query": "trip delay"}),
+        ("read_section", {"document": "policy_wording", "number": 3}),
+        ("read_section", {"document": "claims_manual", "number": 9}),
         (
             "decide_claim",
             {
@@ -33,8 +32,9 @@ def test_decide_claim_reads_then_decides(backend, script, saver):
     assert [step["text"] for step in steps] == [
         "Security check: no instructions found",
         "Read the claim, its policy and the customer's claim history",
-        "Read policy wording section: 3. Trip Delay",
-        "Read claims manual section: 9. Repeat claims",
+        "Searched the documents for trip delay",
+        "Read policy wording section 3: Trip Delay",
+        "Read claims manual section 9: Repeat claims",
         "Decided: approve for $420.00",
         "Paid $420.00",
     ]

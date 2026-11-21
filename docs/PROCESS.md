@@ -1,11 +1,11 @@
 # Process
 
-`uv sync` and `npm install` at the repo root install everything, including a git pre-commit hook. `npm run dev` starts the backend, the agent's service and the dashboard, with the variables in `.env`. `npm run seed` resets the database to the seeded queue; stop `npm run dev` first. `npm run build` builds the dashboard into `dashboard/dist`, which the backend then serves itself.
+`uv sync` and `npm install` at the repo root install everything, including a git pre-commit hook. `npm run dev` starts the backend, the agent's service, the dashboard and the context layer (on :8006), with the variables in `.env`. `npm run seed` resets the database to the seeded queue; stop `npm run dev` first. `npm run build` builds the dashboard into `dashboard/dist`, which the backend then serves itself.
 
 `npm run check` runs every check, and needs no Supabase, Langfuse or OpenRouter, so it passes with `.env` moved out of the way:
 
 - Python: ruff (lint and format), pyright, and pytest with 80% coverage
-- The server check (`npm run check:server`): the backend imports with only the `server` dependency group, which is what goes to Lambda
+- The server check (`npm run check:server`): the backend imports with only the `server` dependency group, which is what goes to Lambda; and `npm run check:context` does the same for the context layer's `context` group
 - TypeScript: ESLint, Prettier, tsc, and vitest with 80% coverage
 - Playwright end-to-end tests
 

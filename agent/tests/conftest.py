@@ -1,8 +1,12 @@
+import json
+import threading
+import time
 from typing import Any
 
 import boto3
 import httpx
 import pytest
+import uvicorn
 from fastapi.testclient import TestClient
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
@@ -17,6 +21,7 @@ from agent.sigv4 import SigV4Auth
 from agent.tests.gateway_stand_in import StandInGateway, answer
 from backend.main import app
 from conftest import API_KEY
+from context import server as context_server
 
 REPLY_USAGE = {
     "model_name": "stub/model",
@@ -137,14 +142,6 @@ def gateway(backend):
     tools[app + "get_claim"] = lambda a: answer(
         backend.get(f"/api/claims/{a['claim_id']}")
     )
-    tools[app + "list_sections"] = lambda a: answer(
-        backend.get(f"/api/documents/{a['document']}/sections")
-    )
-    tools[app + "get_section"] = lambda a: answer(
-        backend.get(
-            f"/api/documents/{a['document']}/section", params={"heading": a["heading"]}
-        )
-    )
     tools[app + "calculate_payout"] = lambda a: answer(
         backend.post("/api/payouts", json=a)
     )
@@ -154,7 +151,21 @@ def gateway(backend):
     tools[app + "pay_claim"] = lambda a: answer(
         backend.post(f"/api/claims/{a['claim_id']}/payment", json=a)
     )
+    for tool in context_server.TOOLS:
+        tools["undercover-context___" + tool.__name__] = _context_tool(tool)
     return stand_in
+
+
+def _context_tool(function):
+    """A stand-in Gateway tool that is a tool of the real context layer."""
+
+    def call(arguments):
+        try:
+            return json.dumps(function(**arguments)), False
+        except ValueError as error:
+            return str(error), True
+
+    return call
 
 
 @pytest.fixture
@@ -172,3 +183,26 @@ def signed_gateway_route(gateway):
         transport=httpx.ASGITransport(app=gateway.app),
     )
     return GatewayRoute(url, connection)
+
+
+@pytest.fixture(scope="session")
+def context_server_url():
+    """The real context layer, serving on a local port for the whole test run."""
+    app = context_server.build_server().streamable_http_app()
+    server = uvicorn.Server(
+        uvicorn.Config(app, host="127.0.0.1", port=0, log_level="warning")
+    )
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    while not server.started:
+        time.sleep(0.01)
+    port = server.servers[0].sockets[0].getsockname()[1]
+    yield f"http://127.0.0.1:{port}/mcp"
+    server.should_exit = True
+    thread.join()
+
+
+@pytest.fixture(autouse=True)
+def context_layer(monkeypatch, context_server_url):
+    """Point the direct route's context layer at the real one."""
+    monkeypatch.setenv("UNDERCOVER_CONTEXT", context_server_url)

@@ -8,6 +8,7 @@ HTTP_CLIENTS = {
     "api.py",
     "backend_http.py",
     "deadline.py",
+    "direct.py",
     "improver_api.py",
     "mcp_connection.py",
     "sigv4.py",
@@ -201,3 +202,19 @@ def test_only_screening_holds_the_checks_instructions():
     assert holders == ["screening.py"]
     for name in ("improver.py", "improver_tools.py", "improver_api.py", "tools.py"):
         assert "screening" not in (ROOT / "agent" / name).read_text(), name
+
+
+def test_only_seed_data_reads_the_context_layers_files():
+    """The app needs `context/` only while seeding: its Lambda package has none."""
+    for path in (ROOT / "backend").glob("*.py"):
+        if path.name != "seed_data.py":
+            text = path.read_text()
+            assert "context.files" not in text, path.name
+            modules = {m.split(".")[0] for m in _imported_modules(path)}
+            assert "context" not in modules, path.name
+
+
+def test_the_app_no_longer_reads_the_files_that_moved_to_the_context_layer():
+    text = (ROOT / "backend" / "seed_data.py").read_text()
+    for name in ("plans.json", "policy_wording.md", "claims_manual.md"):
+        assert name not in text, name

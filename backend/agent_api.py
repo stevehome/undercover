@@ -8,8 +8,6 @@ from starlette.routing import BaseRoute
 
 AGENT_OPERATIONS = {
     "get_claim",
-    "list_sections",
-    "get_section",
     "calculate_payout",
     "decide_claim",
     "pay_claim",

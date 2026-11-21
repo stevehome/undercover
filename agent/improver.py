@@ -31,11 +31,12 @@ STOPPED = "stopped"
 INSTRUCTIONS = """You improve the configuration of UnderCover's claim agent, an \
 AI agent that decides travel insurance claims, and then your own recipe.
 
-The claim agent works from its instructions, the policy wording and the claims \
-manual, which it searches and reads by section as it needs, the claim, the policy \
-and the customer's earlier claims, and its tools for working out a payout. It never \
-sees the handlers' decisions or the scores. You may change only its instructions, \
-its model and its reasoning effort, and only to the models allowed.
+The claim agent works from its instructions, the claim, the policy and the \
+customer's earlier claims, its tools for working out a payout, and the context \
+layer: the policy wording and the claims manual, which it searches and reads by \
+section as it needs, and the plans, claim rules, definitions and outside facts. It \
+never sees the handlers' decisions or the scores. You may change only its \
+instructions, its model and its reasoning effort, and only to the models allowed.
 
 A model allowed, at a reasoning effort allowed for it, that neither the current \
 version nor any earlier round's version has used is always a change worth trying. \

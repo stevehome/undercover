@@ -5,7 +5,7 @@ from agent.direct import DirectRoute
 from agent.tools import CLAIM_TOOLS
 
 CLAIM = "CLM-1001"
-SECTIONS = ("list_sections", {"document": "policy_wording"})
+TERM = ("lookup_term", {"term": "carrier"})
 LINE = {"description": "Hotel", "amount": "420.00", "kind": "expense"}
 PAYOUT = ("calculate_payout", {"benefit": "trip_delay", "lines": [LINE]})
 
@@ -93,9 +93,9 @@ def test_a_refusal_by_the_app_reaches_the_model_and_the_claim_goes_on(
 def test_a_tool_the_gateways_policy_refuses_is_recorded_as_the_gateways(
     backend, script, saver, on_gateway
 ):
-    on_gateway.denied.add("undercover-app___list_sections")
+    on_gateway.denied.add("undercover-context___lookup_term")
 
-    agents.decide_claim(CLAIM, script(SECTIONS, PAYOUT, decide(), "Approved."), saver)
+    agents.decide_claim(CLAIM, script(TERM, PAYOUT, decide(), "Approved."), saver)
 
     refusals = [s for s in steps(backend) if s.startswith("Refused by the Gateway: ")]
     assert len(refusals) == 1
@@ -123,3 +123,63 @@ def test_a_payment_the_gateway_refuses_waits_for_a_sign_off_which_pays_it_once(
     assert paid["signed_off_by"] == "HND-01"
     assert paid["signed_off_on"]
     assert on_gateway.names.count("undercover-app___pay_claim") == 1
+
+
+CONTEXT_CALLS = [
+    ("lookup_term", {"term": "carrier"}),
+    ("describe_fields", {"record": "claim"}),
+    ("get_plan", {"plan": "premium"}),
+    ("get_claim_rules", {}),
+    ("search_reference_data", {"query": "tropical storm"}),
+    ("search_documents", {"query": "sign off"}),
+    ("read_section", {"document": "claims_manual", "number": 14}),
+]
+
+
+def test_all_seven_context_tools_answer_on_either_route(
+    backend, script, saver, on_route
+):
+    reply = script(*CONTEXT_CALLS, decide(), "Approved.")
+
+    agents.decide_claim(CLAIM, reply, saver)
+
+    texts = steps(backend)
+    assert "Looked up the term carrier" in texts
+    assert "Looked up the fields of a claim" in texts
+    assert "Looked up the premium plan" in texts
+    assert "Looked up the claim rules" in texts
+    assert "Searched the reference data for tropical storm" in texts
+    assert "Searched the documents for sign off" in texts
+    assert "Read claims manual section 14: Records" in texts
+    assert not any(t.startswith("Refused") for t in texts)
+
+
+def test_the_gateway_names_the_context_layers_tools_after_its_target(
+    script, saver, on_gateway
+):
+    agents.decide_claim(CLAIM, script(*CONTEXT_CALLS, decide(), "Done."), saver)
+
+    context_calls = [n for n in on_gateway.names if "context" in n]
+    assert context_calls == [
+        "undercover-context___lookup_term",
+        "undercover-context___describe_fields",
+        "undercover-context___get_plan",
+        "undercover-context___get_claim_rules",
+        "undercover-context___search_reference_data",
+        "undercover-context___search_documents",
+        "undercover-context___read_section",
+    ]
+
+
+def test_a_section_that_does_not_exist_is_a_refusal_by_the_context_layer(
+    backend, script, saver, on_route
+):
+    missing = ("read_section", {"document": "claims_manual", "number": 99})
+
+    agents.decide_claim(CLAIM, script(missing, decide(), "Approved."), saver)
+
+    refusals = [s for s in steps(backend) if s.startswith("Refused by")]
+    assert len(refusals) == 1
+    assert refusals[0].startswith("Refused by the context layer: ")
+    assert "no section 99" in refusals[0]
+    assert api.get_claim(CLAIM)["status"] == "decided"

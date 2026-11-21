@@ -1,5 +1,6 @@
 """The starting records: reads `data/` into rows for the tables."""
 
+import importlib
 import json
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -12,7 +13,7 @@ from backend import money, tables
 from backend.statuses import ClaimStatus, Verdict
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-DOCUMENTS = {"policy_wording": "policy_wording.md", "claims_manual": "claims_manual.md"}
+DOCUMENTS = ("policy_wording", "claims_manual")
 
 
 def _load_json(name: str) -> Any:
@@ -29,30 +30,26 @@ def _with_security(name: str) -> Any:
     return [*_load_json(name), *_load_json(f"security/{name}")]
 
 
-def _sections(text: str) -> list[tuple[str, str]]:
-    """Split a Markdown document into its ``##``-headed sections, in order."""
-    sections: list[tuple[str, str]] = []
-    heading: str | None = None
-    lines: list[str] = []
-    for line in text.splitlines():
-        if line.startswith("## "):
-            if heading is not None:
-                sections.append((heading, "\n".join(lines).strip()))
-            heading, lines = line.removeprefix("## ").strip(), []
-        elif heading is not None:
-            lines.append(line)
-    if heading is not None:
-        sections.append((heading, "\n".join(lines).strip()))
-    return sections
+def _context_files() -> Any:
+    """The context layer's file readers.
+
+    The app needs `context/` only while seeding, and its Lambda package has none, so
+    this is loaded when seeding and not when the app is imported.
+    """
+    return importlib.import_module("context.files")
+
+
+def _plans() -> Any:
+    """The plans and add-ons from the context layer's file, in `Decimal` dollars."""
+    return money.convert(_context_files().read_data("plans.yaml").content)
 
 
 def _document_rows() -> list[dict[str, Any]]:
+    """The policy wording and the claims manual, each with its version."""
+    documents = [_context_files().read_document(name) for name in DOCUMENTS]
     return [
-        {"document": document, "position": position, "heading": heading, "text": text}
-        for document, filename in DOCUMENTS.items()
-        for position, (heading, text) in enumerate(
-            _sections((DATA_DIR / filename).read_text())
-        )
+        {"document": doc.name, "version": doc.version, "text": doc.body}
+        for doc in documents
     ]
 
 
@@ -107,7 +104,7 @@ def _first_version(**content: str) -> dict[str, Any]:
 
 def records() -> dict[Table, list[dict[str, Any]]]:
     """Return every table's starting rows."""
-    plan_data = _load_json("plans.json")
+    plan_data = _plans()
     return {
         tables.settings: [
             {"key": key, "value": value}
@@ -136,7 +133,7 @@ def records() -> dict[Table, list[dict[str, Any]]]:
         tables.policies: _with_security("policies.json"),
         tables.customers: _with_security("customers.json"),
         tables.handlers: _load_json("handlers.json"),
-        tables.document_sections: _document_rows(),
+        tables.documents: _document_rows(),
         tables.claims: [_claim_row(claim) for claim in _with_security("claims.json")],
         tables.held_out_claims: [
             _held_out_row(claim) for claim in _load_json("evals/held_out_claims.json")

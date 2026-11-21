@@ -6,6 +6,7 @@ import pytest
 
 from backend import money, reference
 from backend.errors import NotFound
+from context import files
 
 DATA = Path(__file__).resolve().parents[2] / "data"
 
@@ -34,8 +35,8 @@ def test_handlers_match_their_file():
     assert reference.handler_by_email("nobody@undercover.example") is None
 
 
-def test_plans_and_add_ons_match_their_file():
-    file = from_file("plans.json")
+def test_plans_and_add_ons_match_the_context_layers_file():
+    file = money.convert(files.read_data("plans.yaml").content)
     for plan in file["plans"]:
         assert reference.plan(plan["plan"]) == plan
     for add_on in file["add_ons"]:
@@ -45,21 +46,6 @@ def test_plans_and_add_ons_match_their_file():
     )
 
 
-def test_sections_come_in_the_order_of_the_document():
-    headings = list(reference.sections("policy_wording"))
-    text = (DATA / "policy_wording.md").read_text()
-    in_file = [
-        line.removeprefix("## ").strip()
-        for line in text.splitlines()
-        if line.startswith("## ")
-    ]
-    assert headings == in_file
-    assert "Trip Delay" in " ".join(
-        headings + list(reference.sections("claims_manual"))
-    )
-    assert reference.section("policy_wording", headings[0])
-
-
 @pytest.mark.parametrize(
     "lookup",
     [
@@ -67,8 +53,6 @@ def test_sections_come_in_the_order_of_the_document():
         lambda: reference.customer("CUS-9999"),
         lambda: reference.plan("gold"),
         lambda: reference.add_on("jetpack"),
-        lambda: reference.sections("diary"),
-        lambda: reference.section("policy_wording", "Nothing"),
     ],
 )
 def test_a_missing_record_raises_not_found(lookup):

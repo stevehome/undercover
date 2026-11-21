@@ -89,12 +89,11 @@ handlers = Table(
     Column("can_approve_over_limit", Boolean, nullable=False),
 )
 
-document_sections = Table(
-    "document_sections",
+documents = Table(
+    "documents",
     metadata,
     Column("document", String, primary_key=True),
-    Column("position", Integer, primary_key=True),
-    Column("heading", String, nullable=False),
+    Column("version", String, nullable=False),
     Column("text", String, nullable=False),
 )
 

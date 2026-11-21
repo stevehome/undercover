@@ -17,7 +17,14 @@ MARCUS = "marcus.oyelaran@undercover.example"
 @pytest.fixture(autouse=True)
 def no_outside_services(monkeypatch):
     """Tests run on SQLite and make no network calls, whatever .env holds."""
-    for name in ("DATABASE_URL", "LANGFUSE_SECRET_KEY", "LANGFUSE_PUBLIC_KEY"):
+    for name in (
+        "DATABASE_URL",
+        "LANGFUSE_SECRET_KEY",
+        "LANGFUSE_PUBLIC_KEY",
+        "UNDERCOVER_GATEWAY_URL",
+        "UNDERCOVER_CONTEXT",
+        "UNDERCOVER_MEMORY_ID",
+    ):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("UNDERCOVER_AGENT", "http://127.0.0.1:9")
     monkeypatch.setenv("UNDERCOVER_API_KEY", API_KEY)

@@ -68,13 +68,13 @@ Puts the app's tools on both routes. The context layer joins them in Phase 2.
 
 **Success criteria**
 
-- [ ] Each tool is called against the real files in `context/`: a known term in any case, an unknown term (which lists the terms), each record's fields, each plan, the claim rules, a reference-data search with every word, a document search, a section read, and a section that doesn't exist. Every answer names its file and source.
-- [ ] A test lists the tools: seven, all read-only, each with a one-line description and no optional input.
-- [ ] A test calls `context.server.handler` with Function URL events, with a Function URL's host, twice in one process, listing the tools and then calling one, and both succeed.
-- [ ] `npm run check:context` passes, and fails when an import is added that the group lacks (tried once and undone).
-- [ ] The agent's API document test expects four operations. After seeding, the plans match `plans.yaml` and the two documents are in `documents` with versions `2026.1` and `2026.2`.
-- [ ] With `npm run dev` running, the claim agent's tools from the context layer answer on the direct route (a test with the real server on a local port).
-- [ ] `npm run check` passes with `.env` away. `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md` and `data/README.md` describe the layer. Commit.
+- [x] Each tool is called against the real files in `context/`: a known term in any case, an unknown term (which lists the terms), each record's fields, each plan, the claim rules, a reference-data search with every word, a document search, a section read, and a section that doesn't exist. Every answer names its file and source.
+- [x] A test lists the tools: seven, all read-only, each with a one-line description and no optional input.
+- [x] A test calls `context.server.handler` with Function URL events, with a Function URL's host, twice in one process, listing the tools and then calling one, and both succeed.
+- [x] `npm run check:context` passes, and fails when an import is added that the group lacks (tried once and undone).
+- [x] The agent's API document test expects four operations. After seeding, the plans match `plans.yaml` and the two documents are in `documents` with versions `2026.1` and `2026.2`.
+- [x] With `npm run dev` running, the claim agent's tools from the context layer answer on the direct route (a test with the real server on a local port).
+- [x] `npm run check` passes with `.env` away. `docs/SPEC.md`, `docs/TECH_STACK.md`, `docs/PROCESS.md` and `data/README.md` describe the layer. Commit.
 
 ## Phase 3: A complete decision record
 

@@ -271,24 +271,6 @@ def get_claim(claim_id: str) -> dict[str, Any]:
 
 
 @app.get(
-    "/api/documents/{document}/sections",
-    operation_id="list_sections",
-    dependencies=AGENT,
-)
-def list_sections(document: str) -> list[str]:
-    """List a document's section headings, in order."""
-    return list(reference.sections(document))
-
-
-@app.get(
-    "/api/documents/{document}/section", operation_id="get_section", dependencies=AGENT
-)
-def get_section(document: str, heading: str) -> dict[str, str]:
-    """Return the text of one section of a document."""
-    return {"text": reference.section(document, heading)}
-
-
-@app.get(
     "/api/configuration/current",
     operation_id="get_current_configuration",
     dependencies=AGENT,

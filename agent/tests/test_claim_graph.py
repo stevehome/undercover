@@ -88,11 +88,13 @@ def test_deciding_twice_is_a_repeat_not_a_second_decision(backend, script, saver
 
 
 def test_a_refusal_goes_back_to_the_model(backend, script, saver):
-    bad = ("read_section", {"document": "claims_manual", "heading": "No such section"})
+    bad = ("read_section", {"document": "claims_manual", "number": 99})
 
     agents.decide_claim(CLAIM, script(bad, decision(), "Done."), saver)
 
     assert api.get_claim(CLAIM)["paid_amount"] == "420.00"
+    steps = backend.get(f"/api/claims/{CLAIM}/steps").json()
+    assert any(s["text"].startswith("Refused by the context layer:") for s in steps)
 
 
 def test_no_decision_sends_the_claim_back_to_the_agent(backend, script, saver):
@@ -102,7 +104,7 @@ def test_no_decision_sends_the_claim_back_to_the_agent(backend, script, saver):
 
 
 def test_a_model_that_never_stops_fails_the_claim(backend, script, saver):
-    steps = [("list_sections", {"document": "policy_wording"})] * (MAX_MODEL_CALLS + 1)
+    steps = [("get_claim", {})] * (MAX_MODEL_CALLS + 1)
 
     with pytest.raises(ModelCallLimit):
         agents.decide_claim(CLAIM, script(*steps), saver)

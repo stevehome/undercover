@@ -12,7 +12,6 @@ from pydantic import BaseModel, Field
 from agent import backend_http
 from agent.backend_http import call as _call
 
-Document = Literal["policy_wording", "claims_manual"]
 Decision = Literal["approve", "decline", "refer"]
 HoldReason = Literal["gateway"]
 GATEWAY_HOLD: HoldReason = "gateway"
@@ -92,17 +91,6 @@ def list_claims() -> list[dict[str, Any]]:
 def get_claim(claim_id: str) -> dict[str, Any]:
     """Return one claim in full, with its policy and the customer's claim history."""
     return _call("GET", f"/api/claims/{claim_id}")
-
-
-def list_sections(document: Document) -> list[str]:
-    """List a document's section headings."""
-    return _call("GET", f"/api/documents/{document}/sections")
-
-
-def get_section(document: Document, heading: str) -> dict[str, str]:
-    """Return one section of a document, as `{"text": ...}`."""
-    params = {"heading": heading}
-    return _call("GET", f"/api/documents/{document}/section", params=params)
 
 
 def record_step(claim_id: str, text: str) -> None:

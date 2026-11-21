@@ -62,25 +62,3 @@ def approvers() -> list[dict[str, Any]]:
 def handler_by_email(email: str) -> dict[str, Any] | None:
     """Return the handler with this email address, or None."""
     return next((h for h in handlers() if h["email"].lower() == email.lower()), None)
-
-
-def sections(document: str) -> dict[str, str]:
-    """Return a document's sections by heading, in order, or raise NotFound."""
-    with db.connection() as conn:
-        rows = conn.execute(
-            select(tables.document_sections.c.heading, tables.document_sections.c.text)
-            .where(tables.document_sections.c.document == document)
-            .order_by(tables.document_sections.c.position)
-        )
-        found = {heading: text for heading, text in rows}
-    if not found:
-        raise NotFound(f"No document {document}")
-    return found
-
-
-def section(document: str, heading: str) -> str:
-    """Return one section's text, or raise NotFound."""
-    found = sections(document)
-    if heading not in found:
-        raise NotFound(f"No section {heading}")
-    return found[heading]

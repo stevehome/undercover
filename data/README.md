@@ -10,7 +10,7 @@ The backend loads these files into its database the first time it starts, and `n
 - `improvement.json`: the starting values of the improvement settings: the business objectives, the noise and tolerance, the spending limit for each round and how many claim agents work at once in a round's evaluations.
 - `models.json`: the models the claim agent may use, with their reasoning efforts and prices per million tokens. It is read only on the Settings page.
 - `claim_instructions.md` and `improver_recipe.md`: version 1 of the claim agent's configuration and of the improver's recipe.
-- `plans.json`: the three plans (Economy, Premium, First) with their limits, waiting periods and deductibles, and the three add-ons.
+- `plans.json`: the three plans (Economy, Premium, First) with their limits, waiting periods and deductibles, and the three add-ons. The product no longer reads it: seeding loads the plans from `context/plans.yaml`, which holds the same values.
 - `policies.json`: one policy per trip, with the plan, the add-ons, the purchase date, the trip and the travelers.
 - `customers.json`: contact details and claim history, with the date and a one line summary of each earlier claim. This is personal data.
 - `handlers.json`: the claims handlers and their email addresses, which are their sign-ins. Only Dana Whitfield can sign off payouts over the limit, start or stop a round, approve or reject the improver's proposals and change a setting.
@@ -20,6 +20,8 @@ The backend loads these files into its database the first time it starts, and `n
 
 - `policy_wording.md`: the contract with the customer. Short enough to fit in a prompt.
 - `claims_manual.md`: the internal handling manual. Longer, and it holds rules the wording does not, such as the third claim in 12 months, losses to wild animals and meals without receipts.
+
+The product no longer reads these two copies. Seeding loads the documents from `context/policy_wording.md` and `context/claims_manual.md`, which data governance owns and which carry each document's version, and the claim agent reads them through the context layer. They stay here as they were.
 
 ## The evaluation set
 

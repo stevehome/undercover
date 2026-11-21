@@ -6,15 +6,19 @@ policy, so the model acts only on its own claim.
 """
 
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 from langchain.tools import ToolRuntime, tool
 
 from agent import api
-from agent.api import Amount, Benefit, Decision, Document, Line
+from agent.api import Amount, Benefit, Decision, Line
 from agent.claim_text import claim_text
 from agent.contexts import ClaimContext
-from agent.tool_route import APP
+from agent.tool_route import APP, CONTEXT
+
+Document = Literal["policy_wording", "claims_manual"]
+Record = Literal["claim", "policy", "previous_claim"]
+Plan = Literal["economy", "premium", "first"]
 
 
 @tool
@@ -28,24 +32,75 @@ def get_claim(runtime: ToolRuntime[ClaimContext]) -> str:
     return claim_text(claim)
 
 
+def _look_up(
+    runtime: ToolRuntime[ClaimContext],
+    operation: str,
+    arguments: dict[str, Any],
+    step: str,
+) -> dict[str, Any]:
+    """Ask the context layer, and record on the claim what was looked up."""
+    context = runtime.context
+    answer = context.route.call(CONTEXT, operation, arguments)
+    api.record_step(context.claim_id, step)
+    return answer
+
+
 @tool
-def list_sections(document: Document, runtime: ToolRuntime[ClaimContext]) -> list[str]:
-    """List the section headings of the policy wording or the claims manual."""
-    return runtime.context.route.call(APP, "list_sections", {"document": document})
+def lookup_term(term: str, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
+    """Look up a term the policy wording defines, with the sections it comes from."""
+    return _look_up(
+        runtime, "lookup_term", {"term": term}, f"Looked up the term {term}"
+    )
+
+
+@tool
+def describe_fields(
+    record: Record, runtime: ToolRuntime[ClaimContext]
+) -> dict[str, Any]:
+    """Say what each field of a claim, a policy or a previous claim means."""
+    step = f"Looked up the fields of a {record.replace('_', ' ')}"
+    return _look_up(runtime, "describe_fields", {"record": record}, step)
+
+
+@tool
+def get_plan(plan: Plan, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
+    """Get one plan's limits, waiting periods and deductible, and the add-ons."""
+    return _look_up(runtime, "get_plan", {"plan": plan}, f"Looked up the {plan} plan")
+
+
+@tool
+def get_claim_rules(runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
+    """Get the rules claims operations applies to every claim."""
+    return _look_up(runtime, "get_claim_rules", {}, "Looked up the claim rules")
+
+
+@tool
+def search_reference_data(
+    query: str, runtime: ToolRuntime[ClaimContext]
+) -> dict[str, Any]:
+    """Search outside facts, such as storms, strikes and prices, for every word."""
+    step = f"Searched the reference data for {query}"
+    return _look_up(runtime, "search_reference_data", {"query": query}, step)
+
+
+@tool
+def search_documents(query: str, runtime: ToolRuntime[ClaimContext]) -> dict[str, Any]:
+    """Search the policy wording and the claims manual for sections with every word."""
+    step = f"Searched the documents for {query}"
+    return _look_up(runtime, "search_documents", {"query": query}, step)
 
 
 @tool
 def read_section(
-    document: Document, heading: str, runtime: ToolRuntime[ClaimContext]
-) -> str:
-    """Read one section of the policy wording or the claims manual."""
-    context = runtime.context
-    section = context.route.call(
-        APP, "get_section", {"document": document, "heading": heading}
-    )
+    document: Document, number: int, runtime: ToolRuntime[ClaimContext]
+) -> dict[str, Any]:
+    """Read one numbered section of the policy wording or the claims manual."""
+    arguments = {"document": document, "number": number}
     name = document.replace("_", " ")
-    api.record_step(context.claim_id, f"Read {name} section: {heading}")
-    return section["text"]
+    section = runtime.context.route.call(CONTEXT, "read_section", arguments)
+    title = section["answer"]["title"]
+    api.record_step(runtime.context.claim_id, f"Read {name} section {number}: {title}")
+    return section
 
 
 @tool
@@ -96,4 +151,15 @@ def decide_claim(
     return "Recorded"
 
 
-CLAIM_TOOLS = [get_claim, list_sections, read_section, calculate_payout, decide_claim]
+CLAIM_TOOLS = [
+    get_claim,
+    lookup_term,
+    describe_fields,
+    get_plan,
+    get_claim_rules,
+    search_reference_data,
+    search_documents,
+    read_section,
+    calculate_payout,
+    decide_claim,
+]

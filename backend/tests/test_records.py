@@ -7,7 +7,6 @@ from sqlalchemy import update
 from backend import db, payouts, tables
 
 DATA = Path(__file__).resolve().parents[2] / "data"
-WORDING = (DATA / "policy_wording.md").read_text()
 
 
 def test_the_approval_limit_follows_the_database(client):
@@ -21,17 +20,6 @@ def test_the_approval_limit_follows_the_database(client):
         )
 
     assert payouts.needs_sign_off(Decimal("600.00"))
-
-
-def test_a_section_is_the_wording_in_the_file(client):
-    headings = client.get("/api/documents/policy_wording/sections").json()
-    assert "Trip Delay" in " ".join(headings)
-
-    for heading in headings:
-        response = client.get(
-            "/api/documents/policy_wording/section", params={"heading": heading}
-        )
-        assert response.json()["text"] in WORDING
 
 
 def test_only_handlers_who_can_sign_off_are_listed(client):

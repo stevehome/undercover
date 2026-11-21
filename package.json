@@ -7,17 +7,19 @@
   },
   "scripts": {
     "prepare": "lefthook install && playwright install chromium",
-    "dev": "concurrently -k -n backend,agent,dashboard npm:dev:backend npm:dev:agent npm:dev:dashboard",
+    "dev": "concurrently -k -n backend,agent,dashboard,context npm:dev:backend npm:dev:agent npm:dev:dashboard npm:dev:context",
     "dev:backend": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn backend.main:app --reload --reload-dir backend",
     "dev:dashboard": "vite dashboard",
     "format": "uv run ruff format && prettier --write -u dashboard e2e scripts *.config.*",
     "build": "vite build dashboard",
-    "check": "npm run check:python && npm run check:server && npm run check:ts && npm run e2e",
+    "check": "npm run check:python && npm run check:server && npm run check:context && npm run check:ts && npm run e2e",
     "check:python": "uv run ruff format --check && uv run ruff check && pyright && uv run pytest -q",
+    "check:context": "uv run --isolated --only-group context python -c \"import context.server\"",
     "check:server": "uv run --isolated --only-group server python -c \"import backend.main\"",
     "check:ts": "prettier --check -u dashboard e2e scripts *.config.* && eslint dashboard e2e scripts *.config.* && tsc && vitest run --root dashboard --coverage",
     "e2e": "playwright test",
     "seed": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m backend.seed",
+    "dev:context": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m context",
     "dev:agent": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn agent.service:app --port 8002"
   },
   "dependencies": {

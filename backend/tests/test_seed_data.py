@@ -27,13 +27,10 @@ def test_a_new_database_holds_every_record(client):
                 tables.handlers,
             )
         }
-        sections = {
-            row.document: row.n
+        documents = {
+            row.document: row.version
             for row in conn.execute(
-                select(
-                    tables.document_sections.c.document,
-                    func.count().label("n"),
-                ).group_by(tables.document_sections.c.document)
+                select(tables.documents.c.document, tables.documents.c.version)
             )
         }
     assert counts == {
@@ -44,8 +41,7 @@ def test_a_new_database_holds_every_record(client):
         "add_ons": 3,
         "handlers": 3,
     }
-    assert set(sections) == {"policy_wording", "claims_manual"}
-    assert all(n > 3 for n in sections.values())
+    assert documents == {"policy_wording": "2026.1", "claims_manual": "2026.2"}
 
 
 def test_amounts_come_back_exact(client):
