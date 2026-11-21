@@ -121,6 +121,9 @@ claims = Table(
     Column("decided_on", String),
     Column("over_approval_limit", Integer),
     Column("signed_off_by", String),
+    Column("decided_by", String),
+    Column("calculation", JSON),
+    Column("manual_version", String),
     Column("signed_off_on", String),
     Column("hold_reason", String),
     Column("paid_cents", Integer),
@@ -141,6 +144,9 @@ STATE_COLUMNS = [
         "reason",
         "policy_reference",
         "decided_on",
+        "decided_by",
+        "calculation",
+        "manual_version",
         "over_approval_limit",
         "signed_off_by",
         "signed_off_on",
@@ -167,6 +173,16 @@ CONTENT_COLUMNS = [
         "documents",
     ]
 ]
+
+payout_calculations = Table(
+    "payout_calculations",
+    metadata,
+    Column("claim_id", String, primary_key=True),
+    Column("thread", Integer, primary_key=True),
+    Column("steps", JSON, nullable=False),
+    Column("payout_cents", Integer, nullable=False),
+    Column("calculated_on", String, nullable=False),
+)
 
 claim_steps = Table(
     "claim_steps",

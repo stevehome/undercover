@@ -1,3 +1,5 @@
+from backend.tests import records
+
 CLAIM = "CLM-1001"
 APPROVAL = {
     "decision": "approve",
@@ -9,7 +11,7 @@ HOLD = {"reason": "gateway"}
 
 
 def approve(client, claim_id=CLAIM):
-    client.post(f"/api/claims/{claim_id}/decision", json=APPROVAL)
+    records.decide(client, claim_id, APPROVAL)
 
 
 def hold(client, claim_id=CLAIM, body=HOLD):
@@ -64,7 +66,7 @@ def test_a_claim_not_yet_decided_is_not_held(agent):
 
 def test_a_claim_that_is_not_an_approval_is_not_held(agent):
     refer = {**APPROVAL, "decision": "refer", "payout": "0.00"}
-    agent.post(f"/api/claims/{CLAIM}/decision", json=refer)
+    records.decide(agent, CLAIM, refer)
 
     assert hold(agent).status_code == 409
 

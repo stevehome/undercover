@@ -85,11 +85,11 @@ Puts the app's tools on both routes. The context layer joins them in Phase 2.
 
 **Success criteria**
 
-- [ ] Tests cover each refusal and that it names section 14, a complete approval with its calculation, maker, time and version, a decline with no calculation, a referral by the check with the maker "Security check", and a sign-off adding who and when.
-- [ ] A blank reason gets the same 422 on any claim, including one that doesn't exist.
-- [ ] A calculation kept for one attempt is not accepted for the next after a requeue (test).
-- [ ] The agent's API document still has `Amount` as a `number` and the decision as a `string`, and `decided_by` as a string (the document tests).
-- [ ] `npm run check` passes with `.env` away, the end-to-end tests included. `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the record. Commit.
+- [x] Tests cover each refusal and that it names section 14, a complete approval with its calculation, maker, time and version, a decline with no calculation, a referral by the check with the maker "Security check", and a sign-off adding who and when.
+- [x] A blank reason gets the same 422 on any claim, including one that doesn't exist.
+- [x] A calculation kept for one attempt is not accepted for the next after a requeue (test).
+- [x] The agent's API document still has `Amount` as a `number` and the decision as a `string`, and `decided_by` as a string (the document tests).
+- [x] `npm run check` passes with `.env` away, the end-to-end tests included. `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the record. Commit.
 
 ## Phase 4: Memory of each customer
 

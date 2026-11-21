@@ -7,6 +7,7 @@ from langchain_core.exceptions import ModelRateLimitError, ModelTimeoutError
 from langgraph.types import RetryPolicy
 
 from agent import agents, api, dispatcher, work
+from agent.tests import records
 from agent.tests.conftest import STUB_MODEL
 
 DECISION = {
@@ -39,7 +40,7 @@ def run(run_id, decide, n=3):
 
 def approve(claim_id, run_id):
     api.record_step(claim_id, "started")
-    api.decide_claim(claim_id, **DECISION)
+    records.decide(claim_id, DECISION)
     return "Approved."
 
 
@@ -188,6 +189,7 @@ def test_a_held_approval_in_an_evaluation_is_finished_and_its_progress_cleared(
     )
 
     def decide(claim_id, run_id):
+        records.calculated(claim_id, "1200.00")
         return agents.decide_claim(claim_id, script(approve, "Done."), saver, run_id)
 
     rows = run(run_id, decide, 1)

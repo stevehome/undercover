@@ -143,7 +143,7 @@ def gateway(backend):
         backend.get(f"/api/claims/{a['claim_id']}")
     )
     tools[app + "calculate_payout"] = lambda a: answer(
-        backend.post("/api/payouts", json=a)
+        backend.post(f"/api/claims/{a['claim_id']}/payout", json=a)
     )
     tools[app + "decide_claim"] = lambda a: answer(
         backend.post(f"/api/claims/{a['claim_id']}/decision", json=a)

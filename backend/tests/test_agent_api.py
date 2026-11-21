@@ -82,6 +82,12 @@ def test_the_decision_is_a_string_so_a_policy_can_compare_it(document):
 def test_a_decision_other_than_the_three_is_still_refused(agent):
     response = agent.post(
         "/api/claims/CLM-1001/decision",
-        json={"decision": "maybe", "payout": 0, "reason": "x", "policy_reference": "S"},
+        json={
+            "decision": "maybe",
+            "payout": 0,
+            "reason": "x",
+            "policy_reference": "S",
+            "decided_by": "A test agent",
+        },
     )
     assert response.status_code == 422

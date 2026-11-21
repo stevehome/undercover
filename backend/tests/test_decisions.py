@@ -2,30 +2,21 @@ import pytest
 
 from backend import claims
 from backend.errors import Conflict
+from backend.tests import records
 
 
 def decide(client, payout, decision="approve"):
-    return client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
-            "decision": decision,
-            "payout": payout,
-            "reason": "Stubbed.",
-            "policy_reference": "Section 3",
-        },
-    )
+    return decide_other(client, "CLM-1001", payout, decision)
 
 
-def decide_other(client, claim_id, payout):
-    return client.post(
-        f"/api/claims/{claim_id}/decision",
-        json={
-            "decision": "approve",
-            "payout": payout,
-            "reason": "Stubbed.",
-            "policy_reference": "Section 3",
-        },
-    )
+def decide_other(client, claim_id, payout, decision="approve"):
+    body = {
+        "decision": decision,
+        "payout": payout,
+        "reason": "Stubbed.",
+        "policy_reference": "Section 3",
+    }
+    return records.decide(client, claim_id, body)
 
 
 def pay(client, amount):
@@ -33,9 +24,10 @@ def pay(client, amount):
 
 
 def test_approve_within_limit_is_decided(client):
-    response = client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
+    response = records.decide(
+        client,
+        "CLM-1001",
+        {
             "decision": "approve",
             "payout": "420.00",
             "reason": "Routine trip delay with receipts.",
@@ -117,9 +109,10 @@ def test_pay_without_decision_is_blocked(client):
 
 
 def test_decline_is_decided_and_unpayable(client):
-    client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
+    records.decide(
+        client,
+        "CLM-1001",
+        {
             "decision": "decline",
             "payout": "0.00",
             "reason": "Not a covered reason.",
@@ -204,7 +197,15 @@ def test_amounts_are_exact_to_the_cent(client):
 
 @pytest.mark.parametrize("amount", ["-1.00", "1.005", "abc"])
 def test_malformed_amounts_are_rejected(client, amount):
-    assert decide(client, amount).status_code == 422
+    body = {
+        "decision": "approve",
+        "payout": amount,
+        "reason": "Stubbed.",
+        "policy_reference": "Section 3",
+        "decided_by": "A test agent",
+    }
+
+    assert client.post("/api/claims/CLM-1001/decision", json=body).status_code == 422
 
 
 def test_record_step_moves_claim_in_progress_and_lists_in_order(client):
@@ -232,6 +233,7 @@ def test_only_an_approval_has_a_payout(client, decision):
             "payout": "50.00",
             "reason": "r",
             "policy_reference": "s",
+            "decided_by": "A test agent",
         },
     )
 

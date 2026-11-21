@@ -1,5 +1,6 @@
 import pytest
 
+from backend.tests import records
 from conftest import API_KEY
 
 APPROVAL = {
@@ -31,7 +32,7 @@ def test_an_agent_route_refuses_a_wrong_key(anonymous, method, path, body):
 
 def test_an_agent_route_works_with_the_key(agent):
     assert agent.get("/api/configuration/current").status_code == 200
-    assert agent.post("/api/claims/CLM-1001/decision", json=APPROVAL).status_code == 200
+    assert records.decide(agent, "CLM-1001", APPROVAL).status_code == 200
     paid = agent.post("/api/claims/CLM-1001/payment", json={"amount": "420.00"})
     assert paid.status_code == 200
 

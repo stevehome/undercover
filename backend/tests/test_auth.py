@@ -3,6 +3,8 @@ import time
 import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
 
+from backend.tests import records
+
 MARCUS = "marcus.oyelaran@undercover.example"
 OVER_THE_LIMIT = {
     "decision": "approve",
@@ -91,7 +93,7 @@ def test_every_handler_action_needs_a_sign_in(anonymous, method, path, body):
 def test_a_sign_off_over_the_limit_by_marcus_is_refused_with_a_reason(
     anonymous, agent, as_handler
 ):
-    agent.post("/api/claims/CLM-1001/decision", json=OVER_THE_LIMIT)
+    records.decide(agent, "CLM-1001", OVER_THE_LIMIT)
     refused = anonymous.post(
         "/api/claims/CLM-1001/sign-off", headers=as_handler(MARCUS)
     )
@@ -101,7 +103,7 @@ def test_a_sign_off_over_the_limit_by_marcus_is_refused_with_a_reason(
 
 
 def test_a_sign_off_by_dana_records_dana(anonymous, agent, as_handler):
-    agent.post("/api/claims/CLM-1001/decision", json=OVER_THE_LIMIT)
+    records.decide(agent, "CLM-1001", OVER_THE_LIMIT)
     signed = anonymous.post("/api/claims/CLM-1001/sign-off", headers=as_handler())
     assert signed.status_code == 200
     assert signed.json()["signed_off_by"] == "HND-01"

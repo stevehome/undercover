@@ -62,3 +62,8 @@ def approvers() -> list[dict[str, Any]]:
 def handler_by_email(email: str) -> dict[str, Any] | None:
     """Return the handler with this email address, or None."""
     return next((h for h in handlers() if h["email"].lower() == email.lower()), None)
+
+
+def document_version(document: str) -> str:
+    """Return the version of a document, such as the claims manual."""
+    return _one(tables.documents, tables.documents.c.document, document)["version"]

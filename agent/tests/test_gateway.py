@@ -40,7 +40,7 @@ def test_an_amount_goes_to_the_gateway_as_a_number(gateway, signed_gateway_route
         APP,
         "calculate_payout",
         {
-            "policy_id": "POL-2001",
+            "claim_id": CLAIM,
             "benefit": "trip_delay",
             "lines": [LINE],
             "paid_by_others": Decimal(0),

@@ -1,7 +1,7 @@
 """The UnderCover Agent: decides one claim, or carries it on."""
 
 from contextvars import Context
-from typing import Any
+from typing import Any, NamedTuple
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
@@ -12,6 +12,17 @@ from agent import api, checkpoint, harness, lease, routes, timing, tracing
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
+
+DECIDED_BY = "UnderCover Agent, configuration version"
+
+
+class Attempt(NamedTuple):
+    """What one working of a claim is recorded with: its thread, run, tags and maker."""
+
+    thread_id: str
+    run_id: int | None
+    tags: list[str]
+    decided_by: str
 
 
 def decide_claim(
@@ -60,8 +71,13 @@ def decide_claim(
             configuration["instructions"],
             screening_llm or harness.screening_model(),
         )
-        tags = _tags(run_id, configuration["round_id"])
-        outcome = Context().run(_work_traced, graph, claim, thread_id, run_id, tags)
+        attempt = Attempt(
+            thread_id,
+            run_id,
+            _tags(run_id, configuration["round_id"]),
+            f"{DECIDED_BY} {configuration['version']}",
+        )
+        outcome = Context().run(_work_traced, graph, claim, attempt)
         if claim["evaluation_run_id"] is not None:
             saver.delete_thread(thread_id)
         return outcome
@@ -73,24 +89,16 @@ def _tags(run_id: int | None, round_id: int | None) -> list[str]:
     return [*run_tags, *([] if round_id is None else [f"round-{round_id}"])]
 
 
-def _work_traced(
-    graph: Any,
-    claim: dict[str, Any],
-    thread_id: str,
-    run_id: int | None,
-    tags: list[str],
-) -> str:
+def _work_traced(graph: Any, claim: dict[str, Any], attempt: Attempt) -> str:
     """Work a claim in a trace of its own, in one Langfuse session."""
-    with tracing.trace(thread_id, tags) as traced:
-        config: RunnableConfig = {**traced, "configurable": {"thread_id": thread_id}}
-        return _work(graph, config, claim, run_id)
+    with tracing.trace(attempt.thread_id, attempt.tags) as traced:
+        thread = {"thread_id": attempt.thread_id}
+        config: RunnableConfig = {**traced, "configurable": thread}
+        return _work(graph, config, claim, attempt)
 
 
 def _work(
-    graph: Any,
-    config: RunnableConfig,
-    claim: dict[str, Any],
-    run_id: int | None,
+    graph: Any, config: RunnableConfig, claim: dict[str, Any], attempt: Attempt
 ) -> str:
     """Start the claim's graph, carry it on, or answer a sign-off."""
     claim_id = claim["claim_id"]
@@ -103,7 +111,9 @@ def _work(
         start = Command(resume={"handler": claim["signed_off_by"]})
     else:
         start = None if state.next else new_claim(claim_id)
-    context = ClaimContext(claim_id, run_id, claim["policy_id"], routes.choose())
-    with timing.segment(claim_id, run_id):
+    context = ClaimContext(
+        claim_id, attempt.run_id, attempt.decided_by, routes.choose()
+    )
+    with timing.segment(claim_id, attempt.run_id):
         result = graph.invoke(start, config, context=context, durability="sync")
     return result["messages"][-1].text

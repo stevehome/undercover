@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 
 from agent import agents
+from agent.tests import records
 from agent.tests.conftest import StubModel, new_run
 from agent.tests.test_claim_graph import CLAIM, Stopped, decision, sign_off
 from backend import usage
@@ -29,6 +30,7 @@ def test_work_with_no_run_belongs_to_no_run(backend, script, saver):
 def test_two_runs_have_separate_totals(backend, script, saver):
     first, second = new_run(), new_run()
     agents.decide_claim("CLM-1001", script(decision(), "Done."), saver, run_id=first)
+    records.calculated("CLM-1002", "420.00")
     agents.decide_claim("CLM-1002", script(decision(), "Done."), saver, run_id=second)
 
     assert usage.run_totals(first)["model_calls"] == 3

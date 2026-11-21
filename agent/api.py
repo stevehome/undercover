@@ -5,7 +5,7 @@ It has no operation for the scores, the handlers' decisions or the rounds.
 
 from decimal import Decimal
 from http import HTTPStatus
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, TypedDict, Unpack
 
 from pydantic import BaseModel, Field
 
@@ -98,20 +98,19 @@ def record_step(claim_id: str, text: str) -> None:
     _call("POST", f"/api/claims/{claim_id}/steps", json={"text": text})
 
 
-def decide_claim(
-    claim_id: str,
-    decision: Decision,
-    payout: Amount,
-    reason: str,
-    policy_reference: str,
-) -> dict[str, Any]:
+class DecisionFields(TypedDict):
+    """What a decision record holds, as the claim agent records it."""
+
+    decision: Decision
+    payout: Amount
+    reason: str
+    policy_reference: str
+    decided_by: str
+
+
+def decide_claim(claim_id: str, **record: Unpack[DecisionFields]) -> dict[str, Any]:
     """Record the decision on a claim, and return the claim."""
-    body = {
-        "decision": decision,
-        "payout": str(payout),
-        "reason": reason,
-        "policy_reference": policy_reference,
-    }
+    body = {**record, "payout": str(record["payout"])}
     return _call("POST", f"/api/claims/{claim_id}/decision", json=body)
 
 
@@ -166,16 +165,15 @@ def release_lease(claim_id: str, owner: str) -> None:
 
 
 def calculate_payout(
-    policy_id: str, benefit: Benefit, lines: list[Line], paid_by_others: Amount
+    claim_id: str, benefit: Benefit, lines: list[Line], paid_by_others: Amount
 ) -> dict[str, Any]:
-    """Work out a payout with UnderCover's payout rules."""
+    """Work out a claim's payout with UnderCover's payout rules; the app keeps it."""
     body = {
-        "policy_id": policy_id,
         "benefit": benefit,
         "lines": [line.model_dump(mode="json") for line in lines],
         "paid_by_others": str(paid_by_others),
     }
-    return _call("POST", "/api/payouts", json=body)
+    return _call("POST", f"/api/claims/{claim_id}/payout", json=body)
 
 
 def requeue_claim(claim_id: str) -> None:

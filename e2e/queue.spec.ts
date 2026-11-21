@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { handlerHeaders, test } from "./signIn";
 import { agentHeaders } from "./agentKey";
+import { recordDecision } from "./decisions";
 
 test("the queue page lists the claims", async ({ page }) => {
   await page.goto("/");
@@ -31,14 +32,11 @@ test("the queue shows a claim's status as it moves through its states", async ({
   await page.goto("/");
   await expect(row()).toContainText("in progress");
 
-  await request.post(`/api/claims/${claimId}/decision`, {
-    headers: agentHeaders,
-    data: {
-      decision: "approve",
-      payout: "1250.00",
-      reason: "A passport lost while swimming, replaced abroad.",
-      policy_reference: "Section 6",
-    },
+  await recordDecision(request, claimId, {
+    decision: "approve",
+    payout: "1250.00",
+    reason: "A passport lost while swimming, replaced abroad.",
+    policy_reference: "Section 6",
   });
   await page.goto("/");
   await expect(row()).toContainText("waiting for sign-off");

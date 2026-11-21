@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy import select
 
 from backend import db, tables
+from backend.tests import records
 
 EVALUATION = {
     "concurrency": 5,
@@ -87,7 +88,7 @@ def test_a_copy_cannot_be_signed_off(client):
         "reason": "Stubbed.",
         "policy_reference": "S1",
     }
-    client.post(f"/api/claims/{copy}/decision", json=body)
+    records.decide(client, copy, body)
 
     response = client.post(f"/api/claims/{copy}/sign-off")
 
@@ -128,7 +129,7 @@ def answer_like_the_handlers(client, claim_id):
         "reason": "Stubbed.",
         "policy_reference": "S1",
     }
-    client.post(f"/api/claims/{claim_id}/decision", json=body)
+    records.decide(client, claim_id, body)
 
 
 def test_an_evaluation_is_scored_from_its_records(client):

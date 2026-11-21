@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { password, signIn } from "./signIn";
-import { agentHeaders } from "./agentKey";
+import { recordDecision } from "./decisions";
 
 test("a page without a session goes to sign-in", async ({ page }) => {
   await page.goto("/scoreboard");
@@ -41,14 +41,11 @@ test("a handler who can't sign off is told why on a held payout", async ({
   request,
 }) => {
   const claimId = "CLM-1008";
-  await request.post(`/api/claims/${claimId}/decision`, {
-    headers: agentHeaders,
-    data: {
-      decision: "approve",
-      payout: "1300.00",
-      reason: "A payout over the approval limit.",
-      policy_reference: "Section 7",
-    },
+  await recordDecision(request, claimId, {
+    decision: "approve",
+    payout: "1300.00",
+    reason: "A payout over the approval limit.",
+    policy_reference: "Section 7",
   });
   await signIn(page, "marcus.oyelaran");
 

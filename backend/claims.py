@@ -6,7 +6,7 @@ from typing import Any
 
 from sqlalchemy import insert, or_, select, update
 
-from backend import db, money, payouts, reference, tables
+from backend import calculations, db, decision_record, money, payouts, reference, tables
 from backend.errors import Conflict, NotFound
 from backend.statuses import ClaimStatus
 
@@ -68,19 +68,39 @@ def get_full(claim_id: str) -> dict[str, Any]:
     }
 
 
-def decide(
+def calculate_payout(
     claim_id: str,
-    decision: str,
-    payout: Decimal,
-    reason: str,
-    policy_reference: str,
+    benefit: payouts.Benefit,
+    lines: list[payouts.Line],
+    paid_by_others: Decimal,
 ) -> dict[str, Any]:
+    """Work out a claim's payout on its policy, and keep it for the claim's attempt."""
+    row = get_row(claim_id)
+    with db.connection() as conn:
+        policy_id = conn.execute(
+            select(tables.claims.c.policy_id).where(
+                tables.claims.c.claim_id == claim_id
+            )
+        ).scalar_one()
+    calculation = payouts.work_out_payout(policy_id, benefit, lines, paid_by_others)
+    calculations.keep(claim_id, row["thread"], calculation)
+    return calculation
+
+
+def decide(claim_id: str, record: decision_record.Decision) -> dict[str, Any]:
     """Record a claim's one decision; an approval over the limit needs a sign-off.
 
-    Repeating the decision already recorded is done, not an error.
+    An approval rests on the calculation kept for this attempt, which the record
+    holds (claims manual section 14). Repeating the decision already recorded is
+    done, not an error.
     """
-    get_row(claim_id)
-    over_limit = decision == "approve" and payouts.needs_sign_off(payout)
+    row = get_row(claim_id)
+    calculation = None
+    approval = record.decision == "approve"
+    if approval:
+        kept = calculations.latest(claim_id, row["thread"])
+        calculation = decision_record.require_calculation(kept, record.payout)
+    over_limit = approval and payouts.needs_sign_off(record.payout)
     with db.connection() as conn:
         decided = conn.execute(
             update(tables.claims)
@@ -92,16 +112,22 @@ def decide(
                 status=ClaimStatus.WAITING_FOR_SIGN_OFF
                 if over_limit
                 else ClaimStatus.DECIDED,
-                decision=decision,
-                payout_cents=money.to_cents(payout),
-                reason=reason,
-                policy_reference=policy_reference,
+                decision=record.decision,
+                payout_cents=money.to_cents(record.payout),
+                reason=record.reason,
+                policy_reference=record.policy_reference,
                 decided_on=db.now(),
+                decided_by=record.decided_by,
+                calculation=calculation,
+                manual_version=reference.document_version("claims_manual"),
                 over_approval_limit=int(over_limit),
             )
         )
     row = get_row(claim_id)
-    if decided.rowcount == 0 and (row["decision"], row["payout"]) != (decision, payout):
+    if decided.rowcount == 0 and (row["decision"], row["payout"]) != (
+        record.decision,
+        record.payout,
+    ):
         raise Conflict("Claim has already been decided")
     return row
 

@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import select
 
 from backend import db, tables
+from backend.tests import records
 
 MARCUS = "marcus.oyelaran@undercover.example"
 IMPROVER = {"model": "openai/gpt-6-luna", "reasoning_effort": "medium"}
@@ -66,15 +67,13 @@ class Flow:
             if correct
             else ("decline", "0.00")
         )
-        self.client.post(
-            f"/api/claims/{claim['claim_id']}/decision",
-            json={
-                "decision": decision,
-                "payout": payout,
-                "reason": "Because.",
-                "policy_reference": "Section 3",
-            },
-        )
+        body = {
+            "decision": decision,
+            "payout": payout,
+            "reason": "Because.",
+            "policy_reference": "Section 3",
+        }
+        records.decide(self.client, claim["claim_id"], body)
         self.client.post(
             f"/api/runs/{run_id}/claims/{claim['claim_id']}",
             json={"status": "done", "note": "done"},

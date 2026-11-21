@@ -59,6 +59,7 @@ A judge grades each explanation in an evaluation against the handler's reason, f
 
 - A payout over the approval limit, $1,000 to start with and a setting, needs a handler's sign-off. The agent can approve such a claim, but the payment waits until a handler signs off. The system must block the payment until then, even if the agent tries to pay.
 - Decisions follow the policy wording.
+- Every decision record is complete, as section 14 of the claims manual says: the decision, the payout, the calculation, the section relied on, a reason in plain language, who or what made the decision and when, and the version of the claims manual in force; a payout over the approval limit also holds who signed off and when. An approval rests on a payout calculation made for that attempt at the claim, and is refused unless it has one and its payout is the calculation's. A record that falls short is refused, and the refusal names section 14 and says what is missing, so the agent can put it right and try again.
 - Our handlers' own decisions on these claims are in `data/evals/`. We use them to check the agent's work in evaluations, which work copies of the claims that never show in the queue and can't be signed off. The claim agent must never see them. The improver reads the evaluation set's decisions and reasons, nothing in the agent reads the held-out set's, and the dashboard shows both sets' decisions as it does today.
 - Amounts are in US dollars.
 

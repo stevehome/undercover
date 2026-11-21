@@ -3,12 +3,16 @@ from langchain_core.messages import AIMessage
 
 from agent import agents, api, backend_http
 from agent.claim_nodes import MAX_MODEL_CALLS, ModelCallLimit
+from agent.tests import records
 from agent.tests.conftest import REPLY_USAGE, StubModel
 
 CLAIM = "CLM-1001"
 
 
 def decision(kind="approve", payout="420.00"):
+    """A decision for the scripted model to record; an approval has its calculation."""
+    if kind == "approve":
+        records.calculated(CLAIM, payout)
     return (
         "decide_claim",
         {

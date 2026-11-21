@@ -1,9 +1,11 @@
 from decimal import Decimal
 
 from agent import agents, api
+from agent.tests import records
 
 
 def test_decide_claim_reads_then_decides(backend, script, saver):
+    records.calculated("CLM-1001", "420.00")
     llm = script(
         ("get_claim", {}),
         ("search_documents", {"query": "trip delay"}),
@@ -48,7 +50,6 @@ def test_payout_comes_from_the_payout_tool(backend, script, saver):
         (
             "calculate_payout",
             {
-                "policy_id": "POL-2001",
                 "benefit": "trip_delay",
                 "lines": [line],
                 "paid_by_others": "0.00",
@@ -70,7 +71,7 @@ def test_payout_comes_from_the_payout_tool(backend, script, saver):
 
     assert api.get_claim("CLM-1001")["payout"] == "700.00"
     assert (
-        api.calculate_payout("POL-2001", "trip_delay", [api.Line(**line)], Decimal(0))[
+        api.calculate_payout("CLM-1001", "trip_delay", [api.Line(**line)], Decimal(0))[
             "payout"
         ]
         == "700.00"

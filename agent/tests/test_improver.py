@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from agent import api, dispatcher, harness, improver_api, rounds
 from agent.backend_http import ApiRefusal
+from agent.tests import records
 from agent.tests.conftest import StubModel
 from backend import db, tables
 
@@ -67,7 +68,13 @@ def worked(monkeypatch):
             decision, payout = ("decline", Decimal(0))
             if run["configuration_version"] == 2:
                 decision, payout = answer(run["eval_set"], claim_id.split("-", 2)[2])
-            api.decide_claim(claim_id, decision, payout, "Because.", "Section 3")
+            fields = {
+                "decision": decision,
+                "payout": payout,
+                "reason": "Because.",
+                "policy_reference": "Section 3",
+            }
+            records.decide(claim_id, fields)
             return "Decided."
 
         return real(run_id, concurrency, decide)

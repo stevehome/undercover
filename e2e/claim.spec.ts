@@ -1,20 +1,17 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
-import { agentHeaders } from "./agentKey";
+import { recordDecision } from "./decisions";
 
 test("a decided claim's page shows its decision, payout and reason", async ({
   page,
   request,
 }) => {
   const claimId = "CLM-1006";
-  await request.post(`/api/claims/${claimId}/decision`, {
-    headers: agentHeaders,
-    data: {
-      decision: "approve",
-      payout: "425.00",
-      reason: "A covered trip delay with receipts.",
-      policy_reference: "Section 3",
-    },
+  await recordDecision(request, claimId, {
+    decision: "approve",
+    payout: "425.00",
+    reason: "A covered trip delay with receipts.",
+    policy_reference: "Section 3",
   });
 
   await page.goto(`/claims/${claimId}`);
@@ -51,14 +48,11 @@ test("a sign-off pays the claim, with the handler and the time", async ({
   request,
 }) => {
   const claimId = "CLM-1007";
-  await request.post(`/api/claims/${claimId}/decision`, {
-    headers: agentHeaders,
-    data: {
-      decision: "approve",
-      payout: "1200.00",
-      reason: "A hospital admission over the approval limit.",
-      policy_reference: "Section 7",
-    },
+  await recordDecision(request, claimId, {
+    decision: "approve",
+    payout: "1200.00",
+    reason: "A hospital admission over the approval limit.",
+    policy_reference: "Section 7",
   });
 
   await page.goto(`/claims/${claimId}`);

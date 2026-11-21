@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
 import { agentHeaders } from "./agentKey";
+import { recordDecision } from "./decisions";
 
 const standIn = "http://127.0.0.1:8003";
 
@@ -36,14 +37,11 @@ test("the scoreboard shows an evaluation played out through the API", async ({
   ).json()) as { run_id: number; claims: { claim_id: string }[] };
   expect(run.claims).toHaveLength(5);
   for (const claim of run.claims) {
-    await request.post(`/api/claims/${claim.claim_id}/decision`, {
-      headers: agentHeaders,
-      data: {
-        decision: "decline",
-        payout: "0.00",
-        reason: "Not covered.",
-        policy_reference: "Section 1",
-      },
+    await recordDecision(request, claim.claim_id, {
+      decision: "decline",
+      payout: "0.00",
+      reason: "Not covered.",
+      policy_reference: "Section 1",
     });
   }
   await request.post(`/api/runs/${String(run.run_id)}/finish`, {

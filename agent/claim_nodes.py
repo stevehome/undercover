@@ -45,7 +45,14 @@ def refer_flagged(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str
     """Refer a flagged claim to a handler without the claim agent seeing it."""
     claim_id = runtime.context.claim_id
     reason = f"The security check found an instruction in the claim. {state['flagged']}"
-    api.decide_claim(claim_id, "refer", Decimal(0), reason, SECURITY_CHECK)
+    api.decide_claim(
+        claim_id,
+        decision="refer",
+        payout=Decimal(0),
+        reason=reason,
+        policy_reference=SECURITY_CHECK,
+        decided_by=SECURITY_CHECK,
+    )
     api.record_step(claim_id, f"Referred to a handler: {reason}")
     return {"messages": [AIMessage(reason)]}
 

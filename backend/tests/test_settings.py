@@ -1,5 +1,7 @@
 import pytest
 
+from backend.tests import records
+
 MARCUS = "marcus.oyelaran@undercover.example"
 
 
@@ -9,15 +11,13 @@ def setting(client, key):
 
 
 def decide(client, claim_id, payout):
-    return client.post(
-        f"/api/claims/{claim_id}/decision",
-        json={
-            "decision": "approve",
-            "payout": payout,
-            "reason": "Covered.",
-            "policy_reference": "Section 7",
-        },
-    ).json()
+    body = {
+        "decision": "approve",
+        "payout": payout,
+        "reason": "Covered.",
+        "policy_reference": "Section 7",
+    }
+    return records.decide(client, claim_id, body).json()
 
 
 def test_the_settings_start_with_the_labs_values(client):

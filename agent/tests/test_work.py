@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 
 from agent import api, work
+from agent.tests import records
 
 DECISION = {
     "decision": "approve",
@@ -35,7 +36,7 @@ def test_retries_once_then_succeeds(backend, run_id):
         if len(attempts) == 1:
             api.record_step(claim_id, "started")
             raise RuntimeError("boom")
-        api.decide_claim(claim_id, **DECISION)
+        records.decide(claim_id, DECISION)
         return "Approved for $100.00."
 
     assert work.work_claim(run_id, "CLM-1001", decide) == "Approved $100.00"
@@ -50,7 +51,7 @@ def test_a_failed_attempts_reason_stays_on_the_claim(backend, run_id):
     def decide(claim_id, run_id):
         if api.get_claim(claim_id)["thread"] == 1:
             raise RuntimeError("the model stalled")
-        api.decide_claim(claim_id, **DECISION)
+        records.decide(claim_id, DECISION)
         return "Approved for $100.00."
 
     work.work_claim(run_id, "CLM-1001", decide)
@@ -77,7 +78,7 @@ def test_does_not_retry_a_claim_already_decided(backend, run_id):
 
     def decide(claim_id, run_id):
         attempts.append(claim_id)
-        api.decide_claim(claim_id, **DECISION)
+        records.decide(claim_id, DECISION)
         raise RuntimeError("dropped on the way back")
 
     outcome = work.work_claim(run_id, "CLM-1001", decide)
@@ -92,7 +93,7 @@ def test_a_stopped_claim_carries_on_without_a_new_attempt(backend, run_id):
     api.record_step("CLM-1001", "started")
 
     def decide(claim_id, run_id):
-        api.decide_claim(claim_id, **DECISION)
+        records.decide(claim_id, DECISION)
         return "Approved for $100.00."
 
     work.work_claim(run_id, "CLM-1001", decide)
@@ -106,7 +107,7 @@ def test_a_claim_that_failed_starts_afresh_on_a_new_thread(backend, run_id):
         api.record_step(claim_id, "started")
         if api.get_claim(claim_id)["thread"] == 1:
             raise RuntimeError("boom")
-        api.decide_claim(claim_id, **DECISION)
+        records.decide(claim_id, DECISION)
         return "Approved for $100.00."
 
     work.work_claim(run_id, "CLM-1001", decide)
@@ -119,7 +120,7 @@ def test_a_claim_that_failed_starts_afresh_on_a_new_thread(backend, run_id):
 def test_a_referral_is_left_for_a_handler_in_one_line(backend, run_id):
     def decide(claim_id, run_id):
         refer = {**DECISION, "decision": "refer", "payout": Decimal(0)}
-        api.decide_claim(claim_id, **refer)
+        records.decide(claim_id, refer)
         return "A long\nmulti-line account of the referral."
 
     outcome = work.work_claim(run_id, "CLM-1001", decide)
@@ -132,7 +133,7 @@ def test_a_referral_is_left_for_a_handler_in_one_line(backend, run_id):
 
 def test_a_held_approval_is_done_and_says_it_waits(backend, run_id):
     def decide(claim_id, run_id):
-        api.decide_claim(claim_id, **{**DECISION, "payout": Decimal("2000.00")})
+        records.decide(claim_id, {**DECISION, "payout": Decimal("2000.00")})
         return "Approved."
 
     work.work_claim(run_id, "CLM-1001", decide)

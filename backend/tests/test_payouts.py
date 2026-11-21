@@ -2,7 +2,7 @@ import pytest
 
 from backend import payouts
 
-POLICY = "POL-2001"
+CLAIM = "CLM-1001"
 
 
 def line(description, amount, kind="item", quantity=1, **extra):
@@ -17,11 +17,10 @@ def line(description, amount, kind="item", quantity=1, **extra):
     }
 
 
-def payout(client, benefit, lines, paid_by_others="0.00", policy_id=POLICY):
+def payout(client, benefit, lines, paid_by_others="0.00", claim_id=CLAIM):
     response = client.post(
-        "/api/payouts",
+        f"/api/claims/{claim_id}/payout",
         json={
-            "policy_id": policy_id,
             "benefit": benefit,
             "lines": lines,
             "paid_by_others": paid_by_others,

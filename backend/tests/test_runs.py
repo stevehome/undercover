@@ -1,5 +1,7 @@
 import pytest
 
+from backend.tests import records
+
 DISPATCH = {
     "concurrency": 3,
     "model": "stub/model",
@@ -19,7 +21,7 @@ def decide(client, claim_id, payout):
         "reason": "Stubbed.",
         "policy_reference": "S1",
     }
-    client.post(f"/api/claims/{claim_id}/decision", json=body)
+    records.decide(client, claim_id, body)
 
 
 def test_a_dispatch_takes_waiting_and_in_progress_claims_oldest_first(client):
@@ -142,7 +144,7 @@ def test_the_summary_is_built_from_the_records(client):
             "reason": "Stubbed.",
             "policy_reference": "S1",
         }
-        client.post(f"/api/claims/{claim_id}/decision", json=body)
+        records.decide(client, claim_id, body)
     url = f"/api/runs/{run['run_id']}/claims"
     client.post(f"{url}/CLM-1004", json={"status": "left for a handler", "note": ""})
     client.post(f"{url}/CLM-1005", json={"status": "left for a handler", "note": ""})
@@ -184,9 +186,10 @@ def test_requeue_starts_a_new_thread(client):
 
 
 def test_requeue_decided_claim_is_blocked(client):
-    client.post(
-        "/api/claims/CLM-1001/decision",
-        json={
+    records.decide(
+        client,
+        "CLM-1001",
+        {
             "decision": "approve",
             "payout": 420.0,
             "reason": "Routine trip delay with receipts.",

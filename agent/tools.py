@@ -1,8 +1,8 @@
 """Everything the agents can do: one tool for each thing they may do.
 
 Tools get their state from the run's context, never from closures or globals. The
-claim agent's tools take no id from the model: they fill in the claim and its
-policy, so the model acts only on its own claim.
+claim agent's tools take no id from the model: they fill in the claim and who
+makes the decision, so the model acts only on its own claim.
 """
 
 from decimal import Decimal
@@ -120,7 +120,7 @@ def calculate_payout(
     """
     context = runtime.context
     arguments = {
-        "policy_id": context.policy_id,
+        "claim_id": context.claim_id,
         "benefit": benefit,
         "lines": lines,
         "paid_by_others": paid_by_others,
@@ -144,6 +144,7 @@ def decide_claim(
         "payout": payout,
         "reason": reason,
         "policy_reference": policy_reference,
+        "decided_by": context.decided_by,
     }
     context.route.call(APP, "decide_claim", arguments)
     detail = f" for ${payout:,.2f}" if decision == "approve" else ""

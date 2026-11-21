@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from agent import agents, api, routes
@@ -55,6 +57,10 @@ def test_the_same_tools_decide_and_pay_a_claim_on_either_route(
     texts = steps(backend)
     assert "Read the claim, its policy and the customer's claim history" in texts
     assert texts[-2:] == ["Decided: approve for $420.00", "Paid $420.00"]
+    claim = api.get_claim(CLAIM)
+    assert claim["decided_by"] == "UnderCover Agent, configuration version 1"
+    assert claim["manual_version"] == "2026.2"
+    assert sum(Decimal(s["amount"]) for s in claim["calculation"]) == Decimal("420.00")
 
 
 def test_the_gateway_route_calls_the_tools_and_the_payment_as_the_gateways(
@@ -74,9 +80,10 @@ def test_the_gateway_route_calls_the_tools_and_the_payment_as_the_gateways(
     ]
 
 
-def test_no_tool_takes_a_claim_a_policy_or_a_customer_from_the_model():
+def test_no_tool_takes_a_claim_a_policy_a_customer_or_the_maker_from_the_model():
+    ids = {"claim_id", "policy_id", "customer_id", "decided_by"}
     for tool in CLAIM_TOOLS:
-        assert not {"claim_id", "policy_id", "customer_id"} & set(tool.args), tool.name
+        assert not ids & set(tool.args), tool.name
 
 
 def test_a_refusal_by_the_app_reaches_the_model_and_the_claim_goes_on(
@@ -84,7 +91,7 @@ def test_a_refusal_by_the_app_reaches_the_model_and_the_claim_goes_on(
 ):
     refused = decide("decline", "100.00")  # only an approval has a payout
 
-    agents.decide_claim(CLAIM, script(refused, decide(), "Approved."), saver)
+    agents.decide_claim(CLAIM, script(refused, PAYOUT, decide(), "Approved."), saver)
 
     assert any(s.startswith("Refused by the app: ") for s in steps(backend))
     assert api.get_claim(CLAIM)["status"] == "decided"
@@ -139,7 +146,7 @@ CONTEXT_CALLS = [
 def test_all_seven_context_tools_answer_on_either_route(
     backend, script, saver, on_route
 ):
-    reply = script(*CONTEXT_CALLS, decide(), "Approved.")
+    reply = script(*CONTEXT_CALLS, PAYOUT, decide(), "Approved.")
 
     agents.decide_claim(CLAIM, reply, saver)
 
@@ -157,7 +164,7 @@ def test_all_seven_context_tools_answer_on_either_route(
 def test_the_gateway_names_the_context_layers_tools_after_its_target(
     script, saver, on_gateway
 ):
-    agents.decide_claim(CLAIM, script(*CONTEXT_CALLS, decide(), "Done."), saver)
+    agents.decide_claim(CLAIM, script(*CONTEXT_CALLS, PAYOUT, decide(), "Done."), saver)
 
     context_calls = [n for n in on_gateway.names if "context" in n]
     assert context_calls == [
@@ -176,10 +183,22 @@ def test_a_section_that_does_not_exist_is_a_refusal_by_the_context_layer(
 ):
     missing = ("read_section", {"document": "claims_manual", "number": 99})
 
-    agents.decide_claim(CLAIM, script(missing, decide(), "Approved."), saver)
+    agents.decide_claim(CLAIM, script(missing, PAYOUT, decide(), "Approved."), saver)
 
     refusals = [s for s in steps(backend) if s.startswith("Refused by")]
     assert len(refusals) == 1
     assert refusals[0].startswith("Refused by the context layer: ")
     assert "no section 99" in refusals[0]
+    assert api.get_claim(CLAIM)["status"] == "decided"
+
+
+def test_an_approval_before_any_calculation_is_refused_and_the_model_puts_it_right(
+    backend, script, saver, on_route
+):
+    agents.decide_claim(CLAIM, script(decide(), PAYOUT, decide(), "Approved."), saver)
+
+    refused = [s for s in steps(backend) if s.startswith("Refused by the app")]
+    assert len(refused) == 1
+    assert "Claims manual section 14" in refused[0]
+    assert "calculation" in refused[0]
     assert api.get_claim(CLAIM)["status"] == "decided"

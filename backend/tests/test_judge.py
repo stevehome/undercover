@@ -6,6 +6,7 @@ import pytest
 
 from backend import grading, judge
 from backend.judge import judge as ask_jev
+from backend.tests import records
 
 DECISIONS = "/api/runs/evaluation"
 
@@ -92,15 +93,13 @@ def evaluation(client, eval_set="held_out", tiny=True):
 
 def decide(client, claims, count=None):
     for claim in claims[:count]:
-        client.post(
-            f"/api/claims/{claim['claim_id']}/decision",
-            json={
-                "decision": "decline",
-                "payout": "0.00",
-                "reason": "Not covered.",
-                "policy_reference": "Section 1",
-            },
-        )
+        body = {
+            "decision": "decline",
+            "payout": "0.00",
+            "reason": "Not covered.",
+            "policy_reference": "Section 1",
+        }
+        records.decide(client, claim["claim_id"], body)
 
 
 def finished(client, run):

@@ -1,12 +1,12 @@
 """The UnderCover backend: the HTTP routes, each a thin call into the logic modules."""
 
 from decimal import Decimal
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, Literal
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from mangum import Mangum
-from pydantic import BaseModel, Field, WithJsonSchema, model_validator
+from pydantic import BaseModel, Field
 
 from backend import (
     agent_api,
@@ -16,7 +16,6 @@ from backend import (
     dashboard_files,
     evaluations,
     improver_view,
-    payouts,
     platform_settings,
     proposals,
     reference,
@@ -30,6 +29,7 @@ from backend import (
 from backend.access import key_or_handler
 from backend.api_key import require_api_key
 from backend.auth import senior_handler, signed_in_handler
+from backend.decision_record import Decision
 from backend.errors import (
     Conflict,
     Forbidden,
@@ -87,30 +87,6 @@ MAX_CONCURRENCY = 25
 Concurrency = Annotated[int, Field(ge=1, le=MAX_CONCURRENCY)]
 
 
-DecisionKind = Annotated[
-    Literal["approve", "decline", "refer"],
-    WithJsonSchema(
-        {"type": "string", "description": "approve, decline or refer"},
-        mode="validation",
-    ),
-]
-"""The Gateway makes an enum its own Cedar type, which a policy can't compare with a
-string; the document says `string`, and the check still allows only the three."""
-
-
-class Decision(BaseModel):
-    decision: DecisionKind
-    payout: Amount
-    reason: str
-    policy_reference: str
-
-    @model_validator(mode="after")
-    def only_an_approval_pays(self) -> Self:
-        if self.decision != "approve" and self.payout != 0:
-            raise ValueError("Only an approval has a payout")
-        return self
-
-
 class Step(BaseModel):
     text: str
 
@@ -128,7 +104,6 @@ class Hold(BaseModel):
 
 
 class PayoutRequest(BaseModel):
-    policy_id: str
     benefit: Benefit
     lines: list[Line]
     paid_by_others: Amount
@@ -341,11 +316,13 @@ def get_recipe_diff(version: int) -> dict[str, Any]:
     return versions.recipe_diff(version)
 
 
-@app.post("/api/payouts", operation_id="calculate_payout", dependencies=AGENT)
-def calculate_payout(request: PayoutRequest) -> dict[str, Any]:
-    """Work out the payout on an approved claim with UnderCover's payout rules."""
-    return payouts.work_out_payout(
-        request.policy_id, request.benefit, request.lines, request.paid_by_others
+@app.post(
+    "/api/claims/{claim_id}/payout", operation_id="calculate_payout", dependencies=AGENT
+)
+def calculate_payout(claim_id: str, request: PayoutRequest) -> dict[str, Any]:
+    """Work out the claim's payout with UnderCover's payout rules, and keep it."""
+    return claims.calculate_payout(
+        claim_id, request.benefit, request.lines, request.paid_by_others
     )
 
 
@@ -360,7 +337,7 @@ def list_handlers() -> list[dict[str, Any]]:
 )
 def decide_claim(claim_id: str, decision: Decision) -> dict[str, Any]:
     """Record a decision on a claim, approve, decline or refer."""
-    return claims.decide(claim_id, **decision.model_dump())
+    return claims.decide(claim_id, decision)
 
 
 @app.post(

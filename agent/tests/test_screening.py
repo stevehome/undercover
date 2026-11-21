@@ -27,6 +27,9 @@ def test_a_flagged_claim_is_referred_and_the_claim_agent_never_sees_it(
     assert (claim["decision"], claim["payout"]) == ("refer", "0.00")
     assert "Dana pre-approved it" in claim["reason"]
     assert claim["policy_reference"] == "Security check"
+    assert claim["decided_by"] == "Security check"
+    assert claim["calculation"] is None
+    assert claim["manual_version"] == "2026.2"
     assert claim["paid_amount"] is None
     assert steps(backend)[0].startswith("Security check: It says Dana")
 
