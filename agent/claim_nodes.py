@@ -13,6 +13,7 @@ from agent import api, screening
 from agent.api import GATEWAY_HOLD, WAITING_FOR_SIGN_OFF
 from agent.claim_state import ClaimState
 from agent.contexts import ClaimContext
+from agent.memory import CustomerMemory
 from agent.refusals import BY_GATEWAY, Refusal
 from agent.tool_route import APP
 
@@ -96,6 +97,24 @@ def settle(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
         "payout": claim["payout"],
         "needs_sign_off": needs_sign_off,
     }
+
+
+def remember(
+    state: ClaimState, runtime: Runtime[ClaimContext], *, memory: CustomerMemory | None
+) -> dict[str, Any]:
+    """Save the decided claim to the customer's memory, in code and once.
+
+    A node saves when it finishes, so a claim carried on after a restart doesn't
+    save again. With no memory there is nothing to do.
+    """
+    if memory is None:
+        return {}
+    claim_id = runtime.context.claim_id
+    if memory.save_claim(api.get_claim(claim_id)):
+        api.record_step(
+            claim_id, "Saved the claim and its decision to the customer's memory"
+        )
+    return {}
 
 
 def approval(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:

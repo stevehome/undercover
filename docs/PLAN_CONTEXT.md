@@ -99,10 +99,10 @@ Puts the app's tools on both routes. The context layer joins them in Phase 2.
 
 **Success criteria**
 
-- [ ] With a stand-in store: the two events are saved after a decision, nothing for a claim the check referred or for an evaluation's copy, a search stays within the claim's customer and leaves out the claim in hand, and there is no memory tool when memory is off.
-- [ ] A claim carried on after a restart doesn't save twice (graph test).
-- [ ] With the store failing, the decision stands and a warning is logged; a failed search is a refusal.
-- [ ] `npm run check` passes with `.env` away. `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the memory. Commit.
+- [x] With a stand-in store: the two events are saved after a decision, nothing for a claim the check referred or for an evaluation's copy, a search stays within the claim's customer and leaves out the claim in hand, and there is no memory tool when memory is off.
+- [x] A claim carried on after a restart doesn't save twice (graph test).
+- [x] With the store failing, the decision stands and a warning is logged; a failed search is a refusal.
+- [x] `npm run check` passes with `.env` away. `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the memory. Commit.
 
 ## Phase 5: Every step on the claim page
 

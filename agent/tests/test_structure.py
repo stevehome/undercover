@@ -218,3 +218,10 @@ def test_the_app_no_longer_reads_the_files_that_moved_to_the_context_layer():
     text = (ROOT / "backend" / "seed_data.py").read_text()
     for name in ("plans.json", "policy_wording.md", "claims_manual.md"):
         assert name not in text, name
+
+
+def test_only_memory_talks_to_agentcore_memory():
+    for path in AGENT_MODULES:
+        if path.name != "memory.py":
+            modules = {m.split(".")[0] for m in _imported_modules(path)}
+            assert "langgraph_checkpoint_aws" not in modules, path.name

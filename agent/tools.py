@@ -6,14 +6,16 @@ makes the decision, so the model acts only on its own claim.
 """
 
 from decimal import Decimal
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from langchain.tools import ToolRuntime, tool
+from langchain_core.tools import BaseTool
 
 from agent import api
 from agent.api import Amount, Benefit, Decision, Line
 from agent.claim_text import claim_text
 from agent.contexts import ClaimContext
+from agent.memory import CustomerMemory
 from agent.tool_route import APP, CONTEXT
 
 Document = Literal["policy_wording", "claims_manual"]
@@ -152,6 +154,16 @@ def decide_claim(
     return "Recorded"
 
 
+@tool
+def search_memory(query: str, runtime: ToolRuntime[ClaimContext]) -> list[str]:
+    """Search what we remember about this claim's customer from their earlier claims."""
+    context = runtime.context
+    memory = cast(CustomerMemory, context.memory)  # only offered when memory is on
+    found = memory.search(context.customer_id, query, context.claim_id)
+    api.record_step(context.claim_id, f"Searched the customer's memory for {query}")
+    return found
+
+
 CLAIM_TOOLS = [
     get_claim,
     lookup_term,
@@ -164,3 +176,8 @@ CLAIM_TOOLS = [
     calculate_payout,
     decide_claim,
 ]
+
+
+def claim_tools(memory: bool) -> list[BaseTool]:
+    """Return the claim agent's tools, with a memory search only when memory is on."""
+    return [*CLAIM_TOOLS, search_memory] if memory else CLAIM_TOOLS

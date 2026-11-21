@@ -13,12 +13,13 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import api, backend_http, harness
+from agent import api, backend_http, harness, memory
 from agent.gateway import GatewayRoute
 from agent.mcp_connection import McpConnection
 from agent.screening import Screening
 from agent.sigv4 import SigV4Auth
 from agent.tests.gateway_stand_in import StandInGateway, answer
+from agent.tests.stand_in_memory import StandInMemory
 from backend.main import app
 from conftest import API_KEY
 from context import server as context_server
@@ -206,3 +207,12 @@ def context_server_url():
 def context_layer(monkeypatch, context_server_url):
     """Point the direct route's context layer at the real one."""
     monkeypatch.setenv("UNDERCOVER_CONTEXT", context_server_url)
+
+
+@pytest.fixture
+def memory_on(monkeypatch):
+    """Turn the agent's memory on, with a stand-in for AgentCore Memory."""
+    store = StandInMemory()
+    monkeypatch.setenv("UNDERCOVER_MEMORY_ID", "memory-1")
+    monkeypatch.setattr(memory, "open_store", lambda memory_id: store)
+    return store

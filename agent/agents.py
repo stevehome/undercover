@@ -8,21 +8,24 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 
-from agent import api, checkpoint, harness, lease, routes, timing, tracing
+from agent import api, checkpoint, harness, lease, memory, routes, timing, tracing
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
+from agent.memory import CustomerMemory
 
 DECIDED_BY = "UnderCover Agent, configuration version"
 
 
 class Attempt(NamedTuple):
-    """What one working of a claim is recorded with: its thread, run, tags and maker."""
+    """What one working of a claim is recorded with and uses: its thread, run, tags,
+    maker and memory."""
 
     thread_id: str
     run_id: int | None
     tags: list[str]
     decided_by: str
+    memory: CustomerMemory | None
 
 
 def decide_claim(
@@ -65,17 +68,20 @@ def decide_claim(
             else api.run_configuration(run_id)
         )
         llm = llm or harness.model(harness.model_settings(configuration))
+        customer_memory = memory.open_for(claim)
         graph = build_graph(
             saver,
             llm,
             configuration["instructions"],
             screening_llm or harness.screening_model(),
+            customer_memory,
         )
         attempt = Attempt(
             thread_id,
             run_id,
             _tags(run_id, configuration["round_id"]),
             f"{DECIDED_BY} {configuration['version']}",
+            customer_memory,
         )
         outcome = Context().run(_work_traced, graph, claim, attempt)
         if claim["evaluation_run_id"] is not None:
@@ -112,7 +118,12 @@ def _work(
     else:
         start = None if state.next else new_claim(claim_id)
     context = ClaimContext(
-        claim_id, attempt.run_id, attempt.decided_by, routes.choose()
+        claim_id,
+        claim["customer_id"],
+        attempt.run_id,
+        attempt.decided_by,
+        routes.choose(),
+        attempt.memory,
     )
     with timing.segment(claim_id, attempt.run_id):
         result = graph.invoke(start, config, context=context, durability="sync")
