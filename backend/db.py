@@ -9,7 +9,6 @@ from pathlib import Path
 from threading import Lock
 
 from sqlalchemy import Connection, Engine, create_engine, func, insert, select, text
-from sqlalchemy.pool import NullPool
 
 from backend import money, seed_data, tables
 
@@ -45,9 +44,12 @@ def on_lambda() -> bool:
 def make_engine(url: str) -> Engine:
     """Make an engine; Postgres keeps our tables in their own schema.
 
-    On Lambda there is no pool, since each instance handles one request at a time
-    and Supabase's transaction pooler hands out a connection for each transaction,
-    and no prepared statements, which that pooler can't keep.
+    The tables are named with their schema in each statement, as Supabase's
+    transaction pooler can't be trusted to keep a connection's search path.
+    On Lambda each instance handles one request at a time, so it keeps one
+    connection for the next request, checked as it is taken, rather than making
+    a new one, which costs several trips to the database; and no prepared
+    statements, which that pooler can't keep.
     """
     json_options = {
         "json_serializer": lambda value: json.dumps(value, default=str),
@@ -55,15 +57,17 @@ def make_engine(url: str) -> Engine:
     }
     if url.startswith("sqlite"):
         return create_engine(url, **json_options)
+    in_schema = {"schema_translate_map": {None: SCHEMA}}
     if on_lambda():
         return create_engine(
             url,
             **json_options,
-            poolclass=NullPool,
-            connect_args={
-                "options": f"-c search_path={SCHEMA}",
-                "prepare_threshold": None,
-            },
+            pool_size=1,
+            max_overflow=0,
+            pool_pre_ping=True,
+            pool_recycle=RECYCLE_CONNECTION_SECONDS,
+            connect_args={"prepare_threshold": None},
+            execution_options=in_schema,
         )
     return create_engine(
         url,
@@ -73,7 +77,7 @@ def make_engine(url: str) -> Engine:
         pool_timeout=WAIT_FOR_CONNECTION_SECONDS,
         pool_pre_ping=True,
         pool_recycle=RECYCLE_CONNECTION_SECONDS,
-        connect_args={"options": f"-c search_path={SCHEMA}"},
+        execution_options=in_schema,
     )
 
 
