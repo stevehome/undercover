@@ -61,11 +61,29 @@ def get_full(claim_id: str) -> dict[str, Any]:
     return {
         **claim,
         **row,
+        "sent_back_decisions": list_sent_back(claim_id),
         "policy": reference.policy(claim["policy_id"]),
         "customer_previous_claims": reference.customer(claim["customer_id"])[
             "previous_claims"
         ],
     }
+
+
+def list_sent_back(claim_id: str) -> list[dict[str, Any]]:
+    """List a claim's decisions that were sent back, oldest first."""
+    columns = tables.sent_back_decisions.c
+    with db.connection() as conn:
+        rows = conn.execute(
+            select(tables.sent_back_decisions)
+            .where(columns.claim_id == claim_id)
+            .order_by(columns.id)
+        )
+        return [
+            money.dollar_fields(
+                {k: v for k, v in row._mapping.items() if k not in ("id", "claim_id")}
+            )
+            for row in rows
+        ]
 
 
 def calculate_payout(
@@ -307,6 +325,17 @@ def acquire_lease(claim_id: str, owner: str) -> int:
     if leased.rowcount == 0:
         raise Conflict("Claim is being worked by another agent")
     return LEASE_SECONDS
+
+
+def hear_resume(claim_id: str) -> None:
+    """Note that the agent is working a resumed claim, so a dispatch leaves it."""
+    get_row(claim_id)
+    with db.connection() as conn:
+        conn.execute(
+            update(tables.claims)
+            .where(tables.claims.c.claim_id == claim_id)
+            .values(resume_heard_on=db.now())
+        )
 
 
 def release_lease(claim_id: str, owner: str) -> None:

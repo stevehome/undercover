@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy import Connection, and_, func, insert, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
-from backend import db, grading, money, tables, usage, versions
+from backend import db, grading, money, quiet, tables, usage, versions
 from backend.errors import Conflict, NotFound
 from backend.statuses import ClaimStatus, ItemStatus, RunKind, RunStatus, Stage
 
@@ -120,8 +120,9 @@ def get_current_run() -> dict[str, Any] | None:
 def _claims_to_dispatch() -> list[str]:
     """List the queue's claims to work, oldest submitted first.
 
-    Those in progress and those waiting, and any approved and ready to pay
-    that a restart left unpaid. An evaluation's copies are never among them.
+    Those in progress and those waiting, those sent back, and any approved and ready
+    to pay that a restart left unpaid. A claim in progress whose resume the app has
+    heard from lately is left to it. An evaluation's copies are never among them.
     """
     columns = tables.claims.c
     payable = and_(
@@ -135,8 +136,19 @@ def _claims_to_dispatch() -> list[str]:
             .where(
                 columns.evaluation_run_id.is_(None),
                 or_(
-                    columns.status.in_([ClaimStatus.WAITING, ClaimStatus.IN_PROGRESS]),
+                    columns.status.in_(
+                        [
+                            ClaimStatus.WAITING,
+                            ClaimStatus.IN_PROGRESS,
+                            ClaimStatus.SENT_BACK,
+                        ]
+                    ),
                     payable,
+                ),
+                or_(
+                    columns.status != ClaimStatus.IN_PROGRESS,
+                    columns.resume_heard_on.is_(None),
+                    columns.resume_heard_on < quiet.cutoff(),
                 ),
             )
             .order_by(columns.submitted_on, columns.claim_id)

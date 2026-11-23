@@ -99,6 +99,13 @@ it("reads a claim's calculation as cents, a deduction with its sign", async () =
       { step: "Hotel", amount: "1000.00" },
       { step: "Less the deductible", amount: "-50.00" },
     ],
+    sent_back_decisions: [
+      {
+        payout: "1200.00",
+        calculation: [{ step: "Hotel", amount: "1200.00" }],
+        note: "Check the dates.",
+      },
+    ],
   };
   vi.stubGlobal(
     "fetch",
@@ -108,6 +115,8 @@ it("reads a claim's calculation as cents, a deduction with its sign", async () =
   const read = await fetchClaim("CLM-1001");
 
   expect(read.calculation?.map((line) => line.amount)).toEqual([100000, -5000]);
+  expect(read.sent_back_decisions[0].payout).toBe(120000);
+  expect(read.sent_back_decisions[0].calculation?.[0].amount).toBe(120000);
 });
 
 it("sends the signed-in handler's token with an action", async () => {

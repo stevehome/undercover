@@ -119,15 +119,26 @@ def remember(
 
 
 def approval(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
-    """Wait for a handler's sign-off, which pays. Code before `interrupt` runs twice.
+    """Wait for a handler's sign-off, which pays, or for a send back. Code before
+    `interrupt` runs twice.
 
-    An evaluation's copy is never signed off, so it does not wait.
+    A send back forgets the decision, adds the handler's note for the model and starts
+    its model calls again, so the agent decides anew. An evaluation's copy is never
+    signed off, so it does not wait.
     """
     if runtime.context.evaluation:
         return {}
     answer = interrupt(
         {"claim_id": runtime.context.claim_id, "payout": state["payout"]}
     )
+    if "message" in answer:
+        return {
+            "messages": [HumanMessage(answer["message"])],
+            "decision": "",
+            "payout": "",
+            "needs_sign_off": False,
+            "model_calls": 0,
+        }
     api.record_step(runtime.context.claim_id, f"Signed off by {answer['handler']}")
     return {}
 

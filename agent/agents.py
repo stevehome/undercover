@@ -10,6 +10,7 @@ from langgraph.types import Command
 
 from agent import (
     api,
+    backend_http,
     checkpoint,
     harness,
     lease,
@@ -19,6 +20,7 @@ from agent import (
     timing,
     tracing,
 )
+from agent.api import SENT_BACK
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
@@ -143,6 +145,11 @@ def _work(
     state = graph.get_state(config)
     if state.values and not state.next:
         return state.values["messages"][-1].text
+    if claim["status"] == SENT_BACK:
+        try:
+            api.take_claim(claim_id)
+        except backend_http.ApiRefusal:
+            return f"{claim_id} was taken by another agent."
     if paused.waiting(graph, config):
         answer = paused.answer(claim)
         if answer is None:

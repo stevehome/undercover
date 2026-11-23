@@ -4,6 +4,7 @@ import { formatMoney } from "../money";
 import { formatTime } from "../time";
 import type { Claim, Handler } from "../types";
 import { useMe } from "../useMe";
+import { SendBackForm } from "./SendBackForm";
 
 function SignOff({
   claimId,
@@ -12,14 +13,17 @@ function SignOff({
   const me = useMe();
   if (me?.can_approve_over_limit) {
     return (
-      <button
-        onClick={() => {
-          void signOffClaim(claimId).then(onUpdated);
-        }}
-        type="button"
-      >
-        Sign off as {me.name}
-      </button>
+      <>
+        <button
+          onClick={() => {
+            void signOffClaim(claimId).then(onUpdated);
+          }}
+          type="button"
+        >
+          Sign off as {me.name}
+        </button>
+        <SendBackForm claimId={claimId} onUpdated={onUpdated} />
+      </>
     );
   }
   return (

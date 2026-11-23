@@ -19,7 +19,7 @@ Our goal is to handle claims straight through, as accurately as our handlers do.
 
 A handler starts a dispatch on the queue page, choosing how many claim agents work at once, from 1 to 25. A dispatch works every claim left in progress and every waiting claim, oldest submitted first, with no model choosing the order. Only one dispatch or evaluation runs at a time. The page shows each claim of the dispatch and where it stands, the model cost and the time, and when the dispatch ends a summary built from our records: how many claims were approved, declined and referred, each payout waiting for a sign-off, and each claim left for a handler or still in progress. A claim shows as in progress while the agent works on it. Someone can also start the agent on one named claim from the command line.
 
-When the agent approves a payout over $1,000, it stops and waits for a handler, keeping everything it has worked out. When a handler signs off on the dashboard, the sign-off pays the claim in the same step, and the payment records who signed off and when. The agent doesn't need to be running. The agent itself never pays more than $1,000: the backend refuses any payment over the limit, so only a sign-off pays more. A handler can only sign off for now; rejecting a held payout comes later.
+When the agent approves a payout over $1,000, it stops and waits for a handler, keeping everything it has worked out. When a handler signs off on the dashboard, the sign-off pays the claim in the same step, and the payment records who signed off and when. The agent doesn't need to be running. The agent itself never pays more than $1,000: the backend refuses any payment over the limit, so only a sign-off pays more. A senior handler can also send the decision back to the agent with a note of up to 1,000 characters: the agent reads the note, checks it against the policy wording and the claims manual, and decides again at the next dispatch. A claim can be sent back more than once, and the claim page keeps each decision that was sent back with its note, who sent it and when. A sign-off and a send back can't both happen: whichever comes first wins. Rejecting a held payout outright comes later.
 
 If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C, it carries on with that claim from where it got to the next time it runs, and that doesn't count as a new attempt. A claim that hits a rate limit or a timeout waits and carries on from where it got to, and if it is still hitting them it stays in progress for the next dispatch. A claim that fails with any other error goes back in the queue and the same dispatch tries it once more, and a claim that fails twice is left for a handler. One bad claim never stops a dispatch. A dispatch that was stopped is finished by the next one. No claim is ever decided or paid twice.
 
@@ -47,7 +47,7 @@ A judge grades each explanation in an evaluation against the handler's reason, f
 
 ## What the team needs to see
 
-- The queue, with where each claim stands: waiting, in progress, waiting for sign-off or decided.
+- The queue, with where each claim stands: waiting, in progress, waiting for sign-off, sent back or decided.
 - Each claim in full, with the agent's decision and its reasons.
 - What the agent is doing on a claim while it works, step by step: each tool it calls, each lookup in the context layer with what was looked up and where it came from, each search or save in its memory, and each refusal, which stands out and says who refused it (the app, the context layer, the memory or the Gateway's Policy). A Context used panel lists everything the agent looked up in the context layer, once each, grouped by file, with each file's source. The decision shows its whole record: the payout's calculation line by line, who or what made the decision, when, and the claims manual's version.
 - What each claim cost to work, in model cost and time, and the totals for each dispatch.
@@ -73,4 +73,4 @@ Everything starts in `data/`, described in `data/README.md`, and is then kept in
 
 - No real payments.
 - No messages to customers.
-- Rejecting a held payout. A handler can only sign off.
+- Rejecting a held payout outright. A handler can sign off or send the decision back.

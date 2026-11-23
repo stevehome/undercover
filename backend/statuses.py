@@ -9,6 +9,7 @@ class ClaimStatus(StrEnum):
     WAITING = "waiting"
     IN_PROGRESS = "in progress"
     WAITING_FOR_SIGN_OFF = "waiting for sign-off"
+    SENT_BACK = "sent back"
     DECIDED = "decided"
 
 

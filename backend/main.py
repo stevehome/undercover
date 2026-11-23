@@ -22,6 +22,7 @@ from backend import (
     round_view,
     rounds,
     runs,
+    sent_back,
     spending,
     usage,
     versions,
@@ -99,6 +100,10 @@ class Lease(BaseModel):
 
 class Payment(BaseModel):
     amount: Amount
+
+
+class SendBack(BaseModel):
+    note: str
 
 
 class Hold(BaseModel):
@@ -372,6 +377,36 @@ def sign_off_claim(
     signed = claims.sign_off(claim_id, handler["handler_id"])
     background.add_task(agent_service.resume_claim, claim_id)
     return signed
+
+
+@app.post("/api/claims/{claim_id}/send-back", operation_id="send_back_claim")
+def send_back_claim(
+    claim_id: str, body: SendBack, handler: Senior, background: BackgroundTasks
+) -> dict[str, Any]:
+    """Send an approval waiting for sign-off back to the agent with a note.
+
+    The agent is asked to resume the claim once the send back is saved.
+    """
+    sent = sent_back.send_back_claim(claim_id, handler, body.note)
+    background.add_task(agent_service.resume_claim, claim_id)
+    return sent
+
+
+@app.post("/api/claims/{claim_id}/take", operation_id="take_claim", dependencies=AGENT)
+def take_claim(claim_id: str) -> dict[str, Any]:
+    """Take a sent-back claim for the agent; whoever asks second gets a 409."""
+    return sent_back.take_claim(claim_id)
+
+
+@app.post(
+    "/api/claims/{claim_id}/resume-heard",
+    operation_id="hear_resume",
+    dependencies=AGENT,
+)
+def hear_resume(claim_id: str) -> dict[str, str]:
+    """Note that the agent is working a resumed claim."""
+    claims.hear_resume(claim_id)
+    return {"claim_id": claim_id}
 
 
 @app.post(

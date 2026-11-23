@@ -33,7 +33,7 @@ test("the configuration page shows version 1 and what it changed", async ({
   ).toBeVisible();
   await expect(page.getByText("Current version: 1")).toBeVisible();
   await expect(
-    page.getByText("calling decide_claim once").first(),
+    page.getByText("calling decide_claim, with").first(),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Show changes" }).click();

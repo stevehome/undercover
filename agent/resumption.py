@@ -1,8 +1,8 @@
-"""Resuming a claim whose pause a handler has answered."""
+"""Resuming a claim whose pause a handler has answered: a sign-off or a send back."""
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
-from agent import agents, api, backend_http, paused
+from agent import agents, api, backend_http, heartbeat, paused
 
 
 def refusal(
@@ -22,3 +22,9 @@ def refusal(
     if paused.answer(claim) is None:
         return f"{claim_id} is waiting for a handler to sign off"
     return None
+
+
+def work(claim_id: str) -> str:
+    """Carry a claim on from its pause, telling the app every minute it is working."""
+    with heartbeat.beating(lambda: api.hear_resume(claim_id)):
+        return agents.decide_claim(claim_id)

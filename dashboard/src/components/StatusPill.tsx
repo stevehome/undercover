@@ -15,6 +15,7 @@ const TONES: Record<string, string> = {
   "change waiting": "wait",
   "recipe waiting": "wait",
   "waiting for sign-off": "alert",
+  "sent back": "alert",
   "still in progress": "alert",
   "rolled back": "bad",
   stopped: "bad",

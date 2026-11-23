@@ -7,6 +7,7 @@ afterEach(cleanup);
 it.each([
   ["kept", "pill-good"],
   ["waiting for sign-off", "pill-alert"],
+  ["sent back", "pill-alert"],
   ["rolled back", "pill-bad"],
   ["in progress", "pill-wait"],
   ["decided", "pill-good"],

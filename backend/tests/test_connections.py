@@ -73,3 +73,15 @@ def test_working_out_a_payout_and_requeueing_hold_one_connection_at_a_time(
     client.post("/api/claims/CLM-1005/requeue")
 
     assert deepest[0] == 1
+
+
+def test_a_send_back_a_take_and_a_heartbeat_hold_one_connection_at_a_time(
+    client, deepest
+):
+    records.decide(client, "CLM-1006", OVER_THE_LIMIT)
+    client.post("/api/claims/CLM-1006/send-back", json={"note": "Check the dates."})
+    client.post("/api/claims/CLM-1006/take")
+    client.post("/api/claims/CLM-1006/resume-heard")
+    client.get("/api/claims/CLM-1006")
+
+    assert deepest[0] == 1

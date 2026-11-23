@@ -1,5 +1,5 @@
 export type ClaimStatus =
-  "waiting" | "in progress" | "waiting for sign-off" | "decided";
+  "waiting" | "in progress" | "waiting for sign-off" | "sent back" | "decided";
 
 export type Decision = "approve" | "decline" | "refer";
 
@@ -83,8 +83,25 @@ export interface Claim {
   paid_on: string | null;
   /** The evaluation this claim is a copy for, or null for a queue claim. */
   evaluation_run_id: number | null;
+  /** Each decision a senior handler sent back, oldest first, with their note. */
+  sent_back_decisions: SentBackDecision[];
   policy: Policy;
   customer_previous_claims: PreviousClaim[];
+}
+
+/** A decision a senior handler sent back to the agent, with the note they wrote. */
+export interface SentBackDecision {
+  decision: Decision;
+  payout: number;
+  reason: string;
+  policy_reference: string;
+  decided_by: string | null;
+  decided_on: string;
+  calculation: CalculationLine[] | null;
+  manual_version: string | null;
+  note: string;
+  sent_back_by: string;
+  sent_back_on: string;
 }
 
 /** One line of a payout's calculation, in whole cents. */

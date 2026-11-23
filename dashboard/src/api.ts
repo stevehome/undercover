@@ -20,6 +20,7 @@ import type {
   DiffLine,
   Recipe,
   Round,
+  SentBackDecision,
   Scores,
 } from "./types";
 
@@ -29,14 +30,31 @@ type WireSummary = Omit<ClaimSummary, "amount_claimed"> & {
 
 type WireClaim = Omit<
   Claim,
-  "amount_claimed" | "items" | "payout" | "paid_amount" | "calculation"
+  | "amount_claimed"
+  | "items"
+  | "payout"
+  | "paid_amount"
+  | "calculation"
+  | "sent_back_decisions"
 > & {
   amount_claimed: string;
   items: (Omit<Item, "amount"> & { amount: string })[];
   payout: string | null;
   paid_amount: string | null;
-  calculation: { step: string; amount: string }[] | null;
+  calculation: WireLine[] | null;
+  sent_back_decisions: (Omit<SentBackDecision, "payout" | "calculation"> & {
+    payout: string;
+    calculation: WireLine[] | null;
+  })[];
 };
+
+interface WireLine {
+  step: string;
+  amount: string;
+}
+
+const linesFromWire = (lines: WireLine[] | null) =>
+  lines?.map((line) => ({ ...line, amount: parseCents(line.amount) })) ?? null;
 
 interface WireStep {
   recorded_on: string;
@@ -104,11 +122,12 @@ export async function fetchClaim(claimId: string): Promise<Claim> {
     })),
     payout: optionalCents(claim.payout),
     paid_amount: optionalCents(claim.paid_amount),
-    calculation:
-      claim.calculation?.map((line) => ({
-        ...line,
-        amount: parseCents(line.amount),
-      })) ?? null,
+    calculation: linesFromWire(claim.calculation),
+    sent_back_decisions: claim.sent_back_decisions.map((sent) => ({
+      ...sent,
+      payout: parseCents(sent.payout),
+      calculation: linesFromWire(sent.calculation),
+    })),
   };
 }
 
@@ -358,6 +377,10 @@ export const runAgent = (claimId: string) => post(`/api/claims/${claimId}/run`);
 
 export const signOffClaim = (claimId: string) =>
   post(`/api/claims/${claimId}/sign-off`);
+
+/** Send an approval back to the agent with a note it must read. */
+export const sendBackClaim = (claimId: string, note: string) =>
+  post(`/api/claims/${claimId}/send-back`, { note });
 
 /** The signed-in handler, and whether they can sign off over the limit. */
 export const fetchMe = () => getJson<Handler>("/api/me");

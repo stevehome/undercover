@@ -30,6 +30,7 @@ Benefit = Literal[
 ]
 WAITING = "waiting"
 WAITING_FOR_SIGN_OFF = "waiting for sign-off"
+SENT_BACK = "sent back"
 RunClaimStatus = Literal[
     "to do", "in progress", "done", "left for a handler", "still in progress"
 ]
@@ -129,6 +130,16 @@ def pay_claim(claim_id: str, amount: Amount) -> dict[str, Any]:
 def hold_for_sign_off(claim_id: str, reason: HoldReason) -> dict[str, Any]:
     """Hold an approved, unpaid claim for a handler's sign-off, and return the claim."""
     return _call("POST", f"/api/claims/{claim_id}/hold", json={"reason": reason})
+
+
+def take_claim(claim_id: str) -> dict[str, Any]:
+    """Take a claim a handler sent back; a second taker is refused."""
+    return _call("POST", f"/api/claims/{claim_id}/take")
+
+
+def hear_resume(claim_id: str) -> None:
+    """Tell the app the agent is still working a resumed claim."""
+    _call("POST", f"/api/claims/{claim_id}/resume-heard")
 
 
 def record_model_call(

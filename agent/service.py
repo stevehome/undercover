@@ -12,7 +12,6 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
 from agent import (
-    agents,
     api,
     backend_http,
     checkpoint,
@@ -82,7 +81,7 @@ def round_worker() -> Callable[..., None]:
 
 def claim_worker() -> Callable[[str], str]:
     """Return what carries on with a claim; tests swap in a stub model."""
-    return agents.decide_claim
+    return resumption.work
 
 
 def claim_refusal() -> Callable[[str], str | None]:

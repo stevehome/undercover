@@ -16,6 +16,7 @@ const TOTALS = [
   ["Waiting", "waiting"],
   ["In progress", "in progress"],
   ["Waiting for sign-off", "waiting for sign-off"],
+  ["Sent back", "sent back"],
   ["Decided", "decided"],
 ] as const;
 

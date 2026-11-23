@@ -126,6 +126,7 @@ claims = Table(
     Column("manual_version", String),
     Column("signed_off_on", String),
     Column("hold_reason", String),
+    Column("resume_heard_on", String),
     Column("paid_cents", Integer),
     Column("paid_on", String),
     Column("lease_owner", String),
@@ -151,6 +152,7 @@ STATE_COLUMNS = [
         "signed_off_by",
         "signed_off_on",
         "hold_reason",
+        "resume_heard_on",
         "paid_cents",
         "paid_on",
         "evaluation_run_id",
@@ -182,6 +184,24 @@ payout_calculations = Table(
     Column("steps", JSON, nullable=False),
     Column("payout_cents", Integer, nullable=False),
     Column("calculated_on", String, nullable=False),
+)
+
+sent_back_decisions = Table(
+    "sent_back_decisions",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("claim_id", String, nullable=False),
+    Column("decision", String, nullable=False),
+    Column("payout_cents", Integer, nullable=False),
+    Column("reason", String, nullable=False),
+    Column("policy_reference", String, nullable=False),
+    Column("decided_by", String),
+    Column("decided_on", String, nullable=False),
+    Column("calculation", JSON),
+    Column("manual_version", String),
+    Column("note", String, nullable=False),
+    Column("sent_back_by", String, nullable=False),
+    Column("sent_back_on", String, nullable=False),
 )
 
 claim_steps = Table(

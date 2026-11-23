@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { requestUrl } from "../testHelpers";
@@ -49,6 +50,7 @@ function makeClaim(overrides: Partial<Claim>): Claim {
     paid_amount: null,
     paid_on: null,
     evaluation_run_id: null,
+    sent_back_decisions: [],
     policy: {
       policy_id: "POL-2003",
       customer_id: "CUS-3003",
@@ -105,6 +107,43 @@ it("lets a handler sign off an over-limit claim", async () => {
 
   await waitFor(() => {
     expect(calls).toContain("/api/claims/CLM-1003/sign-off");
+  });
+});
+
+it("offers a senior handler a send back beside the sign-off, with a required note", async () => {
+  const calls: { url: string; body: string }[] = [];
+  const impl = (input: FetchInput, init?: RequestInit): Promise<Response> => {
+    const url = requestUrl(input);
+    calls.push({ url, body: typeof init?.body === "string" ? init.body : "" });
+    return Promise.resolve(new Response(JSON.stringify(handlers)));
+  };
+  vi.stubGlobal("fetch", vi.fn(impl));
+  render(
+    <MeContext.Provider value={handlers[0]}>
+      <PaymentPanel claim={makeClaim({})} onUpdated={() => undefined} />
+    </MeContext.Provider>,
+  );
+
+  expect(
+    screen.getByRole("button", { name: "Sign off as Dana Whitfield" }),
+  ).toBeDefined();
+  const send = screen.getByRole("button", { name: "Send back" });
+  expect((send as HTMLButtonElement).disabled).toBe(true);
+
+  fireEvent.change(screen.getByLabelText(/A note for the agent/), {
+    target: { value: "  The dates don't match.  " },
+  });
+  fireEvent.click(send);
+  const dialog = screen.getByRole("dialog", {
+    name: "Send CLM-1003 back to the agent?",
+  });
+  fireEvent.click(within(dialog).getByRole("button", { name: "Send back" }));
+
+  await waitFor(() => {
+    expect(calls).toContainEqual({
+      url: "/api/claims/CLM-1003/send-back",
+      body: JSON.stringify({ note: "The dates don't match." }),
+    });
   });
 });
 
@@ -196,7 +235,7 @@ it("shows no sign-off buttons on an evaluation's copy", () => {
   expect(screen.queryByRole("button")).toBeNull();
 });
 
-it("tells a handler who can't sign off why, and offers no button", () => {
+it("tells a handler who can't sign off why, and offers no button or note", () => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("[]")));
   const marcus: Handler = {
     ...handlers[0],
@@ -213,4 +252,5 @@ it("tells a handler who can't sign off why, and offers no button", () => {
 
   expect(screen.getByText(/Marcus Oyelaran can't sign off/)).toBeDefined();
   expect(screen.queryByRole("button")).toBeNull();
+  expect(screen.queryByLabelText(/A note for the agent/)).toBeNull();
 });

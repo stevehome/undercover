@@ -4,8 +4,9 @@ START -> screen -> agent <-> tools, or refer_flagged -> END for a flagged claim.
 agent -> settle; settle -> agent (no decision yet), approval (over the limit), pay
 (at or under it) or remember (a decline or a referral). pay -> approval when the
 Gateway refuses the payment, else remember. approval pauses until a handler signs
-off, which pays, and goes on to remember. remember -> END, the last node of every
-path: the claim is saved to the customer's memory once its decision is final.
+off, which pays, and goes on to remember, or, when a handler sends the decision
+back, to agent. remember -> END, the last node of every path: the claim is saved to
+the customer's memory once its decision is final.
 """
 
 from functools import partial
@@ -49,6 +50,11 @@ def after_settle(
 def after_pay(state: ClaimState) -> Literal["approval", "remember"]:
     """Send a payment the Gateway refused to a sign-off, else on to be remembered."""
     return "approval" if state["needs_sign_off"] else "remember"
+
+
+def after_approval(state: ClaimState) -> Literal["agent", "remember"]:
+    """Send a claim whose decision was sent back to the agent, else remember it."""
+    return "remember" if state["decision"] else "agent"
 
 
 def build_graph(
@@ -97,6 +103,6 @@ def build_graph(
         "settle", after_settle, ["agent", "approval", "pay", "remember"]
     )
     builder.add_conditional_edges("pay", after_pay, ["approval", "remember"])
-    builder.add_edge("approval", "remember")
+    builder.add_conditional_edges("approval", after_approval, ["agent", "remember"])
     builder.add_edge("remember", END)
     return builder.compile(checkpointer=checkpointer)

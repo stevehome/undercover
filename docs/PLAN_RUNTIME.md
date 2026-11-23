@@ -57,7 +57,7 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 - [x] `resume_claim` refuses a claim that isn't paused, one that is paused but not signed off and one that doesn't exist, each with its reason, and works a signed-off one beside a dispatch without waiting for it.
 - [x] A sign-off pays and answers with the claim when the agent can't be reached, and the app logs a warning; a test with a stand-in agent that is down, one that times out and one that answers.
 - [ ] With `npm run dev` running, a claim over the limit pauses, and signing it off on the dashboard pays it and ends the agent's work (Playwright MCP, as Dana Whitfield), with the claim's steps ending "Signed off by Dana Whitfield".
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/STATUS.md` describes it. Commit.
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/STATUS.md` describes it. Commit.
 
 ## Phase 2: Sign off or send back (step 2)
 
@@ -73,14 +73,14 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 
 **Success criteria**
 
-- [ ] Backend tests: a send back refused for a non-senior handler, a blank note, a note over 1,000 characters, an evaluation's copy, a claim that isn't waiting for sign-off, and a claim already sent back; the decision kept with its note, who and when, and the claim's own decision cleared.
-- [ ] A sign-off and a send back at the same moment: exactly one goes through, whichever is first, and the other is a 409 (two requests, in threads).
-- [ ] A sent-back claim is taken once when a resume and a dispatch both ask; the second gets a 409 and leaves it.
-- [ ] A dispatch started while a resume is working leaves its claim alone; the same dispatch takes a sent-back claim nobody has taken.
-- [ ] A new decision after a send back is paid when within the limit, waits for sign-off again when over it, and an approval without a fresh calculation is refused; a claim can be sent back twice.
-- [ ] A send back the agent never received: the next dispatch works the claim, and a dispatch that carries on a claim whose thread is still paused resumes it with the note.
-- [ ] A graph test with a scripted model: after a send back the model sees the message naming the handler and how to treat the note, its model-call count starts again, and nothing pays the earlier decision.
-- [ ] vitest: the two buttons for a senior handler and neither for the other; the note required; each sent-back decision on the claim page; `sent back` in the queue.
+- [x] Backend tests: a send back refused for a non-senior handler, a blank note, a note over 1,000 characters, an evaluation's copy, a claim that isn't waiting for sign-off, and a claim already sent back; the decision kept with its note, who and when, and the claim's own decision cleared.
+- [x] A sign-off and a send back at the same moment: exactly one goes through, whichever is first, and the other is a 409 (two requests, in threads).
+- [x] A sent-back claim is taken once when a resume and a dispatch both ask; the second gets a 409 and leaves it.
+- [x] A dispatch started while a resume is working leaves its claim alone; the same dispatch takes a sent-back claim nobody has taken.
+- [x] A new decision after a send back is paid when within the limit, waits for sign-off again when over it, and an approval without a fresh calculation is refused; a claim can be sent back twice.
+- [x] A send back the agent never received: the next dispatch works the claim, and a dispatch that carries on a claim whose thread is still paused resumes it with the note.
+- [x] A graph test with a scripted model: after a send back the model sees the message naming the handler and how to treat the note, its model-call count starts again, and nothing pays the earlier decision.
+- [x] vitest: the two buttons for a senior handler and neither for the other; the note required; each sent-back decision on the claim page; `sent back` in the queue.
 - [ ] With `npm run dev` running, a claim sent back with a note is decided again by the agent, and the claim page shows both decisions and the note (Playwright MCP, as Dana Whitfield).
 - [ ] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md` and `docs/STATUS.md` describe it. Commit.
 
