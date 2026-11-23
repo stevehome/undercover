@@ -19,6 +19,7 @@ from agent import (
     dispatcher,
     harness,
     improver_api,
+    resumption,
     rounds,
     stopwatch,
 )
@@ -84,6 +85,11 @@ def claim_worker() -> Callable[[str], str]:
     return agents.decide_claim
 
 
+def claim_refusal() -> Callable[[str], str | None]:
+    """Return what says why a claim can't be resumed; tests swap in their saver."""
+    return resumption.refusal
+
+
 def dispatch_worker() -> Callable[[int, int], object]:
     """Return what works a run's claims; tests swap in a stand-in."""
     return dispatcher.run_dispatch
@@ -100,8 +106,12 @@ def resume_claim(
     claim_id: str,
     background: BackgroundTasks,
     worker: Annotated[Callable[[str], str], Depends(claim_worker)],
+    refusal: Annotated[Callable[[str], str | None], Depends(claim_refusal)],
 ) -> dict[str, str]:
-    """Carry on with a signed-off claim, and pay it."""
+    """Carry on with a claim whose pause has been answered; refused if it hasn't."""
+    reason = refusal(claim_id)
+    if reason is not None:
+        raise HTTPException(409, reason)
     background.add_task(worker, claim_id)
     return {"claim_id": claim_id}
 

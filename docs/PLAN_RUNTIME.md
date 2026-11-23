@@ -50,12 +50,12 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 
 **Success criteria**
 
-- [ ] A test with stand-ins: an approval over the limit pauses with its place saved in the checkpoint, and the claim shows as waiting for sign-off; the thread has one interrupt waiting.
-- [ ] A payment the Gateway refuses pauses the same way, after the hold.
-- [ ] An evaluation's copy over the limit doesn't pause: its work ends and its saved progress is cleared, as today.
-- [ ] A resume after a sign-off ends the work without paying again, and the claim is saved to a stand-in memory once; a decline, a payment and a pause each save it once, at the end, and a claim the check referred never.
-- [ ] `resume_claim` refuses a claim that isn't paused, one that is paused but not signed off and one that doesn't exist, each with its reason, and works a signed-off one beside a dispatch without waiting for it.
-- [ ] A sign-off pays and answers with the claim when the agent can't be reached, and the app logs a warning; a test with a stand-in agent that is down, one that times out and one that answers.
+- [x] A test with stand-ins: an approval over the limit pauses with its place saved in the checkpoint, and the claim shows as waiting for sign-off; the thread has one interrupt waiting.
+- [x] A payment the Gateway refuses pauses the same way, after the hold.
+- [x] An evaluation's copy over the limit doesn't pause: its work ends and its saved progress is cleared, as today.
+- [x] A resume after a sign-off ends the work without paying again, and the claim is saved to a stand-in memory once; a decline, a payment and a pause each save it once, at the end, and a claim the check referred never.
+- [x] `resume_claim` refuses a claim that isn't paused, one that is paused but not signed off and one that doesn't exist, each with its reason, and works a signed-off one beside a dispatch without waiting for it.
+- [x] A sign-off pays and answers with the claim when the agent can't be reached, and the app logs a warning; a test with a stand-in agent that is down, one that times out and one that answers.
 - [ ] With `npm run dev` running, a claim over the limit pauses, and signing it off on the dashboard pays it and ends the agent's work (Playwright MCP, as Dana Whitfield), with the claim's steps ending "Signed off by Dana Whitfield".
 - [ ] `npm run check` passes with `.env` moved out of the way. `docs/STATUS.md` describes it. Commit.
 

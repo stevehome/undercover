@@ -68,6 +68,18 @@ def decide_proposal(
     return _start(f"/api/proposals/{proposal_id}/decision", body, "proposal_id")
 
 
+def resume_claim(claim_id: str) -> None:
+    """Ask the agent to carry on with a claim a handler has answered.
+
+    The answer is saved before this is asked, so a failure is a warning: the claim
+    is paid, and the agent carries it on when it next works the claim.
+    """
+    try:
+        _post(f"/api/claims/{claim_id}/resume").raise_for_status()
+    except httpx.HTTPError:
+        logger.warning("The agent could not be asked to resume %s", claim_id)
+
+
 def stop_round(round_id: int) -> None:
     """Tell the agent a round is stopped, so it starts no more claims or calls."""
     try:

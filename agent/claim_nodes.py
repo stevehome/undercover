@@ -102,10 +102,11 @@ def settle(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
 def remember(
     state: ClaimState, runtime: Runtime[ClaimContext], *, memory: CustomerMemory | None
 ) -> dict[str, Any]:
-    """Save the decided claim to the customer's memory, in code and once.
+    """Save the decided claim to the customer's memory, in code and once, at the end.
 
-    A node saves when it finishes, so a claim carried on after a restart doesn't
-    save again. With no memory there is nothing to do.
+    It is the last node of every path, after any payment or sign-off. A node saves
+    when it finishes, so a claim carried on after a restart doesn't save again.
+    With no memory there is nothing to do.
     """
     if memory is None:
         return {}
@@ -118,7 +119,12 @@ def remember(
 
 
 def approval(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
-    """Wait for a handler's sign-off, which pays. Code before `interrupt` runs twice."""
+    """Wait for a handler's sign-off, which pays. Code before `interrupt` runs twice.
+
+    An evaluation's copy is never signed off, so it does not wait.
+    """
+    if runtime.context.evaluation:
+        return {}
     answer = interrupt(
         {"claim_id": runtime.context.claim_id, "payout": state["payout"]}
     )
@@ -130,7 +136,7 @@ def pay(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
     """Pay the claim through the route; the backend treats a repeat as done.
 
     A payment the Gateway's Policy refuses leaves the claim waiting for a handler's
-    sign-off, which pays it.
+    sign-off, which pays it, and the graph goes there.
     """
     context = runtime.context
     claim_id = context.claim_id
@@ -149,6 +155,6 @@ def pay(state: ClaimState, runtime: Runtime[ClaimContext]) -> dict[str, Any]:
         )
         api.hold_for_sign_off(claim_id, GATEWAY_HOLD)
         api.record_step(claim_id, f"Waiting for a handler to sign off ${amount}")
-        return {}
+        return {"needs_sign_off": True}
     api.record_step(claim_id, f"Paid ${state['payout']}")
     return {}

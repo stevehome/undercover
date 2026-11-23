@@ -1,25 +1,82 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import agents, api, checkpoint, service
+from agent import agents, api, checkpoint, resumption, service
+from agent.tests import records
+from agent.tests.conftest import STUB_MODEL
 from agent.tests.test_claim_graph import CLAIM, decision, sign_off
 
 
+@pytest.fixture
+def resuming(saver, script):
+    """The service's resume route, working on this test's saver and stub model."""
+    worked = []
+
+    def work(claim_id):
+        worked.append(claim_id)
+        return agents.decide_claim(claim_id, script(), saver)
+
+    service.app.dependency_overrides[service.claim_worker] = lambda: work
+    service.app.dependency_overrides[service.claim_refusal] = lambda: (
+        lambda claim_id: resumption.refusal(claim_id, saver)
+    )
+    yield worked
+    service.app.dependency_overrides.clear()
+
+
+def resume(claim_id=CLAIM):
+    return TestClient(service.app).post(f"/api/claims/{claim_id}/resume")
+
+
 def test_the_service_carries_on_with_a_signed_off_claim(
-    backend, script, saver, as_handler
+    backend, script, saver, as_handler, resuming
 ):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
     sign_off(backend, as_handler)
-    service.app.dependency_overrides[service.claim_worker] = lambda: (
-        lambda claim_id: agents.decide_claim(claim_id, script(), saver)
-    )
-    try:
-        response = TestClient(service.app).post(f"/api/claims/{CLAIM}/resume")
-    finally:
-        service.app.dependency_overrides.clear()
+
+    response = resume()
 
     assert response.status_code == 202
-    assert api.get_claim(CLAIM)["paid_amount"] == "1200.00"
+    assert resuming == [CLAIM]
+    assert "Signed off by HND-01" in records.step_texts(backend, CLAIM)
+
+
+def test_a_claim_nobody_signed_off_is_refused_with_its_reason(
+    backend, script, saver, resuming
+):
+    agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
+
+    response = resume()
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "CLM-1001 is waiting for a handler to sign off"
+    assert resuming == []
+
+
+def test_a_claim_that_is_not_paused_is_refused(backend, script, saver, resuming):
+    agents.decide_claim(CLAIM, script(decision(), "Done."), saver)
+
+    response = resume()
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "CLM-1001 is not waiting for an answer"
+
+
+def test_a_claim_that_does_not_exist_is_refused(backend, resuming):
+    response = resume("CLM-9999")
+
+    assert response.status_code == 409
+    assert "CLM-9999" in response.json()["detail"]
+
+
+def test_a_resume_is_answered_at_once_beside_a_dispatch(
+    backend, script, saver, as_handler, resuming
+):
+    agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
+    sign_off(backend, as_handler)
+    api.create_dispatch(1, STUB_MODEL)
+
+    assert resume().status_code == 202
 
 
 @pytest.fixture

@@ -1,9 +1,11 @@
 """The claim agent's graph: its nodes joined by edges, and the checkpointer.
 
 START -> screen -> agent <-> tools, or refer_flagged -> END for a flagged claim.
-agent -> settle; settle -> agent (no decision yet) or remember (decided);
-remember -> END (decline or referral), pay (at or under the limit) or approval,
-which ends the graph: a sign-off pays.
+agent -> settle; settle -> agent (no decision yet), approval (over the limit), pay
+(at or under it) or remember (a decline or a referral). pay -> approval when the
+Gateway refuses the payment, else remember. approval pauses until a handler signs
+off, which pays, and goes on to remember. remember -> END, the last node of every
+path: the claim is saved to the customer's memory once its decision is final.
 """
 
 from functools import partial
@@ -32,16 +34,21 @@ def after_agent(state: ClaimState) -> Literal["tools", "settle"]:
     return "tools" if state["messages"][-1].tool_calls else "settle"
 
 
-def after_settle(state: ClaimState) -> Literal["agent", "remember"]:
-    """Send the claim back to the agent, or on to be remembered once it is decided."""
-    return "remember" if state["decision"] else "agent"
-
-
-def after_remember(state: ClaimState) -> str:
-    """End a decline or a referral, or send an approval to a sign-off or a payment."""
+def after_settle(
+    state: ClaimState,
+) -> Literal["agent", "approval", "pay", "remember"]:
+    """Send the claim back to the agent until it is decided, then to its payment,
+    its sign-off or, for a decline or a referral, to be remembered."""
+    if not state["decision"]:
+        return "agent"
     if state["decision"] != "approve":
-        return END
+        return "remember"
     return "approval" if state["needs_sign_off"] else "pay"
+
+
+def after_pay(state: ClaimState) -> Literal["approval", "remember"]:
+    """Send a payment the Gateway refused to a sign-off, else on to be remembered."""
+    return "approval" if state["needs_sign_off"] else "remember"
 
 
 def build_graph(
@@ -54,7 +61,7 @@ def build_graph(
     """Build the claim graph on a checkpointer.
 
     With a memory the agent also has a tool to search it, and the decided claim is
-    saved to it; with none, the graph's `remember` node does nothing.
+    saved to it at the end; with none, the graph's `remember` node does nothing.
     """
     tools = claim_tools(memory is not None)
     builder = StateGraph(ClaimState, context_schema=ClaimContext)
@@ -86,8 +93,10 @@ def build_graph(
     builder.add_edge("refer_flagged", END)
     builder.add_conditional_edges("agent", after_agent, ["tools", "settle"])
     builder.add_edge("tools", "agent")
-    builder.add_conditional_edges("settle", after_settle, ["agent", "remember"])
-    builder.add_conditional_edges("remember", after_remember, ["approval", "pay", END])
-    builder.add_edge("approval", END)
-    builder.add_edge("pay", END)
+    builder.add_conditional_edges(
+        "settle", after_settle, ["agent", "approval", "pay", "remember"]
+    )
+    builder.add_conditional_edges("pay", after_pay, ["approval", "remember"])
+    builder.add_edge("approval", "remember")
+    builder.add_edge("remember", END)
     return builder.compile(checkpointer=checkpointer)

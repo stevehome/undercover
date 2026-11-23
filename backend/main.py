@@ -362,9 +362,16 @@ def list_claim_steps(claim_id: str) -> list[dict[str, Any]]:
 
 
 @app.post("/api/claims/{claim_id}/sign-off", operation_id="sign_off_claim")
-def sign_off_claim(claim_id: str, handler: Senior) -> dict[str, Any]:
-    """Sign off an over-limit approved claim as the signed-in handler, which pays it."""
-    return claims.sign_off(claim_id, handler["handler_id"])
+def sign_off_claim(
+    claim_id: str, handler: Senior, background: BackgroundTasks
+) -> dict[str, Any]:
+    """Sign off an over-limit approved claim as the signed-in handler, which pays it.
+
+    The agent is asked to resume the claim once the payment is saved.
+    """
+    signed = claims.sign_off(claim_id, handler["handler_id"])
+    background.add_task(agent_service.resume_claim, claim_id)
+    return signed
 
 
 @app.post(

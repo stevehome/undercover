@@ -9,8 +9,8 @@ from agent.tool_route import ToolRoute
 @dataclass
 class ClaimContext:
     """The claim an agent is deciding, its customer, the run it is worked in if any,
-    who decides it, the route its tools take and its memory, if it has one. The model
-    acts only on this claim."""
+    who decides it, the route its tools take, its memory if it has one, and whether it
+    is an evaluation's copy. The model acts only on this claim."""
 
     claim_id: str
     customer_id: str
@@ -18,6 +18,7 @@ class ClaimContext:
     decided_by: str
     route: ToolRoute
     memory: CustomerMemory | None
+    evaluation: bool = False
 
 
 @dataclass

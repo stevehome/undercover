@@ -8,7 +8,17 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 
-from agent import api, checkpoint, harness, lease, memory, routes, timing, tracing
+from agent import (
+    api,
+    checkpoint,
+    harness,
+    lease,
+    memory,
+    paused,
+    routes,
+    timing,
+    tracing,
+)
 from agent.claim_graph import build_graph
 from agent.claim_state import new_claim
 from agent.contexts import ClaimContext
@@ -60,24 +70,12 @@ def decide_claim(
         if not free:
             return f"{claim_id} is being worked by another agent."
         claim = api.get_claim(claim_id)
-        thread_id = f"{claim_id}-{claim['thread']}"
         saver = checkpointer or checkpoint.saver()
-        configuration = (
-            api.current_configuration()
-            if run_id is None
-            else api.run_configuration(run_id)
-        )
-        llm = llm or harness.model(harness.model_settings(configuration))
-        customer_memory = memory.open_for(claim)
-        graph = build_graph(
-            saver,
-            llm,
-            configuration["instructions"],
-            screening_llm or harness.screening_model(),
-            customer_memory,
+        graph, configuration, customer_memory = _build(
+            claim, saver, llm, run_id, screening_llm
         )
         attempt = Attempt(
-            thread_id,
+            _thread_id(claim),
             run_id,
             _tags(run_id, configuration["round_id"]),
             f"{DECIDED_BY} {configuration['version']}",
@@ -85,8 +83,42 @@ def decide_claim(
         )
         outcome = Context().run(_work_traced, graph, claim, attempt)
         if claim["evaluation_run_id"] is not None:
-            saver.delete_thread(thread_id)
+            saver.delete_thread(attempt.thread_id)
         return outcome
+
+
+def is_paused(claim: dict[str, Any], checkpointer: BaseCheckpointSaver | None) -> bool:
+    """Whether the claim's thread has an interrupt waiting for an answer."""
+    saver = checkpointer or checkpoint.saver()
+    graph, _, _ = _build(claim, saver, None, None, None)
+    return paused.waiting(graph, {"configurable": {"thread_id": _thread_id(claim)}})
+
+
+def _thread_id(claim: dict[str, Any]) -> str:
+    return f"{claim['claim_id']}-{claim['thread']}"
+
+
+def _build(
+    claim: dict[str, Any],
+    saver: BaseCheckpointSaver,
+    llm: BaseChatModel | None,
+    run_id: int | None,
+    screening_llm: BaseChatModel | None,
+) -> tuple[Any, dict[str, Any], CustomerMemory | None]:
+    """Build the claim's graph from its run's configuration, or the current one."""
+    configuration = (
+        api.current_configuration() if run_id is None else api.run_configuration(run_id)
+    )
+    llm = llm or harness.model(harness.model_settings(configuration))
+    customer_memory = memory.open_for(claim)
+    graph = build_graph(
+        saver,
+        llm,
+        configuration["instructions"],
+        screening_llm or harness.screening_model(),
+        customer_memory,
+    )
+    return graph, configuration, customer_memory
 
 
 def _tags(run_id: int | None, round_id: int | None) -> list[str]:
@@ -106,15 +138,16 @@ def _work_traced(graph: Any, claim: dict[str, Any], attempt: Attempt) -> str:
 def _work(
     graph: Any, config: RunnableConfig, claim: dict[str, Any], attempt: Attempt
 ) -> str:
-    """Start the claim's graph, carry it on, or answer a sign-off."""
+    """Start the claim's graph, carry it on, or answer its pause from the app."""
     claim_id = claim["claim_id"]
     state = graph.get_state(config)
     if state.values and not state.next:
         return state.values["messages"][-1].text
-    if state.next == ("approval",):
-        if claim["signed_off_by"] is None:
+    if paused.waiting(graph, config):
+        answer = paused.answer(claim)
+        if answer is None:
             return f"{claim_id} is waiting for a handler to sign off."
-        start = Command(resume={"handler": claim["signed_off_by"]})
+        start = Command(resume=answer)
     else:
         start = None if state.next else new_claim(claim_id)
     context = ClaimContext(
@@ -124,6 +157,7 @@ def _work(
         attempt.decided_by,
         routes.choose(),
         attempt.memory,
+        claim["evaluation_run_id"] is not None,
     )
     with timing.segment(claim_id, attempt.run_id):
         result = graph.invoke(start, config, context=context, durability="sync")

@@ -111,16 +111,19 @@ def test_the_model_searches_the_memory_of_its_own_claims_customer(
     assert "Searched the customer's memory for earlier claims" in steps(backend)
 
 
-def test_a_claim_carried_on_after_it_was_decided_saves_nothing_more(
+def test_a_claim_over_the_limit_is_saved_once_after_its_sign_off(
     backend, script, saver, memory_on, as_handler
 ):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
+    assert memory_on.events == []
+
+    agents.decide_claim(CLAIM, script(), saver)
+    assert memory_on.events == []
+    sign_off(backend, as_handler)
+    agents.decide_claim(CLAIM, script(), saver)
     assert len(memory_on.events) == 2
 
     agents.decide_claim(CLAIM, script(), saver)
-    sign_off(backend, as_handler)
-    agents.decide_claim(CLAIM, script(), saver)
-
     assert len(memory_on.events) == 2
 
 
