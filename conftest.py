@@ -8,6 +8,9 @@ from cryptography.hazmat.primitives.asymmetric import ec
 
 from backend import auth, judge
 from backend.main import app
+from backend.tests import creating
+
+creating.install(app)
 
 API_KEY = "test-agent-key"
 DANA = "dana.whitfield@undercover.example"
