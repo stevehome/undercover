@@ -56,7 +56,7 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 - [x] A resume after a sign-off ends the work without paying again, and the claim is saved to a stand-in memory once; a decline, a payment and a pause each save it once, at the end, and a claim the check referred never.
 - [x] `resume_claim` refuses a claim that isn't paused, one that is paused but not signed off and one that doesn't exist, each with its reason, and works a signed-off one beside a dispatch without waiting for it.
 - [x] A sign-off pays and answers with the claim when the agent can't be reached, and the app logs a warning; a test with a stand-in agent that is down, one that times out and one that answers.
-- [ ] With `npm run dev` running, a claim over the limit pauses, and signing it off on the dashboard pays it and ends the agent's work (Playwright MCP, as Dana Whitfield), with the claim's steps ending "Signed off by Dana Whitfield".
+- [x] With `npm run dev` running, a claim over the limit pauses, and signing it off on the dashboard pays it and ends the agent's work (Playwright MCP, as Dana Whitfield), with the claim's steps ending "Signed off by Dana Whitfield".
 - [x] `npm run check` passes with `.env` moved out of the way. `docs/STATUS.md` describes it. Commit.
 
 ## Phase 2: Sign off or send back (step 2)
@@ -81,7 +81,7 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 - [x] A send back the agent never received: the next dispatch works the claim, and a dispatch that carries on a claim whose thread is still paused resumes it with the note.
 - [x] A graph test with a scripted model: after a send back the model sees the message naming the handler and how to treat the note, its model-call count starts again, and nothing pays the earlier decision.
 - [x] vitest: the two buttons for a senior handler and neither for the other; the note required; each sent-back decision on the claim page; `sent back` in the queue.
-- [ ] With `npm run dev` running, a claim sent back with a note is decided again by the agent, and the claim page shows both decisions and the note (Playwright MCP, as Dana Whitfield).
+- [x] With `npm run dev` running, a claim sent back with a note is decided again by the agent, and the claim page shows both decisions and the note (Playwright MCP, as Dana Whitfield).
 - [x] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md` and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 3: The agent as an AgentCore app (step 3)
@@ -103,8 +103,8 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 - [x] Tests through Starlette's `TestClient`, with stand-ins for the work and for Identity: importing the agent opens nothing and reads no setting; on Runtime the first request fetches each credential into its setting once, and a second request doesn't; each operation accepts work and refuses it; a payload with an input missing, a wrong input and an unknown operation each get a 400 that says what; the ping is `HealthyBusy` while work is going and `Healthy` once it has finished or failed; a request without the key is refused off Runtime and let through on Runtime; the health check works without the key and only once the agent is ready; a failed getting ready answers its error and the next request tries again.
 - [x] Tests of the app's two routes, with stand-ins: the key on the laptop route, the session id (33 characters or more, new each time) on the Runtime route, and on both the payload, an acceptance, a refusal passed on as a 409, a failed connection, an error answer, and a timeout or a cut-off answer that changes nothing and tells the handler to reload; one attempt only.
 - [x] A structure test keeps `bedrock_agentcore.identity` to `credentials.py`, boto3's Runtime client to `agent_runtime.py` and the app's address to `endpoints.py` on the agent's side.
-- [ ] `npm run check:runtime` passes inside `npm run check`.
-- [ ] With `npm run dev` stopped, `uv run --env-file .env --isolated --only-group runtime python -m runtime.main` serves the agent on 8080, and `{"operation": "health"}` posted to `/invocations` answers `{"healthy": true}`.
+- [x] `npm run check:runtime` passes inside `npm run check`.
+- [x] With `npm run dev` stopped, `uv run --env-file .env --isolated --only-group runtime python -m runtime.main` serves the agent on 8080, and `{"operation": "health"}` posted to `/invocations` answers `{"healthy": true}`.
 - [x] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md` and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 4: The app keeps one run at a time (step 4)
@@ -128,8 +128,8 @@ The largest phase: the app takes over creating the work, the agent takes it by i
 - [x] `backend/tests/test_connections.py` covers the new flows: no start, undo or send back holds two connections.
 - [x] The agent tests: `work_run` refuses a run that isn't running and a round that isn't open; the agent marks nothing stopped when it gets ready; `carry_round_on` reads the review from the app; the improver's model is the round's.
 - [x] `npm run e2e` passes with the app creating runs, rounds and reviews.
-- [ ] With `npm run dev` running, a dispatch at N=25 works the queue, and starting another while it runs is refused on the dashboard (Playwright MCP, as Dana Whitfield).
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe it. Commit.
+- [x] With `npm run dev` running, a dispatch at N=25 works the queue, and starting another while it runs is refused on the dashboard (Playwright MCP, as Dana Whitfield).
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 5: Live checks and the last of the documents
 
@@ -144,11 +144,11 @@ You run `npm run seed` once with `npm run dev` stopped, and start it again. Ever
 
 **Success criteria**
 
-- [ ] A dispatch at N=25 finishes and its summary matches the claims' pages; the backend stays up (`/api/health` answers while it runs).
-- [ ] One claim sent back by Dana is decided again by the agent, and its page shows the earlier decision, the note and the new decision; another is signed off and paid once, with her name and the time.
-- [ ] The tiny evaluation finishes, graded, and the check clears all five.
-- [ ] The health check through `runtime.main` answers `{"healthy": true}`.
-- [ ] The cost of each run is reported. `npm run check` passes with `.env` moved out of the way, and the whole change is reviewed once more against the checklist in `docs/CODE_STANDARDS.md`, including the code the build touched outside its own area. Commit.
+- [x] A dispatch at N=25 finishes and its summary matches the claims' pages; the backend stays up (`/api/health` answers while it runs).
+- [x] One claim sent back by Dana is decided again by the agent, and its page shows the earlier decision, the note and the new decision; another is signed off and paid once, with her name and the time.
+- [x] The tiny evaluation finishes, graded, and the check clears all five.
+- [x] The health check through `runtime.main` answers `{"healthy": true}`.
+- [x] The cost of each run is reported. `npm run check` passes with `.env` moved out of the way, and the whole change is reviewed once more against the checklist in `docs/CODE_STANDARDS.md`, including the code the build touched outside its own area. Commit.
 
 ## Things I'd like you to look at
 
