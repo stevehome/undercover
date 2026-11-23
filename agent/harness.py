@@ -18,8 +18,6 @@ NO_EFFORT = "default"
 MODEL_TIMEOUT_SECONDS = 120
 MODEL_DEADLINE_SECONDS = 120
 MODEL_RETRIES = 1
-IMPROVER_MODEL = "openai/gpt-6-luna"
-IMPROVER_EFFORT = "medium"
 IMPROVER_TIMEOUT_SECONDS = 300
 MAX_IMPROVER_CALLS = 40
 SCREENING_MODEL = "openai/gpt-6-luna"
@@ -72,11 +70,6 @@ def model(settings: ModelSettings) -> ChatOpenAI:
         max_retries=MODEL_RETRIES,
         http_client=deadline.client(MODEL_DEADLINE_SECONDS),
     )
-
-
-def improver_settings() -> ModelSettings:
-    """Return the improver's model: GPT-6 Luna at medium effort, or MODEL_NAME."""
-    return _named_model() or ModelSettings(IMPROVER_MODEL, IMPROVER_EFFORT)
 
 
 def improver_model(settings: ModelSettings) -> ChatOpenAI:

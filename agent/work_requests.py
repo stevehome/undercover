@@ -1,114 +1,68 @@
-"""Starting the agent's work: a dispatch, an evaluation, a round or a decision.
+"""Accepting the agent's work: a run, a round, a round's review or a claim.
 
-Each creates what the work needs through the backend, which refuses a second run
-while one is going, and hands the work to the background. It answers at once.
+The app creates what the work needs and asks the agent for it by id. Each request
+checks that the work is what the app says it is, answers at once and hands the work
+to the background.
 """
 
 from typing import Any
 
-from agent import (
-    api,
-    backend_http,
-    dispatcher,
-    harness,
-    improver_api,
-    resumption,
-    rounds,
-    stopwatch,
-)
+from agent import api, backend_http, improver_api, jobs, resumption, rounds
 from agent.background_work import BackgroundWork
 
 ACCEPTED = {"accepted": True}
+WORKED_RUNS = ("dispatch", "evaluation")
 
 
-def _refused(refusal: backend_http.ApiRefusal) -> dict[str, Any]:
-    return {"refused": refusal.detail}
+def _refused(reason: str) -> dict[str, Any]:
+    return {"refused": reason}
 
 
-def _current_model() -> api.ModelUsed:
-    """The model, effort and version a run on the current configuration uses."""
-    configuration = api.current_configuration()
-    settings = harness.model_settings(configuration)
-    return api.ModelUsed(
-        model=settings.name,
-        reasoning_effort=settings.reasoning_effort,
-        configuration_version=configuration["version"],
-    )
-
-
-def start_dispatch(concurrency: int, background: BackgroundWork) -> dict[str, Any]:
-    """Start a dispatch with N claim agents at once; refused while a run is going."""
+def work_run(run_id: int, background: BackgroundWork) -> dict[str, Any]:
+    """Work a dispatch or an evaluation that is running."""
     try:
-        run_id = api.create_dispatch(concurrency, _current_model())
+        run = api.get_run(run_id)
     except backend_http.ApiRefusal as refusal:
-        return _refused(refusal)
-    background.start("dispatch", dispatcher.run_dispatch, run_id, concurrency)
-    return {**ACCEPTED, "run_id": run_id}
+        return _refused(refusal.detail)
+    if run["kind"] not in WORKED_RUNS or run["status"] != "running":
+        return _refused(f"Run {run_id} is not a run that is going")
+    background.start("run", jobs.work_run, run_id, run["concurrency"])
+    return ACCEPTED
 
 
-def start_evaluation(
-    concurrency: int, eval_set: str, tiny: bool, background: BackgroundWork
+def work_round(round_id: int, background: BackgroundWork) -> dict[str, Any]:
+    """Work a round that is open, from its first evaluations."""
+    try:
+        run_id = improver_api.get_stretch(round_id)
+    except backend_http.ApiRefusal as refusal:
+        return _refused(refusal.detail)
+    background.start("round", jobs.work_stretch, round_id, run_id, None)
+    return ACCEPTED
+
+
+def carry_round_on(
+    round_id: int, proposal_id: int, background: BackgroundWork
 ) -> dict[str, Any]:
-    """Start an evaluation on a labelled set; refused while a run is going."""
+    """Carry a round on after a handler's review, which the agent reads from the app."""
     try:
-        run_id = api.create_evaluation(concurrency, eval_set, tiny, _current_model())
+        run_id = improver_api.get_stretch(round_id)
+        proposal = improver_api.get_proposal(proposal_id)
     except backend_http.ApiRefusal as refusal:
-        return _refused(refusal)
-    background.start("evaluation", dispatcher.run_dispatch, run_id, concurrency)
-    return {**ACCEPTED, "run_id": run_id}
-
-
-def start_round(handler_id: str, background: BackgroundWork) -> dict[str, Any]:
-    """Start an improvement round; refused while a run is going."""
-    try:
-        created = rounds.new_round(handler_id)
-    except backend_http.ApiRefusal as refusal:
-        return _refused(refusal)
-    background.start(
-        "round", rounds.work_stretch, created["round_id"], created["run_id"], None
+        return _refused(refusal.detail)
+    if proposal["round_id"] != round_id or proposal["status"] == "pending":
+        return _refused(f"Proposal {proposal_id} has no review for round {round_id}")
+    resume = rounds.decision(
+        proposal["status"] == "approved", proposal["rejection_reason"] or ""
     )
-    return {**ACCEPTED, "round_id": created["round_id"]}
-
-
-def decide_proposal(
-    proposal_id: int,
-    decision: str,
-    handler_id: str,
-    reason: str,
-    background: BackgroundWork,
-) -> dict[str, Any]:
-    """Record a handler's decision, then resume the improver with it."""
-    approved = decision == "approve"
-    settings = harness.improver_settings()
-    watch = stopwatch.Stopwatch(f"Recording the decision on proposal {proposal_id}")
-    try:
-        recorded = improver_api.record_proposal_decision(
-            proposal_id,
-            approved,
-            handler_id,
-            reason,
-            (settings.name, settings.reasoning_effort),
-        )
-    except backend_http.ApiRefusal as refusal:
-        return _refused(refusal)
-    finally:
-        watch.lap("the backend's answer")
-        watch.log()
-    background.start(
-        "improver",
-        rounds.work_stretch,
-        recorded["round_id"],
-        recorded["run_id"],
-        rounds.decision(approved, reason),
-    )
-    return {**ACCEPTED, "proposal_id": proposal_id}
+    background.start("improver", jobs.work_stretch, round_id, run_id, resume)
+    return ACCEPTED
 
 
 def resume_claim(claim_id: str, background: BackgroundWork) -> dict[str, Any]:
     """Carry on with a claim whose pause has been answered; refused if it hasn't."""
     reason = resumption.refusal(claim_id)
     if reason is not None:
-        return {"refused": reason}
+        return _refused(reason)
     background.start(f"claim {claim_id}", resumption.work, claim_id)
     return ACCEPTED
 

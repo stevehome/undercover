@@ -2,7 +2,7 @@ from contextlib import suppress
 
 import httpx
 
-from agent import backend_http, improver_api
+from agent import backend_http
 
 
 class SlowOnce:
@@ -37,7 +37,3 @@ def test_a_call_with_one_attempt_does_not_retry_a_timeout(backend, monkeypatch):
         backend_http.call("GET", "/api/configuration/current")
 
     assert slow.requests == 1
-
-
-def test_recording_a_decision_asks_twice_at_most():
-    assert improver_api.DECISION_ATTEMPTS == 2

@@ -29,25 +29,17 @@ class NoInputs(Inputs):
     pass
 
 
-class StartDispatch(Inputs):
-    concurrency: int
+class WorkRun(Inputs):
+    run_id: int
 
 
-class StartEvaluation(Inputs):
-    concurrency: int
-    eval_set: str
-    tiny: bool
+class WorkRound(Inputs):
+    round_id: int
 
 
-class StartRound(Inputs):
-    handler_id: str
-
-
-class DecideProposal(Inputs):
+class CarryRoundOn(Inputs):
+    round_id: int
     proposal_id: int
-    decision: str
-    handler_id: str
-    reason: str
 
 
 class ResumeClaim(Inputs):
@@ -69,24 +61,17 @@ class Operation(NamedTuple):
 
 
 OPERATIONS = {
-    "start_dispatch": Operation(
-        StartDispatch,
-        lambda i, background: work_requests.start_dispatch(i.concurrency, background),
+    "work_run": Operation(
+        WorkRun, lambda i, background: work_requests.work_run(i.run_id, background)
     ),
-    "start_evaluation": Operation(
-        StartEvaluation,
-        lambda i, background: work_requests.start_evaluation(
-            i.concurrency, i.eval_set, i.tiny, background
-        ),
+    "work_round": Operation(
+        WorkRound,
+        lambda i, background: work_requests.work_round(i.round_id, background),
     ),
-    "start_round": Operation(
-        StartRound,
-        lambda i, background: work_requests.start_round(i.handler_id, background),
-    ),
-    "decide_proposal": Operation(
-        DecideProposal,
-        lambda i, background: work_requests.decide_proposal(
-            i.proposal_id, i.decision, i.handler_id, i.reason, background
+    "carry_round_on": Operation(
+        CarryRoundOn,
+        lambda i, background: work_requests.carry_round_on(
+            i.round_id, i.proposal_id, background
         ),
     ),
     "resume_claim": Operation(

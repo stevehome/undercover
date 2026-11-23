@@ -7,7 +7,7 @@ from agent import agents, api
 from agent.memory import CustomerMemory
 from agent.screening import Screening
 from agent.tests import records
-from agent.tests.conftest import STUB_MODEL
+from agent.tests.conftest import STUB_MODEL, create_evaluation
 from agent.tests.stand_in_memory import StandInMemory
 from agent.tests.test_claim_graph import CLAIM, decision, sign_off
 from agent.tools import claim_tools
@@ -69,7 +69,7 @@ def test_nothing_is_saved_for_a_claim_the_check_referred(
 def test_nothing_is_saved_for_an_evaluations_copy_of_a_claim(
     backend, script, saver, memory_on
 ):
-    run_id = api.create_evaluation(1, "held_out", True, STUB_MODEL)
+    run_id = create_evaluation(1, "held_out", True, STUB_MODEL)
     copy = api.get_run(run_id)["claims"][0]["claim_id"]
 
     agents.decide_claim(

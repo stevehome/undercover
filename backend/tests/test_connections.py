@@ -85,3 +85,22 @@ def test_a_send_back_a_take_and_a_heartbeat_hold_one_connection_at_a_time(
     client.get("/api/claims/CLM-1006")
 
     assert deepest[0] == 1
+
+
+def test_starts_undos_stops_and_heartbeats_hold_one_connection_at_a_time(
+    client, agent_stub, deepest
+):
+    first = client.post("/api/dispatches", json={"concurrency": 2}).json()["run_id"]
+    client.post(f"/api/runs/{first}/heard")
+    client.post(f"/api/runs/{first}/stop", json={"reason": "Stopped"})
+    agent_stub.refuse = True
+    client.post("/api/dispatches", json={"concurrency": 2})
+    agent_stub.refuse = False
+    client.post(
+        "/api/evaluations",
+        json={"concurrency": 2, "eval_set": "held_out", "tiny": True},
+    )
+    client.post("/api/runs/2/stop", json={"reason": "Stopped"})
+    client.post("/api/rounds")
+
+    assert deepest[0] == 1

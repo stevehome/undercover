@@ -2,7 +2,7 @@
 
 The claim agent's client (`api.py`) has no way to these. They give the improver the
 scores, the handlers' reasons on the evaluation set and the round's records, and
-they let the agent's service record a round's progress.
+they let the agent record a round's progress.
 """
 
 from decimal import Decimal
@@ -10,18 +10,6 @@ from typing import Any
 
 from agent import api
 from agent.backend_http import call
-
-DECISION_ATTEMPTS = 2
-
-
-def create_round(handler_id: str, model: str, reasoning_effort: str) -> dict[str, Any]:
-    """Start a round and its first stretch of work; return their ids."""
-    body = {
-        "handler_id": handler_id,
-        "model": model,
-        "reasoning_effort": reasoning_effort,
-    }
-    return call("POST", "/api/improver/rounds", json=body)
 
 
 def get_round(round_id: int) -> dict[str, Any]:
@@ -103,31 +91,19 @@ def record_verdict(round_id: int) -> dict[str, Any]:
     return call("POST", f"/api/improver/rounds/{round_id}/verdict")
 
 
-def record_proposal_decision(
-    proposal_id: int,
-    approved: bool,
-    handler_id: str,
-    rejection_reason: str,
-    used: tuple[str, str],
-) -> dict[str, Any]:
-    """Record a handler's decision; refused if something else is running.
+def get_proposal(proposal_id: int) -> dict[str, Any]:
+    """Return a proposal with what a handler decided and why."""
+    return call("GET", f"/api/proposals/{proposal_id}")
 
-    The backend answers a repeat of the same decision as it did the first time, so
-    a reply lost to a timeout is asked for again.
-    """
-    body = {
-        "approved": approved,
-        "handler_id": handler_id,
-        "rejection_reason": rejection_reason,
-        "model": used[0],
-        "reasoning_effort": used[1],
-    }
-    return call(
-        "POST",
-        f"/api/improver/proposals/{proposal_id}/decision",
-        attempts=DECISION_ATTEMPTS,
-        json=body,
-    )
+
+def get_stretch(round_id: int) -> int:
+    """Return the run that holds an open round's stretch of work."""
+    return call("GET", f"/api/improver/rounds/{round_id}/stretch")["run_id"]
+
+
+def get_run(run_id: int) -> dict[str, Any]:
+    """Return a run, as the app recorded it: its model and its reasoning effort."""
+    return call("GET", f"/api/runs/{run_id}")
 
 
 def finish_run(run_id: int) -> None:

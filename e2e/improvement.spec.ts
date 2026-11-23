@@ -2,9 +2,8 @@ import { expect, test as unsigned } from "@playwright/test";
 import type { APIRequestContext } from "@playwright/test";
 import { signIn, test } from "./signIn";
 import { agentHeaders } from "./agentKey";
+import { askedFor, startRound } from "./startedWork";
 
-const standIn = "http://127.0.0.1:8003";
-const IMPROVER = { model: "openai/gpt-6-luna", reasoning_effort: "medium" };
 const CHANGE = {
   instructions: "Decide the claim, and never approve a late one.\n",
   model: "openai/gpt-6-luna",
@@ -20,15 +19,8 @@ class PlayedRound {
   ) {}
 
   static async start(request: APIRequestContext) {
-    const created = await request.post("/api/improver/rounds", {
-      headers: agentHeaders,
-      data: { handler_id: "HND-01", ...IMPROVER },
-    });
-    const round = (await created.json()) as {
-      round_id: number;
-      run_id: number;
-    };
-    return new PlayedRound(request, round.round_id, round.run_id);
+    const { roundId, runId } = await startRound(request);
+    return new PlayedRound(request, roundId, runId);
   }
 
   async stage(stage: string, progress: number) {
@@ -98,7 +90,7 @@ test("the page shows each stage of a round as it happens", async ({
   ).toContainText("finished");
 });
 
-test("a proposal waiting shows its diff, and approving it goes to the agent's service", async ({
+test("a proposal waiting shows its diff, and approving it is recorded and the agent is asked to carry the round on", async ({
   page,
   request,
 }) => {
@@ -123,22 +115,16 @@ test("a proposal waiting shows its diff, and approving it goes to the agent's se
     .click();
 
   await expect
-    .poll(async () => {
-      const paths = (await (
-        await request.get(`${standIn}/calls`)
-      ).json()) as string[];
-      return paths.includes("decide_proposal");
+    .poll(() => askedFor(request, "carry_round_on"))
+    .toContainEqual({ round_id: round.roundId, proposal_id: proposalId });
+  const proposal = (await (
+    await request.get(`/api/proposals/${String(proposalId)}`, {
+      headers: agentHeaders,
     })
-    .toBe(true);
-  const bodies = (await (await request.get(`${standIn}/bodies`)).json()) as {
-    decision?: string;
-    handler_id?: string;
-  }[];
-  expect(bodies).toContainEqual({
-    proposal_id: proposalId,
-    decision: "approve",
-    handler_id: "HND-01",
-    reason: "",
+  ).json()) as { status: string; decided_by: string };
+  expect(proposal).toMatchObject({
+    status: "approved",
+    decided_by: "Dana Whitfield",
   });
   await round.finish();
 });

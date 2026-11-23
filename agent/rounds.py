@@ -13,7 +13,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 
-from agent import checkpoint, harness, improver, improver_api, tracing
+from agent import api, checkpoint, harness, improver, improver_api, tracing
 from agent.backend_http import ApiRefusal
 from agent.contexts import ImproverContext
 from agent.improver_tools import EVALUATIONS, FIRST, run_round_evaluation, used_by
@@ -32,14 +32,6 @@ CONTENT = {
     "propose_change": ("change", ("instructions", "model", "reasoning_effort")),
     "propose_recipe": ("recipe", ("recipe",)),
 }
-
-
-def new_round(handler_id: str) -> dict[str, Any]:
-    """Start a round and its first stretch; ApiRefusal while a run is going."""
-    settings = harness.improver_settings()
-    return improver_api.create_round(
-        handler_id, settings.name, settings.reasoning_effort
-    )
 
 
 def decision(approved: bool, reason: str) -> dict[str, Any]:
@@ -70,6 +62,12 @@ def _proposal(request: dict[str, Any]) -> tuple[str, dict[str, str], str]:
     return kind, {name: args[name] for name in names}, args["reason"]
 
 
+def _settings_of(run_id: int) -> harness.ModelSettings:
+    """The model and effort the app recorded for the stretch: the improver's own."""
+    run = improver_api.get_run(run_id)
+    return harness.ModelSettings(run["model"], run["reasoning_effort"])
+
+
 def _improve(
     round_id: int,
     run_id: int,
@@ -85,7 +83,7 @@ def _improve(
         improver_api.record_stage(round_id, WORKING, 0)
     graph = improver.build_improver(
         improver_api.recipe_text(round_row["recipe_version"]),
-        llm or harness.improver_model(harness.improver_settings()),
+        llm or harness.improver_model(_settings_of(run_id)),
         saver or checkpoint.saver(),
     )
     session = f"round-{round_id}"
@@ -128,9 +126,9 @@ def work_stretch(
     except ApiRefusal:
         if improver_api.get_round(round_id)["stage"] != STOPPED:
             raise
-    except Exception:
+    except Exception as error:
         logger.exception("Round %s failed", round_id)
-        improver_api.record_stage(round_id, STOPPED, 0)
+        api.stop_run(run_id, f"The agent's work failed: {type(error).__name__}")
         raise
     finally:
         improver_api.finish_run(run_id)

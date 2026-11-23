@@ -2,20 +2,17 @@ import { expect } from "@playwright/test";
 import { test } from "./signIn";
 import type { APIRequestContext } from "@playwright/test";
 import { agentHeaders } from "./agentKey";
+import { askedFor, currentRun, startDispatch } from "./startedWork";
 
-const standIn = "http://127.0.0.1:8003";
-
-async function dispatchesAsked(request: APIRequestContext) {
-  const paths = (await (
-    await request.get(`${standIn}/calls`)
-  ).json()) as string[];
-  const bodies = (await (await request.get(`${standIn}/bodies`)).json()) as {
-    concurrency: number;
-  }[];
-  return bodies.filter((_, index) => paths[index] === "start_dispatch");
+/** The dispatch the app created, once the agent was asked to work it. */
+async function dispatchStarted(request: APIRequestContext) {
+  const run = await currentRun(request);
+  const asked = await askedFor(request, "work_run");
+  const taken = asked.some((body) => body.run_id === run?.run_id);
+  return run?.kind === "dispatch" && taken ? run.concurrency : null;
 }
 
-test("starting a dispatch asks the agent's service for 3 claim agents", async ({
+test("starting a dispatch creates it for 3 claim agents and asks the agent to work it", async ({
   page,
   request,
 }) => {
@@ -24,14 +21,10 @@ test("starting a dispatch asks the agent's service for 3 claim agents", async ({
 
   await page.getByRole("button", { name: "Start a dispatch" }).click();
 
-  await expect
-    .poll(async () =>
-      (await dispatchesAsked(request)).map((b) => b.concurrency),
-    )
-    .toContain(3);
+  await expect.poll(() => dispatchStarted(request)).toBe(3);
 });
 
-test("starting a dispatch with a changed number asks for that many", async ({
+test("starting a dispatch with a changed number creates it for that many", async ({
   page,
   request,
 }) => {
@@ -40,28 +33,14 @@ test("starting a dispatch with a changed number asks for that many", async ({
 
   await page.getByRole("button", { name: "Start a dispatch" }).click();
 
-  await expect
-    .poll(async () =>
-      (await dispatchesAsked(request)).map((b) => b.concurrency),
-    )
-    .toContain(7);
+  await expect.poll(() => dispatchStarted(request)).toBe(7);
 });
 
 test("the queue page shows a dispatch's claims, cost, time and summary", async ({
   page,
   request,
 }) => {
-  const run = (await (
-    await request.post("/api/runs/dispatch", {
-      headers: agentHeaders,
-      data: {
-        concurrency: 3,
-        model: "stub/model",
-        reasoning_effort: "low",
-        configuration_version: 1,
-      },
-    })
-  ).json()) as { run_id: number; claims: { claim_id: string }[] };
+  const run = await startDispatch(request, 3);
   const [first, second] = run.claims.map((claim) => claim.claim_id);
   await request.post(`/api/runs/${String(run.run_id)}/claims/${first}`, {
     headers: agentHeaders,

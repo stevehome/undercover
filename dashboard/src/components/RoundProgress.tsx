@@ -40,7 +40,12 @@ export function RoundProgress({ round }: Readonly<{ round: Round }>) {
           );
         })}
       </ol>
-      {round.stage === "stopped" && <StatusPill status="stopped" />}
+      {round.stage === "stopped" && (
+        <p>
+          <StatusPill status="stopped" />
+          {round.stopped_reason ? ` ${round.stopped_reason}.` : ""}
+        </p>
+      )}
     </div>
   );
 }

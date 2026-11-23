@@ -198,25 +198,6 @@ def requeue_claim(claim_id: str) -> None:
     _call("POST", f"/api/claims/{claim_id}/requeue")
 
 
-def create_dispatch(concurrency: int, model: ModelUsed) -> int:
-    """Start a dispatch of the claims to work; return the run's id."""
-    body = {"concurrency": concurrency, **model.model_dump()}
-    return _call("POST", "/api/runs/dispatch", json=body)["run_id"]
-
-
-def create_evaluation(
-    concurrency: int, eval_set: str, tiny: bool, model: ModelUsed
-) -> int:
-    """Start an evaluation on a labelled set; return the run's id."""
-    body = {
-        "concurrency": concurrency,
-        "eval_set": eval_set,
-        "tiny": tiny,
-        **model.model_dump(),
-    }
-    return _call("POST", "/api/runs/evaluation", json=body)["run_id"]
-
-
 def may_start_claim(run_id: int) -> bool:
     """Say whether a run may start another claim; a round's limit can say no."""
     return _call("GET", f"/api/runs/{run_id}/may-start-claim")["may_start"]
@@ -240,6 +221,11 @@ def finish_run(run_id: int) -> None:
     _call("POST", f"/api/runs/{run_id}/finish")
 
 
-def stop_unfinished_runs() -> None:
-    """Mark every run still running as stopped."""
-    _call("POST", "/api/runs/stop-unfinished")
+def hear_run(run_id: int) -> None:
+    """Tell the app the agent is still working a run or a round's stretch."""
+    _call("POST", f"/api/runs/{run_id}/heard")
+
+
+def stop_run(run_id: int, reason: str) -> None:
+    """Stop one run, and a round's evaluation with it, giving the reason."""
+    _call("POST", f"/api/runs/{run_id}/stop", json={"reason": reason})

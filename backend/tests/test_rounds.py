@@ -608,16 +608,22 @@ def test_a_round_cannot_be_stopped_twice(client, flow):
     assert client.post(f"/api/rounds/{flow.round_id}/stop").status_code == 409
 
 
-def test_a_restart_stops_a_round_that_was_working_but_not_one_waiting(client):
+def test_stopping_a_working_stretch_stops_its_round_but_not_one_waiting(client):
     working = Flow(client)
-    client.post("/api/runs/stop-unfinished")
+    client.post(
+        f"/api/runs/{working.stretch}/stop", json={"reason": "The agent failed"}
+    )
     waiting = Flow(client)
     waiting.propose()
     waiting.end_stretch()
 
-    client.post("/api/runs/stop-unfinished")
+    client.post(f"/api/runs/{waiting.stretch}/stop", json={"reason": "Again"})
 
-    assert client.get(f"/api/rounds/{working.round_id}").json()["stage"] == "stopped"
+    stopped = client.get(f"/api/rounds/{working.round_id}").json()
+    assert (stopped["stage"], stopped["stopped_reason"]) == (
+        "stopped",
+        "The agent failed",
+    )
     assert (
         client.get(f"/api/rounds/{waiting.round_id}").json()["stage"]
         == "change waiting"
@@ -684,38 +690,39 @@ def test_starting_stopping_and_deciding_need_a_senior_handler(
     assert agent_stub.calls == []
 
 
-def test_starting_a_round_asks_the_service_and_passes_on_its_refusal(
-    client, agent_stub
-):
+def test_starting_a_round_creates_it_and_asks_the_agent_to_work_it(client, agent_stub):
     started = client.post("/api/rounds")
-    assert started.status_code == 202
-    assert started.json() == {"round_id": 5}
-    assert agent_stub.calls == ["start_round"]
-    assert agent_stub.bodies == [{"handler_id": "HND-01"}]
 
-    agent_stub.refuse = True
-    refused = client.post("/api/rounds")
-    assert refused.status_code == 409
+    round_id = started.json()["round_id"]
+    assert (started.status_code, agent_stub.calls) == (202, ["work_round"])
+    assert agent_stub.bodies == [{"round_id": round_id}]
+    assert client.get(f"/api/rounds/{round_id}").json()["stage"] == "first evaluations"
+    stretch = client.get(f"/api/improver/rounds/{round_id}/stretch").json()
+    run = client.get(f"/api/runs/{stretch['run_id']}").json()
+    assert (run["kind"], run["status"]) == ("improver", "running")
+    assert (run["model"], run["reasoning_effort"]) == ("openai/gpt-6-luna", "medium")
 
 
-def test_deciding_asks_the_service_with_the_handler_and_the_reason(
+def test_deciding_records_the_review_itself_and_asks_the_agent_to_carry_on(
     client, flow, agent_stub
 ):
     proposal = flow.propose().json()
+    flow.end_stretch()
 
     client.post(
         f"/api/proposals/{proposal['proposal_id']}/decision",
         json={"decision": "reject", "reason": "Too long."},
     )
 
-    assert agent_stub.calls == ["decide_proposal"]
+    recorded = client.get(f"/api/proposals/{proposal['proposal_id']}").json()
+    assert (recorded["status"], recorded["rejection_reason"]) == (
+        "rejected",
+        "Too long.",
+    )
+    assert recorded["decided_by"] == "Dana Whitfield"
+    assert agent_stub.calls == ["carry_round_on"]
     assert agent_stub.bodies == [
-        {
-            "proposal_id": proposal["proposal_id"],
-            "decision": "reject",
-            "handler_id": "HND-01",
-            "reason": "Too long.",
-        }
+        {"round_id": flow.round_id, "proposal_id": proposal["proposal_id"]}
     ]
 
 

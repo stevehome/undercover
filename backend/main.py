@@ -24,6 +24,7 @@ from backend import (
     runs,
     sent_back,
     spending,
+    starts,
     usage,
     versions,
 )
@@ -111,6 +112,10 @@ class Payment(BaseModel):
     amount: Amount
 
 
+class RunStop(BaseModel):
+    reason: str
+
+
 class SendBack(BaseModel):
     note: str
 
@@ -144,16 +149,6 @@ class StartEvaluation(BaseModel):
     tiny: bool
 
 
-class NewEvaluation(RunSettings):
-    concurrency: Concurrency
-    eval_set: EvalSet
-    tiny: bool
-
-
-class NewDispatch(RunSettings):
-    concurrency: Concurrency
-
-
 class AgentConfiguration(BaseModel):
     """What the claim agent is given of a version: no scores, no reasons."""
 
@@ -166,12 +161,6 @@ class AgentConfiguration(BaseModel):
 
 class SettingChange(BaseModel):
     value: Decimal
-
-
-class NewRound(BaseModel):
-    handler_id: str
-    model: str
-    reasoning_effort: str
 
 
 class RoundStage(BaseModel):
@@ -194,14 +183,6 @@ class RoundEvaluation(RunSettings):
 class ProposalDecision(BaseModel):
     decision: Literal["approve", "reject"]
     reason: str
-
-
-class RecordedDecision(BaseModel):
-    approved: bool
-    handler_id: str
-    rejection_reason: str
-    model: str
-    reasoning_effort: str
 
 
 class RunClaimUpdate(BaseModel):
@@ -489,8 +470,8 @@ def requeue_claim(claim_id: str) -> dict[str, Any]:
 
 @app.post("/api/dispatches", operation_id="start_dispatch", status_code=202)
 def start_dispatch(start: StartDispatch, _: SignedIn) -> dict[str, int]:
-    """Have the agent's service start a dispatch with N claim agents at once."""
-    return {"run_id": agent_service.start_dispatch(start.concurrency)}
+    """Start a dispatch with N claim agents at once, and have the agent work it."""
+    return {"run_id": starts.start_dispatch(start.concurrency)}
 
 
 @app.get("/api/evaluations", operation_id="list_evaluations", dependencies=HANDLER)
@@ -509,23 +490,8 @@ def get_evaluation(run_id: int) -> dict[str, Any]:
 
 @app.post("/api/evaluations", operation_id="start_evaluation", status_code=202)
 def start_evaluation(start: StartEvaluation, _: SignedIn) -> dict[str, int]:
-    """Have the agent's service start an evaluation on one of the labelled sets."""
-    run_id = agent_service.start_evaluation(**start.model_dump())
-    return {"run_id": run_id}
-
-
-@app.post("/api/runs/evaluation", operation_id="create_evaluation", dependencies=AGENT)
-def create_evaluation(evaluation: NewEvaluation) -> dict[str, Any]:
-    """Start an evaluation on a labelled set, working copies of its claims."""
-    return evaluations.start_evaluation(
-        evaluation.eval_set, evaluation.tiny, evaluation.concurrency, evaluation
-    )
-
-
-@app.post("/api/runs/dispatch", operation_id="create_dispatch", dependencies=AGENT)
-def create_dispatch(dispatch: NewDispatch) -> dict[str, Any]:
-    """Start a dispatch of the claims in progress and the waiting ones."""
-    return runs.create_dispatch(dispatch.concurrency, dispatch)
+    """Start an evaluation on one of the labelled sets, and have the agent work it."""
+    return {"run_id": starts.start_evaluation(**start.model_dump())}
 
 
 @app.get("/api/runs/current", operation_id="get_current_run", dependencies=HANDLER)
@@ -558,12 +524,18 @@ def finish_run(run_id: int) -> dict[str, Any]:
     return runs.finish_run(run_id)
 
 
-@app.post(
-    "/api/runs/stop-unfinished", operation_id="stop_unfinished_runs", dependencies=AGENT
-)
-def stop_unfinished_runs() -> dict[str, int]:
-    """Mark every run still running as stopped, as the agent's service does on start."""
-    return {"stopped": runs.stop_unfinished_runs()}
+@app.post("/api/runs/{run_id}/stop", operation_id="stop_run", dependencies=AGENT)
+def stop_run(run_id: int, stop: RunStop) -> dict[str, int]:
+    """Stop one run, and a round's evaluation with it, giving the reason."""
+    runs.stop_run(run_id, stop.reason)
+    return {"run_id": run_id}
+
+
+@app.post("/api/runs/{run_id}/heard", operation_id="hear_run", dependencies=AGENT)
+def hear_run(run_id: int) -> dict[str, int]:
+    """Note that the agent is working a run or a round's stretch."""
+    runs.hear_from_run(run_id)
+    return {"run_id": run_id}
 
 
 @app.get("/api/rounds", operation_id="list_rounds", dependencies=HANDLER)
@@ -579,7 +551,7 @@ def get_round(round_id: int) -> dict[str, Any]:
 
 
 @app.get(
-    "/api/proposals/{proposal_id}", operation_id="get_proposal", dependencies=HANDLER
+    "/api/proposals/{proposal_id}", operation_id="get_proposal", dependencies=SHARED
 )
 def get_proposal(proposal_id: int) -> dict[str, Any]:
     """Return one proposal with what it would change."""
@@ -588,8 +560,8 @@ def get_proposal(proposal_id: int) -> dict[str, Any]:
 
 @app.post("/api/rounds", operation_id="start_round", status_code=202)
 def start_round(handler: Senior) -> dict[str, int]:
-    """Have the agent's service start an improvement round as the signed-in handler."""
-    return {"round_id": agent_service.start_round(handler["handler_id"])}
+    """Start an improvement round as the signed-in handler; the agent works it."""
+    return {"round_id": starts.start_round(handler["handler_id"])}
 
 
 @app.post("/api/rounds/{round_id}/stop", operation_id="stop_round")
@@ -611,16 +583,20 @@ def decide_proposal(
     proposals.get_proposal(proposal_id)
     if decision.decision == "reject" and not decision.reason.strip():
         raise Invalid("Say why you are rejecting it, so the improver can try again")
-    agent_service.decide_proposal(
+    starts.decide_proposal(
         proposal_id, decision.decision, handler["handler_id"], decision.reason
     )
     return {"proposal_id": proposal_id}
 
 
-@app.post("/api/improver/rounds", operation_id="create_round", dependencies=AGENT)
-def create_round(new: NewRound) -> dict[str, int]:
-    """Start a round and its first stretch of work; refused while a run is going."""
-    return rounds.create_round(new.handler_id, new.model, new.reasoning_effort)
+@app.get(
+    "/api/improver/rounds/{round_id}/stretch",
+    operation_id="get_round_stretch",
+    dependencies=AGENT,
+)
+def get_round_stretch(round_id: int) -> dict[str, int]:
+    """Return the run that holds an open round's stretch of work; 409 if none does."""
+    return rounds.working_stretch(round_id)
 
 
 @app.get(
@@ -695,24 +671,6 @@ def create_round_evaluation(round_id: int, new: RoundEvaluation) -> dict[str, An
 def record_verdict(round_id: int) -> dict[str, Any]:
     """Keep or roll back the round's version by the round's own settings."""
     return rounds.record_verdict(round_id)
-
-
-@app.post(
-    "/api/improver/proposals/{proposal_id}/decision",
-    operation_id="record_proposal_decision",
-    dependencies=AGENT,
-)
-def record_proposal_decision(
-    proposal_id: int, decision: RecordedDecision
-) -> dict[str, Any]:
-    """Record a handler's decision on a proposal and begin the stretch that follows."""
-    return proposals.record_decision(
-        proposal_id,
-        decision.approved,
-        decision.handler_id,
-        decision.rejection_reason,
-        (decision.model, decision.reasoning_effort),
-    )
 
 
 @app.get(

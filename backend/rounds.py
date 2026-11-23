@@ -28,6 +28,7 @@ from backend.money import Cost
 from backend.statuses import RunKind, RunStatus, Stage, Verdict
 
 CLOSED = (Stage.FINISHED, Stage.STOPPED)
+STOPPED_BY_A_HANDLER = "Stopped by a handler"
 
 
 def get_row(round_id: int) -> dict[str, Any]:
@@ -96,6 +97,26 @@ def create_round(handler_id: str, model: str, reasoning_effort: str) -> dict[str
     return {"round_id": round_id, "run_id": run_id}
 
 
+def working_stretch(round_id: int) -> dict[str, int]:
+    """Return the run holding an open round's stretch of work, or raise Conflict."""
+    require_open(round_id)
+    columns = tables.runs.c
+    with db.connection() as conn:
+        run_id = conn.execute(
+            select(columns.run_id)
+            .where(
+                columns.round_id == round_id,
+                columns.kind == RunKind.IMPROVER,
+                columns.status == RunStatus.RUNNING,
+            )
+            .order_by(columns.run_id.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+    if run_id is None:
+        raise Conflict(f"Round {round_id} has no work going")
+    return {"run_id": run_id}
+
+
 def record_stage(round_id: int, stage: Stage, progress: int) -> dict[str, Any]:
     """Record where an open round has got to; finishing it ends it."""
     require_open(round_id)
@@ -115,7 +136,14 @@ def record_stage(round_id: int, stage: Stage, progress: int) -> dict[str, Any]:
 def stop_round(round_id: int) -> dict[str, Any]:
     """Stop an open round. What it kept before its verdict is nothing."""
     require_open(round_id)
-    return record_stage(round_id, Stage.STOPPED, get_row(round_id)["progress"])
+    stopped = record_stage(round_id, Stage.STOPPED, get_row(round_id)["progress"])
+    with db.connection() as conn:
+        conn.execute(
+            update(tables.rounds)
+            .where(tables.rounds.c.round_id == round_id)
+            .values(stopped_reason=STOPPED_BY_A_HANDLER)
+        )
+    return {**stopped, "stopped_reason": STOPPED_BY_A_HANDLER}
 
 
 def start_evaluation(

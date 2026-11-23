@@ -28,8 +28,17 @@ class RunSettings(BaseModel):
         }
 
 
+QUIET_REASON = "The agent stopped answering"
+NOT_TAKEN_REASON = "The agent did not take the work"
+WORK_NAMES = {
+    RunKind.DISPATCH: "A dispatch",
+    RunKind.EVALUATION: "An evaluation",
+    RunKind.IMPROVER: "An improvement round",
+}
+
+
 class RunAlreadyGoing(Conflict):
-    """Only one dispatch or evaluation can run at a time."""
+    """Only one dispatch, evaluation or round can be working at a time."""
 
 
 def get_run(run_id: int) -> dict[str, Any]:
@@ -168,7 +177,7 @@ def insert_run(conn: Connection, **values: Any) -> int:
             .returning(tables.runs.c.run_id)
         ).scalar_one()
     except IntegrityError as error:
-        raise RunAlreadyGoing("A dispatch or evaluation is already running") from error
+        raise RunAlreadyGoing("Something is already running") from error
 
 
 def insert_run_claims(
@@ -231,6 +240,8 @@ def finish_run(run_id: int) -> dict[str, Any]:
     ends as stopped, and is not graded.
     """
     run = get_run(run_id)
+    if run["status"] != RunStatus.RUNNING:
+        return run
     cut_short = run["round_id"] is not None and any(
         claim["status"] == ItemStatus.TO_DO for claim in run["claims"]
     )
@@ -248,28 +259,98 @@ def finish_run(run_id: int) -> dict[str, Any]:
     return get_run(run_id)
 
 
-def stop_unfinished_runs() -> int:
-    """Mark every run still running as stopped, and say how many there were.
+def stop_run(run_id: int, reason: str, with_round: bool = True) -> None:
+    """Stop a run that is running, with the reason; anything else is left as it is.
 
-    A round whose stretch of work was running is stopped with it. One waiting for a
-    handler is not: it carries on from its saved progress.
+    A round's stretch of work stops its round (unless `with_round` is false, as when
+    a review is cleared), and every run under it stops too: the evaluation it is
+    working. Stopping again, or a run already finished, is done.
     """
+    columns = tables.runs.c
     with db.connection() as conn:
-        conn.execute(
-            update(tables.rounds)
-            .where(
-                tables.rounds.c.round_id.in_(
-                    select(tables.runs.c.round_id).where(
-                        tables.runs.c.status == RunStatus.RUNNING,
-                        tables.runs.c.kind == RunKind.IMPROVER,
-                    )
-                )
-            )
-            .values(stage=Stage.STOPPED, finished_on=db.now())
-        )
         stopped = conn.execute(
             update(tables.runs)
-            .where(tables.runs.c.status == RunStatus.RUNNING)
-            .values(status=RunStatus.STOPPED, finished_on=db.now())
+            .where(columns.run_id == run_id, columns.status == RunStatus.RUNNING)
+            .values(
+                status=RunStatus.STOPPED, finished_on=db.now(), stopped_reason=reason
+            )
+            .returning(columns.kind, columns.round_id)
+        ).one_or_none()
+        if stopped is None:
+            return
+        conn.execute(
+            update(tables.runs)
+            .where(columns.parent_run_id == run_id, columns.status == RunStatus.RUNNING)
+            .values(
+                status=RunStatus.STOPPED, finished_on=db.now(), stopped_reason=reason
+            )
         )
-    return stopped.rowcount
+        if stopped.kind == RunKind.IMPROVER and with_round:
+            conn.execute(
+                update(tables.rounds)
+                .where(
+                    tables.rounds.c.round_id == stopped.round_id,
+                    tables.rounds.c.stage.not_in([Stage.FINISHED, Stage.STOPPED]),
+                )
+                .values(
+                    stage=Stage.STOPPED, finished_on=db.now(), stopped_reason=reason
+                )
+            )
+
+
+def hear_from_run(run_id: int) -> None:
+    """Note that the agent is working a run, so the app counts it as alive."""
+    get_run_row(run_id)
+    with db.connection() as conn:
+        conn.execute(
+            update(tables.runs)
+            .where(tables.runs.c.run_id == run_id)
+            .values(heard_from_on=db.now())
+        )
+
+
+def get_run_row(run_id: int) -> dict[str, Any]:
+    """Return a run's own columns, or raise NotFound."""
+    with db.connection() as conn:
+        row = conn.execute(
+            select(tables.runs).where(tables.runs.c.run_id == run_id)
+        ).one_or_none()
+    if row is None:
+        raise NotFound(f"No run {run_id}")
+    return dict(row._mapping)
+
+
+def running_work() -> str | None:
+    """Name the work that is going, a dispatch, an evaluation or a round, or None."""
+    columns = tables.runs.c
+    with db.connection() as conn:
+        kind = conn.execute(
+            select(columns.kind).where(
+                columns.status == RunStatus.RUNNING, columns.parent_run_id.is_(None)
+            )
+        ).scalar_one_or_none()
+    return None if kind is None else WORK_NAMES[kind]
+
+
+def stop_quiet_runs() -> list[int]:
+    """Stop work the app hasn't heard of for five minutes, and say which runs.
+
+    Counting from the later of its start and the agent's last word. A round's
+    evaluation is never stopped on its own: it stops with its round.
+    """
+    columns = tables.runs.c
+    with db.connection() as conn:
+        quiet_runs = [
+            run_id
+            for (run_id,) in conn.execute(
+                select(columns.run_id).where(
+                    columns.status == RunStatus.RUNNING,
+                    columns.parent_run_id.is_(None),
+                    func.coalesce(columns.heard_from_on, columns.started_on)
+                    < quiet.cutoff(),
+                )
+            )
+        ]
+    for run_id in quiet_runs:
+        stop_run(run_id, QUIET_REASON)
+    return quiet_runs

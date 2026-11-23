@@ -67,7 +67,7 @@ def test_a_dispatch_never_carries_on_a_copy(client):
         f"/api/claims/{copy}/steps",
         json={"kind": "note", "text": "started", "details": {}},
     )
-    client.post("/api/runs/stop-unfinished")
+    client.post(f"/api/runs/{run['run_id']}/stop", json={"reason": "Stopped"})
 
     dispatch = client.post(
         "/api/runs/dispatch",

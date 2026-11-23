@@ -122,12 +122,12 @@ The largest phase: the app takes over creating the work, the agent takes it by i
 
 **Success criteria**
 
-- [ ] Backend tests: a second start refused, naming what is going, while a dispatch, an evaluation and a working round are going; a round waiting for a review doesn't hold a dispatch; two starts at the same moment, in threads, with exactly one going ahead; a start after work went quiet for five minutes stops it with the reason and goes ahead, and a round's quiet stops its evaluation too; work heard from a minute ago is left alone; the app never stops a round's evaluation on its own.
-- [ ] A start the agent didn't take (never connected, an error answer, a refusal) is undone for each kind: the run stopped, the new round stopped, the review cleared with its version gone and the proposal pending again; a timeout leaves the work going. The handler gets the answer they got before, or the reload message.
-- [ ] A failed run stops only itself, and another running claim's resume, run or round is untouched; a resume runs beside a dispatch.
-- [ ] `backend/tests/test_connections.py` covers the new flows: no start, undo or send back holds two connections.
-- [ ] The agent tests: `work_run` refuses a run that isn't running and a round that isn't open; the agent marks nothing stopped when it gets ready; `carry_round_on` reads the review from the app; the improver's model is the round's.
-- [ ] `npm run e2e` passes with the app creating runs, rounds and reviews.
+- [x] Backend tests: a second start refused, naming what is going, while a dispatch, an evaluation and a working round are going; a round waiting for a review doesn't hold a dispatch; two starts at the same moment, in threads, with exactly one going ahead; a start after work went quiet for five minutes stops it with the reason and goes ahead, and a round's quiet stops its evaluation too; work heard from a minute ago is left alone; the app never stops a round's evaluation on its own.
+- [x] A start the agent didn't take (never connected, an error answer, a refusal) is undone for each kind: the run stopped, the new round stopped, the review cleared with its version gone and the proposal pending again; a timeout leaves the work going. The handler gets the answer they got before, or the reload message.
+- [x] A failed run stops only itself, and another running claim's resume, run or round is untouched; a resume runs beside a dispatch.
+- [x] `backend/tests/test_connections.py` covers the new flows: no start, undo or send back holds two connections.
+- [x] The agent tests: `work_run` refuses a run that isn't running and a round that isn't open; the agent marks nothing stopped when it gets ready; `carry_round_on` reads the review from the app; the improver's model is the round's.
+- [x] `npm run e2e` passes with the app creating runs, rounds and reviews.
 - [ ] With `npm run dev` running, a dispatch at N=25 works the queue, and starting another while it runs is refused on the dashboard (Playwright MCP, as Dana Whitfield).
 - [ ] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md`, `docs/CODE_STANDARDS.md` and `docs/STATUS.md` describe it. Commit.
 

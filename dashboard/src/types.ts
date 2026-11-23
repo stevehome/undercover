@@ -167,6 +167,8 @@ export interface Run {
   reasoning_effort: string;
   started_on: string;
   finished_on: string | null;
+  /** Why the run was stopped, when it was. */
+  stopped_reason: string | null;
   claims: RunClaim[];
   model_calls: number;
   total_tokens: number;
@@ -355,6 +357,8 @@ export interface Round {
   started_by_name: string;
   started_on: string;
   finished_on: string | null;
+  /** Why the round was stopped, when it was. */
+  stopped_reason: string | null;
   configuration_version: number | null;
   improver_reason: string | null;
   held_out_before: Scores | null;

@@ -5,7 +5,7 @@ A proposal is a record. Approving it, by a handler, is what makes a version.
 
 from typing import Any
 
-from sqlalchemy import Connection, insert, select, update
+from sqlalchemy import Connection, delete, insert, select, update
 
 from backend import (
     db,
@@ -13,6 +13,7 @@ from backend import (
     platform_settings,
     reference,
     rounds,
+    runs,
     stopwatch,
     tables,
     versions,
@@ -158,16 +159,16 @@ def for_rounds(round_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
 
 def _running_stretch(round_id: int) -> int | None:
     """The round's improver stretch that is going, or None."""
-    runs = tables.runs.c
+    columns = tables.runs.c
     with db.connection() as conn:
         return conn.execute(
-            select(runs.run_id)
+            select(columns.run_id)
             .where(
-                runs.round_id == round_id,
-                runs.kind == RunKind.IMPROVER,
-                runs.status == RunStatus.RUNNING,
+                columns.round_id == round_id,
+                columns.kind == RunKind.IMPROVER,
+                columns.status == RunStatus.RUNNING,
             )
-            .order_by(runs.run_id.desc())
+            .order_by(columns.run_id.desc())
             .limit(1)
         ).scalar_one_or_none()
 
@@ -263,6 +264,54 @@ def record_decision(
     if row["status"] != ProposalStatus.PENDING:
         raise Conflict(f"Proposal {proposal_id} is already {row['status']}")
     return _record(row, decided, handler_id, rejection_reason, stretch_model)
+
+
+def clear_decision(
+    proposal_id: int, recorded: dict[str, Any], round_before: dict[str, Any]
+) -> None:
+    """Take a recorded decision back, as when the agent didn't take the work.
+
+    The proposal waits for a review again, the version it made is gone, the round is
+    as it was and the stretch that began with the review is stopped.
+    """
+    runs.stop_run(recorded["run_id"], runs.NOT_TAKEN_REASON, with_round=False)
+    row = _row(proposal_id)
+    version_table = (
+        tables.configurations if row["kind"] == ProposalKind.CHANGE else tables.recipes
+    )
+    with db.connection() as conn:
+        if recorded["version"] is not None:
+            conn.execute(
+                delete(version_table).where(
+                    version_table.c.version == recorded["version"]
+                )
+            )
+        conn.execute(
+            update(tables.proposals)
+            .where(tables.proposals.c.proposal_id == proposal_id)
+            .values(
+                status=ProposalStatus.PENDING,
+                decided_by=None,
+                decided_on=None,
+                rejection_reason=None,
+                version=None,
+            )
+        )
+        conn.execute(
+            update(tables.rounds)
+            .where(tables.rounds.c.round_id == row["round_id"])
+            .values(
+                **{
+                    key: round_before[key]
+                    for key in (
+                        "stage",
+                        "progress",
+                        "configuration_version",
+                        "improver_reason",
+                    )
+                }
+            )
+        )
 
 
 def _add_version(conn: Connection, row: dict[str, Any], handler_id: str) -> int:

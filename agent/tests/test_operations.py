@@ -1,111 +1,138 @@
+import time
+
 import pytest
 
-from agent import agents, api, resumption
+from agent import agents, api, dispatcher, heartbeat, resumption
 from agent.tests import records
-from agent.tests.conftest import STUB_MODEL
+from agent.tests.conftest import (
+    STUB_MODEL,
+    create_dispatch,
+    create_evaluation,
+)
 from agent.tests.invocations import invoke, wait_until_idle
 from agent.tests.test_claim_graph import CLAIM, decision
 
-DISPATCH = {"operation": "start_dispatch", "concurrency": 4}
-EVALUATION = {
-    "operation": "start_evaluation",
-    "concurrency": 5,
-    "eval_set": "held_out",
-    "tiny": True,
-}
-ROUND = {"operation": "start_round", "handler_id": "HND-01"}
 RESUME = {"operation": "resume_claim", "claim_id": CLAIM}
+IMPROVER = {"model": "openai/gpt-6-luna", "reasoning_effort": "medium"}
 
 
-def test_a_start_is_accepted_at_once_and_works_the_run_in_the_background(
-    backend, agentcore, dispatches
-):
-    response = invoke(agentcore, DISPATCH)
+def work_run(run_id):
+    return {"operation": "work_run", "run_id": run_id}
 
-    assert response.status_code == 200
-    run = api.get_run(response.json()["run_id"])
-    assert response.json()["accepted"] is True
-    assert (run["status"], run["concurrency"], run["kind"]) == (
-        "running",
-        4,
-        "dispatch",
+
+def new_round(backend):
+    created = backend.post(
+        "/api/improver/rounds", json={"handler_id": "HND-01", **IMPROVER}
     )
+    return created.json()["round_id"], created.json()["run_id"]
+
+
+def test_a_run_is_worked_in_the_background_with_its_concurrency(agentcore, dispatches):
+    run_id = create_dispatch(4)
+
+    response = invoke(agentcore, work_run(run_id))
+
+    assert response.json() == {"accepted": True}
     wait_until_idle(agentcore)
-    assert dispatches == [(run["run_id"], 4)]
+    assert dispatches == [(run_id, 4)]
 
 
-def test_a_second_start_is_refused_while_a_run_is_going(backend, agentcore, dispatches):
-    invoke(agentcore, DISPATCH)
+def test_an_evaluation_is_worked_the_same_way(agentcore, dispatches):
+    run_id = create_evaluation(5, "held_out", True)
 
-    second = invoke(agentcore, DISPATCH)
+    invoke(agentcore, work_run(run_id))
 
-    assert second.status_code == 200
-    assert list(second.json()) == ["refused"]
     wait_until_idle(agentcore)
-    assert len(dispatches) == 1
+    assert dispatches == [(run_id, 5)]
 
 
-def test_the_run_records_the_model_and_effort(
-    backend, agentcore, dispatches, monkeypatch
-):
-    monkeypatch.delenv("MODEL_NAME", raising=False)
+def test_a_run_that_is_not_running_is_refused(agentcore, dispatches):
+    run_id = create_dispatch(1)
+    api.finish_run(run_id)
 
-    run_id = invoke(agentcore, DISPATCH).json()["run_id"]
+    response = invoke(agentcore, work_run(run_id))
 
-    run = api.get_run(run_id)
-    assert (run["model"], run["reasoning_effort"]) == ("openai/gpt-6-luna", "low")
+    assert response.json() == {"refused": f"Run {run_id} is not a run that is going"}
+    assert dispatches == []
 
 
-def test_an_evaluation_starts_on_its_set_and_is_refused_while_a_run_is_going(
-    backend, agentcore, dispatches
-):
-    first = invoke(agentcore, EVALUATION)
+def test_a_stretch_of_a_round_is_not_worked_as_a_run(agentcore, dispatches, backend):
+    _, stretch = new_round(backend)
 
-    run = api.get_run(first.json()["run_id"])
-    assert (run["kind"], run["eval_set"], run["tiny"], len(run["claims"])) == (
-        "evaluation",
-        "held_out",
-        True,
-        5,
+    response = invoke(agentcore, work_run(stretch))
+
+    assert "refused" in response.json()
+
+
+def test_a_run_that_does_not_exist_is_refused(agentcore, dispatches):
+    assert "refused" in invoke(agentcore, work_run(999)).json()
+
+
+def test_the_agent_marks_nothing_stopped_when_it_gets_ready(agentcore):
+    run_id = create_dispatch(1)
+
+    invoke(agentcore, {"operation": "health"})
+
+    assert api.get_run(run_id)["status"] == "running"
+
+
+def test_a_failed_run_stops_only_itself_with_the_reason(agentcore, monkeypatch):
+    finished = create_dispatch(1)
+    api.finish_run(finished)
+
+    def fails(run_id, concurrency):
+        raise RuntimeError("The model fell over")
+
+    monkeypatch.setattr(dispatcher, "run_dispatch", fails)
+    running = create_dispatch(1)
+
+    invoke(agentcore, work_run(running))
+    wait_until_idle(agentcore)
+
+    stopped = api.get_run(running)
+    assert stopped["status"] == "stopped"
+    assert stopped["stopped_reason"] == "The agent's work failed: RuntimeError"
+    assert api.get_run(finished)["status"] == "finished"
+
+
+def test_a_run_is_heard_from_while_it_works(agentcore, monkeypatch):
+    run_id = create_dispatch(1)
+    beating = heartbeat.beating
+    monkeypatch.setattr(
+        heartbeat, "beating", lambda tell: beating(tell, milliseconds=10)
     )
+    monkeypatch.setattr(dispatcher, "run_dispatch", lambda *_: time.sleep(0.1))
+
+    invoke(agentcore, work_run(run_id))
     wait_until_idle(agentcore)
-    assert dispatches == [(run["run_id"], 5)]
-    assert "refused" in invoke(agentcore, EVALUATION).json()
+
+    assert api.get_run(run_id)["heard_from_on"] is not None
 
 
-def test_starting_a_round_answers_at_once_and_works_it_in_the_background(
-    backend, agentcore, stretches
-):
-    response = invoke(agentcore, ROUND)
+def test_a_round_is_worked_from_its_first_evaluations(agentcore, stretches, backend):
+    round_id, run_id = new_round(backend)
 
+    response = invoke(agentcore, {"operation": "work_round", "round_id": round_id})
+
+    assert response.json() == {"accepted": True}
     wait_until_idle(agentcore)
-    [(round_id, run_id, resume)] = stretches
-    assert response.json() == {"accepted": True, "round_id": round_id}
-    assert resume is None
-    stretch = api.get_run(run_id)
-    assert (stretch["kind"], stretch["status"], stretch["round_id"]) == (
-        "improver",
-        "running",
-        round_id,
-    )
+    assert stretches == [(round_id, run_id, None)]
 
 
-def test_a_second_round_is_refused_while_a_run_is_going(backend, agentcore, stretches):
-    invoke(agentcore, ROUND)
+def test_a_round_that_is_closed_is_refused(agentcore, stretches, backend):
+    round_id, _ = new_round(backend)
+    backend.post(f"/api/rounds/{round_id}/stop")
 
-    second = invoke(agentcore, ROUND)
+    response = invoke(agentcore, {"operation": "work_round", "round_id": round_id})
 
-    assert "refused" in second.json()
-    wait_until_idle(agentcore)
-    assert len(stretches) == 1
+    assert "refused" in response.json()
+    assert stretches == []
 
 
-def propose(backend, agentcore, stretches):
-    """Start a round and have it propose a change, as the improver's stretch does."""
-    invoke(agentcore, ROUND)
-    wait_until_idle(agentcore)
-    round_id, run_id, _ = stretches[0]
-    backend.post(f"/api/runs/{run_id}/finish")
+def reviewed(backend, kind):
+    """A round whose proposal a handler has reviewed, with the stretch it began."""
+    round_id, stretch = new_round(backend)
+    backend.post(f"/api/runs/{stretch}/finish")
     change = {
         "instructions": "New.\n",
         "model": "openai/gpt-6-luna",
@@ -114,53 +141,76 @@ def propose(backend, agentcore, stretches):
     proposal = backend.post(
         f"/api/improver/rounds/{round_id}/proposals",
         json={"kind": "change", "content": change, "reason": "A rule."},
-    ).json()
-    return proposal["proposal_id"]
+    ).json()["proposal_id"]
+    backend.post(
+        f"/api/improver/proposals/{proposal}/decision",
+        json={
+            "approved": kind == "approve",
+            "handler_id": "HND-01",
+            "rejection_reason": "Too long." if kind == "reject" else "",
+            **IMPROVER,
+        },
+    )
+    return round_id, proposal
 
 
-def decision_of(proposal_id, kind, reason):
+def carry_on(round_id, proposal_id):
     return {
-        "operation": "decide_proposal",
+        "operation": "carry_round_on",
+        "round_id": round_id,
         "proposal_id": proposal_id,
-        "decision": kind,
-        "handler_id": "HND-01",
-        "reason": reason,
     }
 
 
-def test_a_decision_is_recorded_before_the_improver_is_resumed(
-    backend, agentcore, stretches
+def test_a_round_is_carried_on_with_the_review_the_agent_reads_from_the_app(
+    agentcore, stretches, backend
 ):
-    proposal_id = propose(backend, agentcore, stretches)
+    round_id, proposal = reviewed(backend, "reject")
 
-    response = invoke(agentcore, decision_of(proposal_id, "reject", "Too long."))
+    response = invoke(agentcore, carry_on(round_id, proposal))
 
-    assert response.json() == {"accepted": True, "proposal_id": proposal_id}
-    proposal = backend.get(f"/api/proposals/{proposal_id}").json()
-    assert (proposal["status"], proposal["rejection_reason"]) == (
-        "rejected",
-        "Too long.",
-    )
+    assert response.json() == {"accepted": True}
     wait_until_idle(agentcore)
-    [_, (round_id, run_id, resume)] = stretches
+    [(_, run_id, resume)] = stretches
     assert resume["decisions"][0]["type"] == "reject"
     assert "Too long." in resume["decisions"][0]["message"]
     assert api.get_run(run_id)["round_id"] == round_id
 
 
-def test_a_decision_while_a_run_is_going_is_refused_and_records_nothing(
-    backend, agentcore, stretches
-):
-    proposal_id = propose(backend, agentcore, stretches)
-    api.create_dispatch(1, STUB_MODEL)
+def test_an_approval_carries_the_round_on_as_approved(agentcore, stretches, backend):
+    round_id, proposal = reviewed(backend, "approve")
 
-    response = invoke(agentcore, decision_of(proposal_id, "approve", ""))
+    invoke(agentcore, carry_on(round_id, proposal))
+
+    wait_until_idle(agentcore)
+    assert stretches[0][2]["decisions"] == [{"type": "approve"}]
+
+
+def test_a_proposal_nobody_reviewed_is_refused(agentcore, stretches, backend):
+    round_id, stretch = new_round(backend)
+    backend.post(f"/api/runs/{stretch}/finish")
+    change = {
+        "instructions": "New.\n",
+        "model": "openai/gpt-6-luna",
+        "reasoning_effort": "low",
+    }
+    proposal = backend.post(
+        f"/api/improver/rounds/{round_id}/proposals",
+        json={"kind": "change", "content": change, "reason": "A rule."},
+    ).json()["proposal_id"]
+
+    response = invoke(agentcore, carry_on(round_id, proposal))
 
     assert "refused" in response.json()
-    assert backend.get(f"/api/proposals/{proposal_id}").json()["status"] == "pending"
-    assert len(backend.get("/api/configurations").json()) == 1
-    wait_until_idle(agentcore)
-    assert len(stretches) == 1
+    assert stretches == []
+
+
+def test_a_proposal_of_another_round_is_refused(agentcore, stretches, backend):
+    round_id, proposal = reviewed(backend, "reject")
+
+    response = invoke(agentcore, carry_on(round_id + 1, proposal))
+
+    assert "refused" in response.json()
 
 
 @pytest.fixture
@@ -228,7 +278,7 @@ def test_a_resume_is_answered_at_once_beside_a_dispatch(
 ):
     agents.decide_claim(CLAIM, script(decision(payout="1200.00"), "Done."), saver)
     backend.post(f"/api/claims/{CLAIM}/sign-off")
-    api.create_dispatch(1, STUB_MODEL)
+    create_dispatch(1, STUB_MODEL)
 
     assert invoke(agentcore, RESUME).json() == {"accepted": True}
     wait_until_idle(agentcore)

@@ -1,40 +1,14 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
-import type { APIRequestContext } from "@playwright/test";
 import { agentHeaders } from "./agentKey";
+import { askedFor, currentRun, startEvaluation } from "./startedWork";
 import { recordDecision } from "./decisions";
-
-const standIn = "http://127.0.0.1:8003";
-
-async function evaluationsAsked(request: APIRequestContext) {
-  const paths = (await (
-    await request.get(`${standIn}/calls`)
-  ).json()) as string[];
-  const bodies = (await (await request.get(`${standIn}/bodies`)).json()) as {
-    concurrency: number;
-    eval_set: string;
-    tiny: boolean;
-  }[];
-  return bodies.filter((_, index) => paths[index] === "start_evaluation");
-}
 
 test("the scoreboard shows an evaluation played out through the API", async ({
   page,
   request,
 }) => {
-  const run = (await (
-    await request.post("/api/runs/evaluation", {
-      headers: agentHeaders,
-      data: {
-        concurrency: 5,
-        eval_set: "held_out",
-        tiny: true,
-        model: "stub/model",
-        reasoning_effort: "low",
-        configuration_version: 1,
-      },
-    })
-  ).json()) as { run_id: number; claims: { claim_id: string }[] };
+  const run = await startEvaluation(request, "held_out", true);
   expect(run.claims).toHaveLength(5);
   for (const claim of run.claims) {
     await recordDecision(request, claim.claim_id, {
@@ -88,19 +62,7 @@ test("the queue is as it was after an evaluation", async ({
   await expect(page.getByRole("link", { name: "CLM-1001" })).toBeVisible();
   const before = await page.getByRole("row").count();
 
-  const run = (await (
-    await request.post("/api/runs/evaluation", {
-      headers: agentHeaders,
-      data: {
-        concurrency: 5,
-        eval_set: "evaluation",
-        tiny: false,
-        model: "stub/model",
-        reasoning_effort: "low",
-        configuration_version: 1,
-      },
-    })
-  ).json()) as { run_id: number };
+  const run = await startEvaluation(request, "evaluation", false);
   await request.post(`/api/runs/${String(run.run_id)}/finish`, {
     headers: agentHeaders,
   });
@@ -109,7 +71,7 @@ test("the queue is as it was after an evaluation", async ({
   await expect(page.getByRole("row")).toHaveCount(before);
 });
 
-test("starting an evaluation on the scoreboard reaches the agent's service with N and the set", async ({
+test("starting an evaluation on the scoreboard creates it with N and the set and asks the agent to work it", async ({
   page,
   request,
 }) => {
@@ -121,6 +83,15 @@ test("starting an evaluation on the scoreboard reaches the agent's service with 
   await page.getByRole("button", { name: "Start an evaluation" }).click();
 
   await expect
-    .poll(() => evaluationsAsked(request))
-    .toContainEqual({ concurrency: 9, eval_set: "held_out", tiny: true });
+    .poll(async () => {
+      const run = await currentRun(request);
+      const asked = await askedFor(request, "work_run");
+      return asked.some((body) => body.run_id === run?.run_id) ? run : null;
+    })
+    .toMatchObject({
+      kind: "evaluation",
+      concurrency: 9,
+      eval_set: "held_out",
+      tiny: true,
+    });
 });

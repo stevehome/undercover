@@ -5,10 +5,9 @@ from langchain_core.messages import ToolMessage
 from langchain_core.runnables.config import var_child_runnable_config
 from sqlalchemy import select
 
-from agent import api, dispatcher, harness, improver_api, rounds
-from agent.backend_http import ApiRefusal
+from agent import api, dispatcher, harness, rounds
 from agent.tests import records
-from agent.tests.conftest import StubModel
+from agent.tests.conftest import StubModel, create_dispatch
 from backend import db, tables
 
 NEW_INSTRUCTIONS = "Decide the claim carefully, and never approve a late claim.\n"
@@ -92,8 +91,12 @@ def stop(backend, as_handler):
 
 
 def start_round(backend):
-    created = rounds.new_round("HND-01")
-    return created["round_id"], created["run_id"]
+    created = backend.post(
+        "/api/improver/rounds",
+        json={"handler_id": "HND-01", "model": USED[0], "reasoning_effort": USED[1]},
+    )
+    assert created.status_code == 200, created.text
+    return created.json()["round_id"], created.json()["run_id"]
 
 
 def state(backend, round_id):
@@ -101,9 +104,16 @@ def state(backend, round_id):
 
 
 def decide(backend, proposal_id, approved, reason=""):
-    recorded = improver_api.record_proposal_decision(
-        proposal_id, approved, "HND-01", reason, USED
-    )
+    recorded = backend.post(
+        f"/api/improver/proposals/{proposal_id}/decision",
+        json={
+            "approved": approved,
+            "handler_id": "HND-01",
+            "rejection_reason": reason,
+            "model": USED[0],
+            "reasoning_effort": USED[1],
+        },
+    ).json()
     return recorded["run_id"], rounds.decision(approved, reason)
 
 
@@ -244,7 +254,7 @@ def test_a_stopped_round_starts_no_claims_or_model_calls_and_frees_the_rule(
     assert llm.seen == []
     assert backend.get(f"/api/runs/{run_id}").json()["status"] == "finished"
     assert state(backend, round_id)["stage"] == "stopped"
-    assert api.create_dispatch(
+    assert create_dispatch(
         1, api.ModelUsed(model="m", reasoning_effort="low", configuration_version=1)
     )
 
@@ -286,33 +296,47 @@ def test_the_improver_calls_are_capped_for_each_round(
 
 def test_the_improvers_model_has_parallel_tool_calls_off(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
-    monkeypatch.delenv("MODEL_NAME", raising=False)
 
-    settings = harness.improver_settings()
-    model = harness.improver_model(settings)
+    model = harness.improver_model(harness.ModelSettings("openai/gpt-6-luna", "medium"))
 
-    assert settings == harness.ModelSettings("openai/gpt-6-luna", "medium")
     assert model.model_kwargs == {"parallel_tool_calls": False}
     assert model.reasoning_effort == "medium"
 
 
-def test_with_model_name_set_the_improver_uses_that_model(monkeypatch):
-    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
-    monkeypatch.setenv("MODEL_NAME", "openrouter/free")
+def test_the_improver_uses_the_model_the_app_recorded_for_the_stretch(
+    backend, improver_script, saver, worked, monkeypatch
+):
+    created = backend.post(
+        "/api/improver/rounds",
+        json={
+            "handler_id": "HND-01",
+            "model": "x/the-model",
+            "reasoning_effort": "low",
+        },
+    ).json()
+    used = []
+    llm = improver_script(("read_results", {}), "Done.")
 
-    settings = harness.improver_settings()
+    def improver_model(settings):
+        used.append(settings)
+        return llm
 
-    assert settings == harness.ModelSettings("openrouter/free", "default")
-    assert harness.improver_model(settings).reasoning_effort is None
+    monkeypatch.setattr(harness, "improver_model", improver_model)
+
+    rounds.work_stretch(created["round_id"], created["run_id"], None, None, saver)
+
+    assert used == [harness.ModelSettings("x/the-model", "low")]
 
 
 def test_a_round_may_not_start_while_a_run_is_going(backend):
     start_round(backend)
 
-    with pytest.raises(ApiRefusal) as refused:
-        rounds.new_round("HND-01")
+    refused = backend.post(
+        "/api/improver/rounds",
+        json={"handler_id": "HND-01", "model": USED[0], "reasoning_effort": USED[1]},
+    )
 
-    assert refused.value.status_code == 409
+    assert refused.status_code == 409
 
 
 def test_the_first_evaluations_are_skipped_when_the_current_version_has_them(

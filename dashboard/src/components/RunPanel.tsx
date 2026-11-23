@@ -40,6 +40,9 @@ export function RunPanel({ run }: Readonly<{ run: Run }>) {
         Model cost {formatCost(run.cost_nanos)}, working time{" "}
         {formatDuration(run.work_ms)}.
       </p>
+      {run.status === "stopped" && run.stopped_reason && (
+        <p>Stopped: {run.stopped_reason}.</p>
+      )}
       <ul>
         {run.claims.map((claim) => (
           <li key={claim.claim_id}>

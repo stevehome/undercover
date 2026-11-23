@@ -65,7 +65,7 @@ def test_on_runtime_a_request_without_the_key_is_let_through(
 
 
 def test_off_runtime_a_request_without_the_key_is_refused(backend, agentcore):
-    start = {"operation": "start_dispatch", "concurrency": 1}
+    start = {"operation": "work_run", "run_id": 1}
 
     missing = invoke(agentcore, start, key=None)
     wrong = invoke(agentcore, start, key="not-the-key")
@@ -100,13 +100,13 @@ def test_a_failed_getting_ready_answers_the_error_and_the_next_request_tries_aga
 @pytest.mark.parametrize(
     ("payload", "said"),
     [
-        ({"operation": "start_dispatch"}, "concurrency: Field required"),
+        ({"operation": "work_run"}, "run_id: Field required"),
         (
-            {"operation": "start_dispatch", "concurrency": "many"},
-            "concurrency:",
+            {"operation": "work_run", "run_id": "many"},
+            "run_id:",
         ),
-        ({"operation": "start_dispatch", "concurrency": 1, "agents": 3}, "agents:"),
-        ({"operation": "stop_round"}, "Unknown operation 'stop_round'"),
+        ({"operation": "work_run", "run_id": 1, "agents": 3}, "agents:"),
+        ({"operation": "start_dispatch"}, "Unknown operation 'start_dispatch'"),
         ({"concurrency": 3}, '"operation"'),
         ("start", '"operation"'),
     ],

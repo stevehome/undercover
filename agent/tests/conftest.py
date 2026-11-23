@@ -111,9 +111,28 @@ STUB_MODEL = api.ModelUsed(
 )
 
 
+def create_dispatch(concurrency: int, model: api.ModelUsed = STUB_MODEL) -> int:
+    """Create a dispatch as the app does, and return its run's id."""
+    body = {"concurrency": concurrency, **model.model_dump()}
+    return backend_http.call("POST", "/api/runs/dispatch", json=body)["run_id"]
+
+
+def create_evaluation(
+    concurrency: int, eval_set: str, tiny: bool, model: api.ModelUsed = STUB_MODEL
+) -> int:
+    """Create an evaluation as the app does, and return its run's id."""
+    body = {
+        "concurrency": concurrency,
+        "eval_set": eval_set,
+        "tiny": tiny,
+        **model.model_dump(),
+    }
+    return backend_http.call("POST", "/api/runs/evaluation", json=body)["run_id"]
+
+
 def new_run() -> int:
     """Create a dispatch with no claims to work, and finish it, so a claim has a run."""
-    run_id = api.create_dispatch(1, STUB_MODEL)
+    run_id = create_dispatch(1)
     api.finish_run(run_id)
     return run_id
 

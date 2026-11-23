@@ -27,7 +27,7 @@ If the agent is stopped partway through a claim, by a crash, a restart or Ctrl-C
 
 Handlers sign in to the dashboard with their email address and password, through Supabase Auth. There is no sign-up. Every page needs a signed-in handler, and the header shows who is signed in, with a way to sign out. The backend checks the handler on every action a handler takes: signing off a payout, starting a dispatch, an evaluation or a round, stopping a round, approving or rejecting a proposal and changing a setting. A sign-off records the signed-in handler. Dana Whitfield is the senior handler. Only a handler who can sign off payouts over the limit may start or stop a round, approve or reject the improver's proposals or change a setting. When anyone else looks at a held payout, a round or the settings, the page says what they can't do and why, and the backend refuses it as well.
 
-The agent has its own way in: an API key, which the backend checks on every route the agent uses. The agent's routes accept only the key, and what both the agent and the dashboard read accepts the key or a signed-in handler. Everything else the dashboard shows needs a signed-in handler, and a handler's sign-in never works on the agent's routes. Only the health check is open. The agent's service won't start without the key.
+The agent has its own way in: an API key, which the backend checks on every route the agent uses. The agent's routes accept only the key, and what both the agent and the dashboard read accepts the key or a signed-in handler. Everything else the dashboard shows needs a signed-in handler, and a handler's sign-in never works on the agent's routes. Only the health check is open. The agent won't get ready without the key.
 
 ## Hidden instructions
 

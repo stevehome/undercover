@@ -25,8 +25,8 @@ def test_the_laptop_route_posts_the_payload_to_invocations_with_the_key(
 ):
     start(client)
 
-    assert agent_stub.calls == ["start_dispatch"]
-    assert agent_stub.bodies == [START]
+    assert agent_stub.calls == ["work_run"]
+    assert agent_stub.bodies == [{"run_id": 1}]
     assert agent_stub.keys == ["Bearer test-agent-key"]
 
 
@@ -122,12 +122,15 @@ def test_the_runtime_route_sends_the_payload_in_a_new_session_each_time(
 ):
     fake = runtime(FakeRuntime())
 
-    first, second = start(client), start(client)
+    first = start(client)
+    client.post(f"/api/runs/{first.json()['run_id']}/finish")
+    second = start(client)
 
-    assert first.json() == second.json() == {"run_id": 7}
+    assert (first.json(), second.json()) == ({"run_id": 1}, {"run_id": 2})
     assert [json.loads(call["payload"]) for call in fake.calls] == [
-        {"operation": "start_dispatch", **START}
-    ] * 2
+        {"operation": "work_run", "run_id": 1},
+        {"operation": "work_run", "run_id": 2},
+    ]
     assert {call["agentRuntimeArn"] for call in fake.calls} == {ARN}
     sessions = [call["runtimeSessionId"] for call in fake.calls]
     assert len(set(sessions)) == 2

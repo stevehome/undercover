@@ -1,5 +1,6 @@
 import { expect, test as base } from "@playwright/test";
 import type { APIRequestContext, Page } from "@playwright/test";
+import { endWork } from "./startedWork";
 
 export const authStandIn = "http://127.0.0.1:8004";
 export const password = "e2e-password";
@@ -27,9 +28,16 @@ export async function handlerHeaders(
 }
 
 /** Playwright's test, with the page already signed in as Dana Whitfield. */
-export const test = base.extend({
+export const test = base.extend<{ endWork: undefined }>({
   page: async ({ page }, use) => {
     await signIn(page);
     await use(page);
   },
+  endWork: [
+    async ({ request }, use) => {
+      await use(undefined);
+      await endWork(request);
+    },
+    { auto: true },
+  ],
 });

@@ -4,6 +4,7 @@ import pytest
 
 from agent import api, work
 from agent.tests import records
+from agent.tests.conftest import create_dispatch
 
 DECISION = {
     "decision": "approve",
@@ -20,7 +21,7 @@ def item(backend):
 
 @pytest.fixture
 def run_id():
-    return api.create_dispatch(
+    return create_dispatch(
         1,
         api.ModelUsed(
             model="stub/model", reasoning_effort="low", configuration_version=1

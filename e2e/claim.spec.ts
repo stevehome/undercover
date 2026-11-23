@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { test } from "./signIn";
 import { recordDecision } from "./decisions";
+import { askedFor } from "./startedWork";
 
 test("a decided claim's page shows its decision, payout and reason", async ({
   page,
@@ -65,19 +66,10 @@ test("a sign-off pays the claim, with the handler and the time", async ({
   await expect(page.getByText("Paid $1,200.00.")).toBeVisible();
   await expect(page.getByText(/Signed off by Dana Whitfield on/)).toBeVisible();
 
-  const standIn = "http://127.0.0.1:8003";
   await expect
     .poll(async () => {
-      const calls = (await (
-        await request.get(`${standIn}/calls`)
-      ).json()) as string[];
-      const bodies = (await (
-        await request.get(`${standIn}/bodies`)
-      ).json()) as { claim_id?: string }[];
-      return bodies.filter(
-        (body, index) =>
-          calls[index] === "resume_claim" && body.claim_id === claimId,
-      ).length;
+      const asked = await askedFor(request, "resume_claim");
+      return asked.filter((body) => body.claim_id === claimId).length;
     })
     .toBe(1);
 });

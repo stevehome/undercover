@@ -8,7 +8,7 @@ from langgraph.types import RetryPolicy
 
 from agent import agents, api, dispatcher, work
 from agent.tests import records
-from agent.tests.conftest import STUB_MODEL
+from agent.tests.conftest import STUB_MODEL, create_dispatch, create_evaluation
 
 DECISION = {
     "decision": "approve",
@@ -20,7 +20,7 @@ FAST = RetryPolicy(initial_interval=0.01, max_attempts=3, retry_on=work.WAIT_AND
 
 
 def start(n=3):
-    return api.create_dispatch(
+    return create_dispatch(
         n,
         api.ModelUsed(
             model="stub/model", reasoning_effort="low", configuration_version=1
@@ -176,7 +176,7 @@ def test_no_claim_is_decided_twice(backend):
 def test_a_held_approval_in_an_evaluation_is_finished_and_its_progress_cleared(
     backend, script, saver
 ):
-    run_id = api.create_evaluation(1, "held_out", True, STUB_MODEL)
+    run_id = create_evaluation(1, "held_out", True, STUB_MODEL)
     copies = [c["claim_id"] for c in api.get_run(run_id)["claims"]]
     approve = (
         "decide_claim",

@@ -56,3 +56,15 @@ it("says a round was stopped", () => {
   expect(screen.getByText("stopped")).toBeDefined();
   expect(current()).toBeUndefined();
 });
+
+it("says why a stopped round stopped", () => {
+  const round = {
+    ...at("improver working"),
+    stage: "stopped",
+    stopped_reason: "The agent stopped answering",
+  } as unknown as Round;
+
+  render(<RoundProgress round={round} />);
+
+  expect(screen.getByText(/The agent stopped answering\./)).toBeDefined();
+});

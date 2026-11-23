@@ -73,9 +73,13 @@ def test_a_finished_or_stopped_run_lets_the_next_start(client):
     second = dispatch(client).json()
     assert second["run_id"] != first["run_id"]
 
-    assert client.post("/api/runs/stop-unfinished").json() == {"stopped": 1}
+    client.post(f"/api/runs/{second['run_id']}/stop", json={"reason": "Stopped"})
 
     assert client.get(f"/api/runs/{second['run_id']}").json()["status"] == "stopped"
+    assert (
+        client.get(f"/api/runs/{second['run_id']}").json()["stopped_reason"]
+        == "Stopped"
+    )
     assert client.get(f"/api/runs/{first['run_id']}").json()["status"] == "finished"
     assert dispatch(client).status_code == 200
 

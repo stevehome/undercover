@@ -2,14 +2,14 @@
 
 On Runtime every session starts from one snapshot, so nothing is fetched or opened
 when the agent's code is imported: a key or a connection made then would be shared by
-every session. If getting ready fails, that request answers the error and the next
-one tries again.
+every session. It marks no run or round stopped: the app does, when work goes quiet.
+If getting ready fails, that request answers the error and the next one tries again.
 """
 
 import random
 from threading import Lock
 
-from agent import api, backend_http, checkpoint, credentials
+from agent import backend_http, checkpoint, credentials
 
 _getting_ready = Lock()
 _ready = False
@@ -26,7 +26,6 @@ def ensure() -> None:
             credentials.fetch()
         backend_http.require_key()
         checkpoint.saver()
-        api.stop_unfinished_runs()
         _ready = True
 
 

@@ -1,4 +1,4 @@
-"""Asking the agent to start work: a dispatch, an evaluation, a round or a decision.
+"""Asking the agent to work what the app has created: a run, a round or a review.
 
 The agent is an AgentCore app. A payload names an operation and its inputs, and goes
 to the agent on a host of its own (`UNDERCOVER_AGENT`) or, when
@@ -36,35 +36,19 @@ def _ask(operation: str, **inputs: Any) -> dict[str, Any]:
     return answer
 
 
-def start_dispatch(concurrency: int) -> int:
-    """Ask the agent to start a dispatch with this many claim agents at once."""
-    return _ask("start_dispatch", concurrency=concurrency)["run_id"]
+def work_run(run_id: int) -> None:
+    """Ask the agent to work a dispatch or an evaluation the app has created."""
+    _ask("work_run", run_id=run_id)
 
 
-def start_evaluation(concurrency: int, eval_set: str, tiny: bool) -> int:
-    """Ask the agent to start an evaluation on a labelled set."""
-    answer = _ask(
-        "start_evaluation", concurrency=concurrency, eval_set=eval_set, tiny=tiny
-    )
-    return answer["run_id"]
+def work_round(round_id: int) -> None:
+    """Ask the agent to work a round the app has created."""
+    _ask("work_round", round_id=round_id)
 
 
-def start_round(handler_id: str) -> int:
-    """Ask the agent to start an improvement round; return the round's id."""
-    return _ask("start_round", handler_id=handler_id)["round_id"]
-
-
-def decide_proposal(
-    proposal_id: int, decision: str, handler_id: str, reason: str
-) -> None:
-    """Ask the agent to record a handler's decision on a proposal and carry on."""
-    _ask(
-        "decide_proposal",
-        proposal_id=proposal_id,
-        decision=decision,
-        handler_id=handler_id,
-        reason=reason,
-    )
+def carry_round_on(round_id: int, proposal_id: int) -> None:
+    """Ask the agent to carry a round on after a handler's review of a proposal."""
+    _ask("carry_round_on", round_id=round_id, proposal_id=proposal_id)
 
 
 def resume_claim(claim_id: str) -> None:
