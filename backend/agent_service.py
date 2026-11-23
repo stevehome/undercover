@@ -1,88 +1,79 @@
-"""Asking the agent's service to start a dispatch, an evaluation or a round."""
+"""Asking the agent to start work: a dispatch, an evaluation, a round or a decision.
+
+The agent is an AgentCore app. A payload names an operation and its inputs, and goes
+to the agent on a host of its own (`UNDERCOVER_AGENT`) or, when
+`UNDERCOVER_AGENT_RUNTIME` names a runtime's ARN, to that runtime. Each answer says
+what happened in one of four ways: taken, refused (a Conflict with the agent's
+reason), not taken (ServiceUnavailable) or unknown (Unconfirmed: nothing changes and
+the handler is told to reload).
+"""
 
 import logging
 import os
 from typing import Any
 
-import httpx
-
-from backend import stopwatch
-from backend.errors import Conflict, ServiceUnavailable
-
-DEFAULT_AGENT_URL = "http://127.0.0.1:8002"
-TIMEOUT_SECONDS = 5
-# What the agent takes to answer a start or a decision, which waits on its own calls
-# to the backend: 30 seconds each, asked up to twice. This must stay above that.
-ANSWER_TIMEOUT_SECONDS = 70
+from backend import agent_laptop, agent_runtime, stopwatch
+from backend.errors import Conflict, ServiceUnavailable, Unconfirmed
 
 logger = logging.getLogger(__name__)
 
 
-def _post(
-    path: str, body: dict[str, Any] | None = None, timeout: int = TIMEOUT_SECONDS
-) -> httpx.Response:
-    base_url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
-    return httpx.post(f"{base_url}{path}", json=body, timeout=timeout)
-
-
-def _start(path: str, body: dict[str, Any], key: str = "run_id") -> int:
-    """Ask the agent to start a run, a round or a decision; return the id it names.
-
-    Raises Conflict while a run is going and ServiceUnavailable if the agent is down.
-    """
-    watch = stopwatch.Stopwatch(f"The agent's answer to {path}")
+def _ask(operation: str, **inputs: Any) -> dict[str, Any]:
+    """Send one operation; return the agent's answer when it took the work."""
+    route = (
+        agent_runtime if os.environ.get("UNDERCOVER_AGENT_RUNTIME") else agent_laptop
+    )
+    watch = stopwatch.Stopwatch(f"The agent's answer to {operation}")
     try:
-        response = _post(path, body, ANSWER_TIMEOUT_SECONDS)
-    except httpx.HTTPError as error:
-        raise ServiceUnavailable("The agent's service isn't running") from error
+        answer = route.post({"operation": operation, **inputs})
     finally:
         watch.lap("the agent's answer")
         watch.log()
-    if response.status_code == httpx.codes.CONFLICT:
-        raise Conflict(response.json()["detail"])
-    response.raise_for_status()
-    return response.json()[key]
+    if "refused" in answer:
+        raise Conflict(answer["refused"])
+    if not answer.get("accepted"):
+        raise ServiceUnavailable(f"The agent didn't take it: {answer}")
+    return answer
 
 
 def start_dispatch(concurrency: int) -> int:
     """Ask the agent to start a dispatch with this many claim agents at once."""
-    return _start("/api/dispatches", {"concurrency": concurrency})
+    return _ask("start_dispatch", concurrency=concurrency)["run_id"]
 
 
 def start_evaluation(concurrency: int, eval_set: str, tiny: bool) -> int:
     """Ask the agent to start an evaluation on a labelled set."""
-    body = {"concurrency": concurrency, "eval_set": eval_set, "tiny": tiny}
-    return _start("/api/evaluations", body)
+    answer = _ask(
+        "start_evaluation", concurrency=concurrency, eval_set=eval_set, tiny=tiny
+    )
+    return answer["run_id"]
 
 
 def start_round(handler_id: str) -> int:
     """Ask the agent to start an improvement round; return the round's id."""
-    return _start("/api/rounds", {"handler_id": handler_id}, "round_id")
+    return _ask("start_round", handler_id=handler_id)["round_id"]
 
 
 def decide_proposal(
     proposal_id: int, decision: str, handler_id: str, reason: str
-) -> int:
+) -> None:
     """Ask the agent to record a handler's decision on a proposal and carry on."""
-    body = {"decision": decision, "handler_id": handler_id, "reason": reason}
-    return _start(f"/api/proposals/{proposal_id}/decision", body, "proposal_id")
+    _ask(
+        "decide_proposal",
+        proposal_id=proposal_id,
+        decision=decision,
+        handler_id=handler_id,
+        reason=reason,
+    )
 
 
 def resume_claim(claim_id: str) -> None:
     """Ask the agent to carry on with a claim a handler has answered.
 
-    The answer is saved before this is asked, so a failure is a warning: the claim
-    is paid, and the agent carries it on when it next works the claim.
+    The answer is saved before this is asked, so a failure is a warning: the agent
+    carries the claim on when it next works it.
     """
     try:
-        _post(f"/api/claims/{claim_id}/resume").raise_for_status()
-    except httpx.HTTPError:
+        _ask("resume_claim", claim_id=claim_id)
+    except (Conflict, ServiceUnavailable, Unconfirmed):
         logger.warning("The agent could not be asked to resume %s", claim_id)
-
-
-def stop_round(round_id: int) -> None:
-    """Tell the agent a round is stopped, so it starts no more claims or calls."""
-    try:
-        _post(f"/api/rounds/{round_id}/stop")
-    except httpx.HTTPError:
-        logger.warning("The agent could not be told round %s is stopped", round_id)

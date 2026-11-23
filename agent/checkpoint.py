@@ -53,7 +53,7 @@ def _make_pool() -> ConnectionPool[Any]:
         check=TEST_BEFORE_USE,
         kwargs={
             "autocommit": True,
-            "prepare_threshold": 0,
+            "prepare_threshold": None,
             "row_factory": dict_row,
             "options": f"-c search_path={SCHEMA}",
         },

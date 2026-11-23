@@ -24,6 +24,8 @@ def no_outside_services(monkeypatch):
         "UNDERCOVER_GATEWAY_URL",
         "UNDERCOVER_CONTEXT",
         "UNDERCOVER_MEMORY_ID",
+        "UNDERCOVER_AGENT_RUNTIME",
+        "UNDERCOVER_API",
     ):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("UNDERCOVER_AGENT", "http://127.0.0.1:9")

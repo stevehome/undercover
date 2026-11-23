@@ -1,6 +1,7 @@
-// A stand-in for the agent's service on port 8003, so the end-to-end tests
-// never reach the real one. It records every call and its body; GET /calls
-// lists the paths and GET /bodies the bodies, in the same order.
+// A stand-in for the agent's AgentCore app on port 8003, so the end-to-end tests
+// never reach the real one. It answers each payload posted to /invocations as taken
+// and records it: GET /calls lists the operations and GET /bodies their other
+// inputs, in the same order. GET /ping answers as the real app's does when idle.
 import { createServer } from "node:http";
 
 const calls = [];
@@ -8,6 +9,10 @@ const bodies = [];
 
 createServer((request, response) => {
   response.setHeader("content-type", "application/json");
+  if (request.method === "GET" && request.url === "/ping") {
+    response.end(JSON.stringify({ status: "Healthy" }));
+    return;
+  }
   if (request.method === "GET" && request.url === "/calls") {
     response.end(JSON.stringify(calls));
     return;
@@ -19,9 +24,16 @@ createServer((request, response) => {
   let text = "";
   request.on("data", (chunk) => (text += chunk));
   request.on("end", () => {
-    calls.push(request.url);
-    bodies.push(text ? JSON.parse(text) : null);
-    response.statusCode = 202;
-    response.end(JSON.stringify({ run_id: 1, round_id: 1, proposal_id: 1 }));
+    const { operation, ...inputs } = text ? JSON.parse(text) : {};
+    calls.push(operation);
+    bodies.push(inputs);
+    response.end(
+      JSON.stringify({
+        accepted: true,
+        run_id: 1,
+        round_id: 1,
+        proposal_id: 1,
+      }),
+    );
   });
 }).listen(8003, "127.0.0.1");

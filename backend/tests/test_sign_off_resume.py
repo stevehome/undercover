@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from backend import agent_service
+from backend import agent_laptop
 from backend.tests.test_decisions import decide
 
 SIGN_OFF = "/api/claims/CLM-1001/sign-off"
@@ -16,7 +16,7 @@ def test_a_sign_off_asks_the_agent_to_resume_the_claim(client, agent_stub):
 
     client.post(SIGN_OFF)
 
-    assert agent_stub.calls == ["/api/claims/CLM-1001/resume"]
+    assert agent_stub.calls == ["resume_claim"]
 
 
 def test_a_sign_off_pays_and_answers_when_the_agent_is_down(
@@ -58,7 +58,7 @@ def silent_agent(monkeypatch):
     server = ThreadingHTTPServer(("127.0.0.1", 0), Silent)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     monkeypatch.setenv("UNDERCOVER_AGENT", f"http://127.0.0.1:{server.server_port}")
-    monkeypatch.setattr(agent_service, "TIMEOUT_SECONDS", 0.1)
+    monkeypatch.setattr(agent_laptop, "TIMEOUT_SECONDS", 0.1)
     yield
     server.shutdown()
 

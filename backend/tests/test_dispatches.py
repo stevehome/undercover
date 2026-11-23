@@ -10,7 +10,7 @@ def test_a_start_asks_the_agent_with_n(client, agent_stub):
 
     assert response.status_code == 202
     assert response.json() == {"run_id": 5}
-    assert agent_stub.calls == ["/api/dispatches"]
+    assert agent_stub.calls == ["start_dispatch"]
     assert agent_stub.bodies == [{"concurrency": 7}]
 
 
@@ -35,7 +35,7 @@ def test_a_start_says_so_when_the_agent_is_not_running(client, monkeypatch):
     response = start(client)
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "The agent's service isn't running"
+    assert response.json()["detail"] == "The agent isn't running"
 
 
 @pytest.mark.parametrize("concurrency", [0, 26])
@@ -51,7 +51,7 @@ def test_an_evaluation_start_asks_the_agent_with_n_the_set_and_tiny(client, agen
     )
 
     assert response.status_code == 202
-    assert agent_stub.calls == ["/api/evaluations"]
+    assert agent_stub.calls == ["start_evaluation"]
     assert agent_stub.bodies == [
         {"concurrency": 5, "eval_set": "held_out", "tiny": True}
     ]

@@ -38,6 +38,7 @@ from backend.errors import (
     NotFound,
     ServiceUnavailable,
     Unauthorized,
+    Unconfirmed,
 )
 from backend.money import Amount
 from backend.payouts import Benefit, Line
@@ -75,6 +76,14 @@ def invalid(_: Request, error: Invalid) -> JSONResponse:
 @app.exception_handler(ServiceUnavailable)
 def service_unavailable(_: Request, error: ServiceUnavailable) -> JSONResponse:
     return JSONResponse({"detail": str(error)}, status_code=503)
+
+
+@app.exception_handler(Unconfirmed)
+def unconfirmed(_: Request, error: Unconfirmed) -> JSONResponse:
+    detail = (
+        "The agent didn't answer in time. Reload the page to see if it went through"
+    )
+    return JSONResponse({"detail": detail}, status_code=504)
 
 
 AGENT = [Depends(require_api_key)]
@@ -584,10 +593,9 @@ def start_round(handler: Senior) -> dict[str, int]:
 
 
 @app.post("/api/rounds/{round_id}/stop", operation_id="stop_round")
-def stop_round(round_id: int, _: Senior, background: BackgroundTasks) -> dict[str, Any]:
-    """Stop an open round; the agent's service is told and starts no more work."""
+def stop_round(round_id: int, _: Senior) -> dict[str, Any]:
+    """Stop an open round; the app refuses what the agent records for it from now on."""
     rounds.stop_round(round_id)
-    background.add_task(agent_service.stop_round, round_id)
     return round_view.get_round(round_id)
 
 

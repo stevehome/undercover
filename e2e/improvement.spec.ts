@@ -127,7 +127,7 @@ test("a proposal waiting shows its diff, and approving it goes to the agent's se
       const paths = (await (
         await request.get(`${standIn}/calls`)
       ).json()) as string[];
-      return paths.includes(`/api/proposals/${String(proposalId)}/decision`);
+      return paths.includes("decide_proposal");
     })
     .toBe(true);
   const bodies = (await (await request.get(`${standIn}/bodies`)).json()) as {
@@ -135,6 +135,7 @@ test("a proposal waiting shows its diff, and approving it goes to the agent's se
     handler_id?: string;
   }[];
   expect(bodies).toContainEqual({
+    proposal_id: proposalId,
     decision: "approve",
     handler_id: "HND-01",
     reason: "",

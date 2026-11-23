@@ -690,7 +690,7 @@ def test_starting_a_round_asks_the_service_and_passes_on_its_refusal(
     started = client.post("/api/rounds")
     assert started.status_code == 202
     assert started.json() == {"round_id": 5}
-    assert agent_stub.calls == ["/api/rounds"]
+    assert agent_stub.calls == ["start_round"]
     assert agent_stub.bodies == [{"handler_id": "HND-01"}]
 
     agent_stub.refuse = True
@@ -708,9 +708,14 @@ def test_deciding_asks_the_service_with_the_handler_and_the_reason(
         json={"decision": "reject", "reason": "Too long."},
     )
 
-    assert agent_stub.calls == [f"/api/proposals/{proposal['proposal_id']}/decision"]
+    assert agent_stub.calls == ["decide_proposal"]
     assert agent_stub.bodies == [
-        {"decision": "reject", "handler_id": "HND-01", "reason": "Too long."}
+        {
+            "proposal_id": proposal["proposal_id"],
+            "decision": "reject",
+            "handler_id": "HND-01",
+            "reason": "Too long.",
+        }
     ]
 
 
@@ -726,10 +731,12 @@ def test_a_rejection_needs_a_reason(client, flow, agent_stub):
     assert agent_stub.calls == []
 
 
-def test_stopping_a_round_tells_the_service(client, flow, agent_stub):
+def test_stopping_a_round_is_the_apps_own_and_asks_the_agent_nothing(
+    client, flow, agent_stub
+):
     client.post(f"/api/rounds/{flow.round_id}/stop")
 
-    assert agent_stub.calls == [f"/api/rounds/{flow.round_id}/stop"]
+    assert agent_stub.calls == []
 
 
 def test_the_configurations_list_carries_each_versions_held_out_scores(client, flow):

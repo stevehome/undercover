@@ -13,7 +13,17 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import api, backend_http, harness, memory
+from agent import (
+    api,
+    backend_http,
+    checkpoint,
+    dispatcher,
+    entrypoint,
+    harness,
+    memory,
+    readiness,
+    rounds,
+)
 from agent.gateway import GatewayRoute
 from agent.mcp_connection import McpConnection
 from agent.screening import Screening
@@ -216,3 +226,34 @@ def memory_on(monkeypatch):
     monkeypatch.setenv("UNDERCOVER_MEMORY_ID", "memory-1")
     monkeypatch.setattr(memory, "open_store", lambda memory_id: store)
     return store
+
+
+@pytest.fixture
+def agentcore(monkeypatch):
+    """The agent's AgentCore app on a TestClient, ready without a Postgres pool."""
+    monkeypatch.setattr(checkpoint, "saver", lambda: None)
+    readiness.forget()
+    yield TestClient(entrypoint.app)
+    readiness.forget()
+
+
+@pytest.fixture
+def dispatches(monkeypatch):
+    """Replace the dispatch with a stand-in that records the runs it is given."""
+    given = []
+    monkeypatch.setattr(
+        dispatcher, "run_dispatch", lambda run_id, n: given.append((run_id, n))
+    )
+    return given
+
+
+@pytest.fixture
+def stretches(monkeypatch):
+    """Replace a round's work with a stand-in that records the stretches it is given."""
+    given = []
+    monkeypatch.setattr(
+        rounds,
+        "work_stretch",
+        lambda round_id, run_id, resume: given.append((round_id, run_id, resume)),
+    )
+    return given

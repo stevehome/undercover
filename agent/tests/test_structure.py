@@ -18,12 +18,9 @@ AGENT_MODULES = [p for p in (ROOT / "agent").glob("*.py") if p.name not in HTTP_
 
 
 def test_only_the_clients_talk_http():
-    """service.py is the agent's own web entry point: its routes are not calls."""
     for path in AGENT_MODULES:
         tree = ast.parse(path.read_text())
         assert "httpx" not in path.read_text(), path.name
-        if path.name == "service.py":
-            continue
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
                 assert not node.value.startswith(("/api/", "http://")), path.name
@@ -225,3 +222,23 @@ def test_only_memory_talks_to_agentcore_memory():
         if path.name != "memory.py":
             modules = {m.split(".")[0] for m in _imported_modules(path)}
             assert "langgraph_checkpoint_aws" not in modules, path.name
+
+
+def test_identity_is_imported_only_by_the_credentials_module():
+    for path in (ROOT / "agent").glob("*.py"):
+        if path.name != "credentials.py":
+            assert "bedrock_agentcore.identity" not in path.read_text(), path.name
+
+
+def test_the_app_calls_runtime_only_through_agent_runtime():
+    for path in (ROOT / "backend").glob("*.py"):
+        if path.name != "agent_runtime.py":
+            assert "boto3" not in path.read_text(), path.name
+
+
+def test_the_apps_address_is_read_only_by_the_endpoints_module():
+    for path in (ROOT / "agent").glob("*.py"):
+        if path.name != "endpoints.py":
+            assert "UNDERCOVER_API" not in path.read_text().replace(
+                "UNDERCOVER_API_KEY", ""
+            ), path.name

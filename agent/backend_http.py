@@ -10,14 +10,25 @@ from typing import Any
 
 import httpx
 
+from agent import endpoints
 from agent.refusals import BY_APP, Refusal
 
-BACKEND_URL = os.environ.get("UNDERCOVER_BACKEND", "http://localhost:8000")
+DEFAULT_API_URL = "http://localhost:8000"
 TIMEOUT_SECONDS = 30
 API_KEY_VARIABLE = "UNDERCOVER_API_KEY"
 API_KEY_HEADER = "X-API-Key"
 
-client = httpx.Client(base_url=BACKEND_URL, timeout=TIMEOUT_SECONDS)
+client: httpx.Client | None = None
+
+
+def _client() -> httpx.Client:
+    """Return the client to the backend, made on first use at the app's address."""
+    global client  # noqa: PLW0603 - one client, made when it is first needed
+    if client is None:
+        client = httpx.Client(
+            base_url=endpoints.api_url() or DEFAULT_API_URL, timeout=TIMEOUT_SECONDS
+        )
+    return client
 
 
 def require_key() -> str:
@@ -31,7 +42,7 @@ def require_key() -> str:
 def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
     """Send one request to the backend with the API key, read as it is sent."""
     headers = {**kwargs.pop("headers", {}), API_KEY_HEADER: require_key()}
-    return client.request(method, path, headers=headers, **kwargs)
+    return _client().request(method, path, headers=headers, **kwargs)
 
 
 class ApiRefusal(Refusal):

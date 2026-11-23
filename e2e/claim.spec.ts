@@ -65,7 +65,19 @@ test("a sign-off pays the claim, with the handler and the time", async ({
   await expect(page.getByText("Paid $1,200.00.")).toBeVisible();
   await expect(page.getByText(/Signed off by Dana Whitfield on/)).toBeVisible();
 
-  const calls = await request.get("http://127.0.0.1:8003/calls");
-  const paths = (await calls.json()) as string[];
-  expect(paths.filter((path) => path.includes(claimId))).toEqual([]);
+  const standIn = "http://127.0.0.1:8003";
+  await expect
+    .poll(async () => {
+      const calls = (await (
+        await request.get(`${standIn}/calls`)
+      ).json()) as string[];
+      const bodies = (await (
+        await request.get(`${standIn}/bodies`)
+      ).json()) as { claim_id?: string }[];
+      return bodies.filter(
+        (body, index) =>
+          calls[index] === "resume_claim" && body.claim_id === claimId,
+      ).length;
+    })
+    .toBe(1);
 });

@@ -38,6 +38,7 @@ export default defineConfig({
       env: {
         UNDERCOVER_API_KEY: agentKey,
         UNDERCOVER_AGENT: "http://127.0.0.1:8003",
+        UNDERCOVER_AGENT_RUNTIME: "",
         VITE_SUPABASE_URL: authStandIn,
         OPENROUTER_ORIGIN: "http://127.0.0.1:8005",
         OPENROUTER_API_KEY: "e2e-key",

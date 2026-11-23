@@ -1,8 +1,8 @@
-from fastapi.testclient import TestClient
 from sqlalchemy import insert
 
-from agent import agents, api, service
+from agent import agents, api
 from agent.tests.conftest import STUB_MODEL, StubModel
+from agent.tests.invocations import invoke
 from agent.tests.test_claim_graph import CLAIM, decision
 from backend import db, tables
 
@@ -55,15 +55,15 @@ def test_a_claim_in_a_run_uses_the_runs_version(backend, script, saver):
     assert "You are the UnderCover Agent" in sent
 
 
-def test_a_run_starts_on_the_current_versions_model(backend, monkeypatch):
+def test_a_run_starts_on_the_current_versions_model(
+    backend, agentcore, dispatches, monkeypatch
+):
     monkeypatch.delenv("MODEL_NAME", raising=False)
     add_kept_version("Version two.")
 
-    run_id = (
-        TestClient(service.app)
-        .post("/api/dispatches", json={"concurrency": 1})
-        .json()["run_id"]
-    )
+    run_id = invoke(
+        agentcore, {"operation": "start_dispatch", "concurrency": 1}
+    ).json()["run_id"]
 
     run = api.get_run(run_id)
     assert run["configuration_version"] == 2
@@ -73,15 +73,13 @@ def test_a_run_starts_on_the_current_versions_model(backend, monkeypatch):
     )
 
 
-def test_model_name_still_wins(backend, monkeypatch):
+def test_model_name_still_wins(backend, agentcore, dispatches, monkeypatch):
     monkeypatch.setenv("MODEL_NAME", "openrouter/free")
     add_kept_version("Version two.")
 
-    run_id = (
-        TestClient(service.app)
-        .post("/api/dispatches", json={"concurrency": 1})
-        .json()["run_id"]
-    )
+    run_id = invoke(
+        agentcore, {"operation": "start_dispatch", "concurrency": 1}
+    ).json()["run_id"]
 
     run = api.get_run(run_id)
     assert (run["model"], run["reasoning_effort"]) == ("openrouter/free", "default")

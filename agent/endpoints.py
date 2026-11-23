@@ -9,6 +9,7 @@ import os
 GATEWAY_URL = "UNDERCOVER_GATEWAY_URL"
 CONTEXT_URL = "UNDERCOVER_CONTEXT"
 MEMORY_ID = "UNDERCOVER_MEMORY_ID"
+API_URL = "UNDERCOVER_API"
 
 
 def gateway_url() -> str | None:
@@ -24,3 +25,8 @@ def context_url() -> str | None:
 def memory_id() -> str | None:
     """Return the id of the AgentCore Memory, or None when the agent has none."""
     return os.environ.get(MEMORY_ID) or None
+
+
+def api_url() -> str | None:
+    """Return the app's address, or None for the one on this laptop."""
+    return os.environ.get(API_URL) or None

@@ -82,7 +82,7 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 - [x] A graph test with a scripted model: after a send back the model sees the message naming the handler and how to treat the note, its model-call count starts again, and nothing pays the earlier decision.
 - [x] vitest: the two buttons for a senior handler and neither for the other; the note required; each sent-back decision on the claim page; `sent back` in the queue.
 - [ ] With `npm run dev` running, a claim sent back with a note is decided again by the agent, and the claim page shows both decisions and the note (Playwright MCP, as Dana Whitfield).
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md` and `docs/STATUS.md` describe it. Commit.
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/SPEC.md` and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 3: The agent as an AgentCore app (step 3)
 
@@ -100,12 +100,12 @@ The graph pauses for every payout waiting for a sign-off, the app asks the agent
 
 **Success criteria**
 
-- [ ] Tests through Starlette's `TestClient`, with stand-ins for the work and for Identity: importing the agent opens nothing and reads no setting; on Runtime the first request fetches each credential into its setting once, and a second request doesn't; each operation accepts work and refuses it; a payload with an input missing, a wrong input and an unknown operation each get a 400 that says what; the ping is `HealthyBusy` while work is going and `Healthy` once it has finished or failed; a request without the key is refused off Runtime and let through on Runtime; the health check works without the key and only once the agent is ready; a failed getting ready answers its error and the next request tries again.
-- [ ] Tests of the app's two routes, with stand-ins: the key on the laptop route, the session id (33 characters or more, new each time) on the Runtime route, and on both the payload, an acceptance, a refusal passed on as a 409, a failed connection, an error answer, and a timeout or a cut-off answer that changes nothing and tells the handler to reload; one attempt only.
-- [ ] A structure test keeps `bedrock_agentcore.identity` to `credentials.py`, boto3's Runtime client to `agent_runtime.py` and the app's address to `endpoints.py` on the agent's side.
+- [x] Tests through Starlette's `TestClient`, with stand-ins for the work and for Identity: importing the agent opens nothing and reads no setting; on Runtime the first request fetches each credential into its setting once, and a second request doesn't; each operation accepts work and refuses it; a payload with an input missing, a wrong input and an unknown operation each get a 400 that says what; the ping is `HealthyBusy` while work is going and `Healthy` once it has finished or failed; a request without the key is refused off Runtime and let through on Runtime; the health check works without the key and only once the agent is ready; a failed getting ready answers its error and the next request tries again.
+- [x] Tests of the app's two routes, with stand-ins: the key on the laptop route, the session id (33 characters or more, new each time) on the Runtime route, and on both the payload, an acceptance, a refusal passed on as a 409, a failed connection, an error answer, and a timeout or a cut-off answer that changes nothing and tells the handler to reload; one attempt only.
+- [x] A structure test keeps `bedrock_agentcore.identity` to `credentials.py`, boto3's Runtime client to `agent_runtime.py` and the app's address to `endpoints.py` on the agent's side.
 - [ ] `npm run check:runtime` passes inside `npm run check`.
 - [ ] With `npm run dev` stopped, `uv run --env-file .env --isolated --only-group runtime python -m runtime.main` serves the agent on 8080, and `{"operation": "health"}` posted to `/invocations` answers `{"healthy": true}`.
-- [ ] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md` and `docs/STATUS.md` describe it. Commit.
+- [x] `npm run check` passes with `.env` moved out of the way. `docs/TECH_STACK.md` and `docs/STATUS.md` describe it. Commit.
 
 ## Phase 4: The app keeps one run at a time (step 4)
 

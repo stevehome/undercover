@@ -23,3 +23,7 @@ class Forbidden(Exception):
 
 class Invalid(Exception):
     """A value is out of range or the wrong kind (422)."""
+
+
+class Unconfirmed(Exception):
+    """A request was sent but its outcome isn't known, such as a timeout (504)."""

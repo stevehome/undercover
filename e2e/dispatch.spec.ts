@@ -12,7 +12,7 @@ async function dispatchesAsked(request: APIRequestContext) {
   const bodies = (await (await request.get(`${standIn}/bodies`)).json()) as {
     concurrency: number;
   }[];
-  return bodies.filter((_, index) => paths[index] === "/api/dispatches");
+  return bodies.filter((_, index) => paths[index] === "start_dispatch");
 }
 
 test("starting a dispatch asks the agent's service for 3 claim agents", async ({

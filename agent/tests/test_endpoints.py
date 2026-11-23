@@ -1,4 +1,4 @@
-from agent import endpoints, routes
+from agent import backend_http, endpoints, routes
 from agent.direct import DirectRoute
 from agent.gateway import GatewayRoute
 
@@ -28,3 +28,21 @@ def test_the_route_is_the_gateways_only_when_its_address_is_set(monkeypatch):
 
     monkeypatch.setenv(endpoints.GATEWAY_URL, "https://gateway.example/mcp")
     assert isinstance(routes.choose(), GatewayRoute)
+
+
+def test_the_apps_address_is_read_when_the_client_is_first_used(monkeypatch):
+    monkeypatch.setattr(backend_http, "client", None)
+    monkeypatch.setenv(endpoints.API_URL, "https://app.example")
+
+    made = backend_http._client()  # noqa: SLF001 - the client made on first use
+
+    assert str(made.base_url) == "https://app.example"
+    assert backend_http._client() is made  # noqa: SLF001
+
+
+def test_the_apps_address_is_this_laptop_when_none_is_set(monkeypatch):
+    monkeypatch.setattr(backend_http, "client", None)
+    monkeypatch.delenv(endpoints.API_URL, raising=False)
+
+    assert endpoints.api_url() is None
+    assert str(backend_http._client().base_url) == "http://localhost:8000"  # noqa: SLF001

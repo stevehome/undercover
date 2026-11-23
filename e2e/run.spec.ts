@@ -15,7 +15,7 @@ async function evaluationsAsked(request: APIRequestContext) {
     eval_set: string;
     tiny: boolean;
   }[];
-  return bodies.filter((_, index) => paths[index] === "/api/evaluations");
+  return bodies.filter((_, index) => paths[index] === "start_evaluation");
 }
 
 test("the scoreboard shows an evaluation played out through the API", async ({

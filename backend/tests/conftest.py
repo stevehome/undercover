@@ -54,22 +54,25 @@ def statements_to_get(client):
 
 
 class AgentStub(BaseHTTPRequestHandler):
-    """A stand-in for the agent's service that records the paths it is asked for."""
+    """A stand-in for the agent's AgentCore app: it records each operation asked for."""
 
     calls: list[str] = []
     bodies: list[dict] = []
+    keys: list[str | None] = []
     refuse = False
 
     def do_POST(self):
-        self.calls.append(self.path)
         length = int(self.headers.get("Content-Length") or 0)
-        self.bodies.append(json.loads(self.rfile.read(length) or "{}"))
-        status, body = (
-            (409, {"detail": "A run is already going"})
+        payload = json.loads(self.rfile.read(length) or "{}")
+        self.keys.append(self.headers.get("Authorization"))
+        self.calls.append(payload.pop("operation"))
+        self.bodies.append(payload)
+        body = (
+            {"refused": "A run is already going"}
             if self.refuse
-            else (202, {"run_id": 5, "round_id": 5, "proposal_id": 5})
+            else {"accepted": True, "run_id": 5, "round_id": 5, "proposal_id": 5}
         )
-        self.send_response(status)
+        self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps(body).encode())
@@ -81,7 +84,11 @@ class AgentStub(BaseHTTPRequestHandler):
 @pytest.fixture
 def agent_stub(monkeypatch):
     """Point the backend at a stand-in agent service."""
-    handler = type("Stub", (AgentStub,), {"calls": [], "bodies": [], "refuse": False})
+    handler = type(
+        "Stub",
+        (AgentStub,),
+        {"calls": [], "bodies": [], "keys": [], "refuse": False},
+    )
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     monkeypatch.setenv("UNDERCOVER_AGENT", f"http://127.0.0.1:{server.server_port}")

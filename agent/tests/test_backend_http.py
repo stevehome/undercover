@@ -1,8 +1,7 @@
 import httpx
 import pytest
-from fastapi.testclient import TestClient
 
-from agent import api, backend_http, improver_api, service
+from agent import api, backend_http, improver_api, readiness
 
 
 @pytest.fixture
@@ -58,10 +57,9 @@ def test_a_request_with_no_key_set_is_not_sent(requests, monkeypatch):
     assert requests == []
 
 
-def test_the_service_will_not_start_without_the_key(monkeypatch):
+def test_the_agent_is_not_ready_without_the_key(monkeypatch):
     monkeypatch.delenv("UNDERCOVER_API_KEY")
-    with (
-        pytest.raises(RuntimeError, match="UNDERCOVER_API_KEY is missing"),
-        TestClient(service.app),
-    ):
-        pass
+    readiness.forget()
+
+    with pytest.raises(RuntimeError, match="UNDERCOVER_API_KEY is missing"):
+        readiness.ensure()
