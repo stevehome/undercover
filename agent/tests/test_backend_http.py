@@ -63,3 +63,36 @@ def test_the_agent_is_not_ready_without_the_key(monkeypatch):
 
     with pytest.raises(RuntimeError, match="UNDERCOVER_API_KEY is missing"):
         readiness.ensure()
+
+
+def busy_then_ready(monkeypatch, busy):
+    """A backend that answers 429 `busy` times, then an empty claim."""
+    seen = []
+
+    def answer(request):
+        seen.append(request)
+        if len(seen) <= busy:
+            return httpx.Response(429, json={"message": "Rate Exceeded."})
+        return httpx.Response(200, json={"lease_seconds": 60})
+
+    monkeypatch.setattr(
+        backend_http,
+        "client",
+        httpx.Client(base_url="http://backend", transport=httpx.MockTransport(answer)),
+    )
+    monkeypatch.setattr(backend_http.time, "sleep", lambda seconds: None)
+    monkeypatch.setenv("UNDERCOVER_API_KEY", "the-key")
+    return seen
+
+
+def test_a_busy_answer_is_tried_again(monkeypatch):
+    seen = busy_then_ready(monkeypatch, busy=3)
+    assert api.acquire_lease("CLM-1001", "agent") == 60
+    assert len(seen) == 4
+
+
+def test_a_backend_that_stays_busy_fails_in_the_end(monkeypatch):
+    seen = busy_then_ready(monkeypatch, busy=100)
+    with pytest.raises(httpx.HTTPStatusError):
+        api.acquire_lease("CLM-1001", "agent")
+    assert len(seen) == backend_http.BUSY_TRIES

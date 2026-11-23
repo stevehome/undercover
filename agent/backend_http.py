@@ -6,6 +6,8 @@ only the plumbing: the one HTTP client and what a refusal looks like.
 """
 
 import os
+import random
+import time
 from typing import Any
 
 import httpx
@@ -17,6 +19,9 @@ DEFAULT_API_URL = "http://localhost:8000"
 TIMEOUT_SECONDS = 30
 API_KEY_VARIABLE = "UNDERCOVER_API_KEY"
 API_KEY_HEADER = "X-API-Key"
+TOO_MANY_REQUESTS = 429
+BUSY_TRIES = 8
+LONGEST_WAIT_SECONDS = 10
 
 client: httpx.Client | None = None
 
@@ -40,8 +45,17 @@ def require_key() -> str:
 
 
 def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
-    """Send one request to the backend with the API key, read as it is sent."""
+    """Send one request to the backend with the API key, read as it is sent.
+
+    A 429 means the request was not run, as when Lambda has no free slot for it, so
+    it is sent again after a wait that grows, up to BUSY_TRIES times in all.
+    """
     headers = {**kwargs.pop("headers", {}), API_KEY_HEADER: require_key()}
+    for tries in range(1, BUSY_TRIES):
+        response = _client().request(method, path, headers=headers, **kwargs)
+        if response.status_code != TOO_MANY_REQUESTS:
+            return response
+        time.sleep(min(2**tries, LONGEST_WAIT_SECONDS) * random.uniform(0.5, 1.5))  # noqa: S311 - jitter
     return _client().request(method, path, headers=headers, **kwargs)
 
 
