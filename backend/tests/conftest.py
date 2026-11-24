@@ -1,5 +1,6 @@
 import json
 import threading
+from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -9,6 +10,29 @@ from sqlalchemy import event
 from backend import db
 from backend.main import app
 from conftest import API_KEY
+
+
+@pytest.fixture(autouse=True)
+def one_connection_at_a_time(monkeypatch):
+    """Fail any code that opens a connection while it holds one.
+
+    On Lambda the engine keeps one connection, so a nested one would wait for the
+    pool to time out; the laptop's pool of four would hide it.
+    """
+    held = threading.local()
+    opened = db.connection
+
+    @contextmanager
+    def guarded():
+        assert not getattr(held, "open", False), "a connection opened inside another"
+        held.open = True
+        try:
+            with opened() as conn:
+                yield conn
+        finally:
+            held.open = False
+
+    monkeypatch.setattr(db, "connection", guarded)
 
 
 @pytest.fixture

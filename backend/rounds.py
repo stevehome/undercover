@@ -59,12 +59,18 @@ def _group(settings: dict[str, Any], prefix: str) -> dict[str, Decimal]:
 
 
 def begin_stretch(
-    conn: Connection, round_id: int, model: str, reasoning_effort: str
+    conn: Connection,
+    round_id: int,
+    model: str,
+    reasoning_effort: str,
+    configuration_version: int,
 ) -> int:
     """Start a stretch of the improver's work, a run that holds the one-run rule.
 
-    Raises RunAlreadyGoing if something else is running, before anything else is
-    recorded in the caller's transaction.
+    The configuration version is read before the caller's connection is opened,
+    since a request holds one connection at a time. Raises RunAlreadyGoing if
+    something else is running, before anything else is recorded in the caller's
+    transaction.
     """
     return runs.insert_run(
         conn,
@@ -72,13 +78,16 @@ def begin_stretch(
         concurrency=1,
         model=model,
         reasoning_effort=reasoning_effort,
-        configuration_version=versions.current_configuration()["version"],
+        configuration_version=configuration_version,
         round_id=round_id,
     )
 
 
 def create_round(handler_id: str, model: str, reasoning_effort: str) -> dict[str, int]:
     """Start a round and its first stretch of work, or raise RunAlreadyGoing."""
+    recipe_version = versions.current_recipe()["version"]
+    configuration_version = versions.current_configuration()["version"]
+    settings = platform_settings.snapshot()
     with db.connection() as conn:
         round_id = conn.execute(
             insert(tables.rounds)
@@ -86,14 +95,16 @@ def create_round(handler_id: str, model: str, reasoning_effort: str) -> dict[str
                 stage=Stage.FIRST_EVALUATIONS,
                 progress=0,
                 thread_id=f"round-{uuid.uuid4().hex}",
-                recipe_version=versions.current_recipe()["version"],
-                settings=platform_settings.snapshot(),
+                recipe_version=recipe_version,
+                settings=settings,
                 started_by=handler_id,
                 started_on=db.now(),
             )
             .returning(tables.rounds.c.round_id)
         ).scalar_one()
-        run_id = begin_stretch(conn, round_id, model, reasoning_effort)
+        run_id = begin_stretch(
+            conn, round_id, model, reasoning_effort, configuration_version
+        )
     return {"round_id": round_id, "run_id": run_id}
 
 

@@ -43,7 +43,8 @@ def list_rounds() -> list[dict[str, Any]]:
     column = tables.rounds.c.round_id
     with db.connection() as conn:
         found = conn.execute(select(tables.rounds).order_by(column.desc()))
-        return _views([dict(row._mapping) for row in found])
+        rows = [dict(row._mapping) for row in found]
+    return _views(rows)
 
 
 def list_configurations() -> list[dict[str, Any]]:

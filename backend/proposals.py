@@ -210,12 +210,15 @@ def _record(
 ) -> dict[str, Any]:
     """Record the decision, its stretch and its version in one transaction."""
     approved = decided == ProposalStatus.APPROVED
+    configuration_version = versions.current_configuration()["version"]
     watch = stopwatch.Stopwatch(
         f"Recording the decision on proposal {row['proposal_id']}"
     )
     try:
         with db.connection() as conn:
-            run_id = rounds.begin_stretch(conn, row["round_id"], *stretch_model)
+            run_id = rounds.begin_stretch(
+                conn, row["round_id"], *stretch_model, configuration_version
+            )
             watch.lap("begin the stretch")
             version = _add_version(conn, row, handler_id) if approved else None
             watch.lap("add the version")
