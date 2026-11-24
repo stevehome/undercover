@@ -158,3 +158,11 @@ def test_the_work_is_registered_before_it_runs_and_completed_when_it_ends():
     threading.Event().wait(0.05)
 
     assert events == [("added", "a task"), ("ran",), ("completed", 1)]
+
+
+@pytest.mark.parametrize("prefix", ["AGENTCORE_CREDENTIAL_", "CREDENTIAL_"])
+def test_a_credentials_setting_is_read_with_either_prefix(monkeypatch, prefix):
+    monkeypatch.setenv(f"{prefix}UNDERCOVER_API_KEY_NAME", "key-provider")
+
+    assert credentials.providers() == {"UNDERCOVER_API_KEY": "key-provider"}
+    assert credentials.on_runtime()
