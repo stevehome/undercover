@@ -4,6 +4,9 @@ The Gateway names each tool `<target>___<operation>` and turns the app's and the
 context layer's operations into tools, with the Policy in front of them.
 """
 
+import random
+import re
+import time
 from decimal import Decimal
 from typing import Any
 
@@ -17,6 +20,14 @@ from agent.tool_route import CONTEXT
 
 SERVICE = "bedrock-agentcore"
 DENIED = "Tool Execution Denied"
+BUSY = re.compile(
+    r"^(McpException - .*statusCode=429"
+    r"|ValidationException - MCP server .* returned HTTP 429"
+    r"|Client error: API request failed with status: 429)\b",
+    re.DOTALL,
+)
+BUSY_TRIES = 6
+LONGEST_WAIT_SECONDS = 8
 
 
 def _wire(value: Any) -> Any:
@@ -47,6 +58,22 @@ class GatewayRoute:
         return f"{target}___{operation}"
 
     def call(self, target: str, operation: str, arguments: dict[str, Any]) -> Any:
+        """Call a tool through the Gateway, again after a wait if Lambda was busy.
+
+        A 429 in a refusal means the call was never run, as when Lambda has no free
+        slot for it, so it is sent again, up to BUSY_TRIES times in all. Any other
+        refusal is the model's to read.
+        """
+        for tries in range(1, BUSY_TRIES):
+            try:
+                return self._call_once(target, operation, arguments)
+            except Refusal as refusal:
+                if not BUSY.search(refusal.detail):
+                    raise
+            time.sleep(min(2**tries, LONGEST_WAIT_SECONDS) * random.uniform(0.5, 1.5))  # noqa: S311 - jitter
+        return self._call_once(target, operation, arguments)
+
+    def _call_once(self, target: str, operation: str, arguments: dict[str, Any]) -> Any:
         """Call a tool through the Gateway.
 
         A tool the app or the context layer refuses, and a call the Gateway's

@@ -5,6 +5,7 @@ import httpx
 import pytest
 from mcp.shared.exceptions import McpError
 
+from agent import gateway as gateway_module
 from agent.api import Line
 from agent.gateway import GatewayRoute
 from agent.mcp_connection import McpConnection
@@ -112,3 +113,56 @@ def _route(gateway: StandInGateway) -> GatewayRoute:
     url = "http://gateway.test/mcp"
     connection = McpConnection(url, transport=httpx.ASGITransport(app=gateway.app))
     return GatewayRoute(url, connection)
+
+
+BUSY_ANSWERS = [
+    "ValidationException - MCP server 'https://x/mcp' returned HTTP 429 to the "
+    "initialize handshake.",
+    "McpException - MCP invocation failed: ResponseInfo{statusCode=429, "
+    'version=HTTP_1_1}, data={"Reason":"ConcurrentInvocationLimitExceeded"}',
+    "Client error: API request failed with status: 429 - Rate Exceeded.",
+]
+
+
+@pytest.fixture
+def no_waiting(monkeypatch):
+    monkeypatch.setattr(gateway_module.time, "sleep", lambda seconds: None)
+
+
+def _busy_then_ready(busy: str, times: int) -> StandInGateway:
+    gateway = StandInGateway()
+    answers = iter([(busy, True)] * times)
+    gateway.tools["undercover-context___lookup_term"] = lambda _: next(
+        answers, ('{"term": "x"}', False)
+    )
+    return gateway
+
+
+@pytest.mark.parametrize("busy", BUSY_ANSWERS)
+def test_a_busy_answer_is_tried_again(busy, no_waiting):
+    gateway = _busy_then_ready(busy, 2)
+
+    answer = _route(gateway).call(CONTEXT, "lookup_term", {"term": "x"})
+
+    assert answer == {"term": "x"}
+    assert len(gateway.calls) == 3
+
+
+def test_a_gateway_that_stays_busy_ends_in_a_refusal(no_waiting):
+    gateway = _busy_then_ready(BUSY_ANSWERS[2], 100)
+
+    with pytest.raises(Refusal) as refused:
+        _route(gateway).call(CONTEXT, "lookup_term", {"term": "x"})
+
+    assert refused.value.source == BY_CONTEXT_LAYER
+    assert len(gateway.calls) == gateway_module.BUSY_TRIES
+
+
+def test_a_refusal_that_only_mentions_429_is_not_tried_again(no_waiting):
+    text = "Tool failed: its own call returned HTTP 429, or No claim CLM-1429"
+    gateway = _busy_then_ready(text, 100)
+
+    with pytest.raises(Refusal):
+        _route(gateway).call(CONTEXT, "lookup_term", {"term": "x"})
+
+    assert len(gateway.calls) == 1
