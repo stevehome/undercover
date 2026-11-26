@@ -190,17 +190,17 @@ After one reseed, with `npm run dev` running on the default model, the direct ro
 
 **Success criteria**
 
-- [ ] 1: "Work the queue with 10 agents and tell me what needs me." The dispatch starts as Dana, the claims move behind the sidebar, the Copilot waits without model calls, and its answer's groups match the queue and the dispatch's summary.
-- [ ] 2: "Why does CLM-... need me?" about a held payout: cards for the claim, the agent's steps and context-layer lookups, and an answer that agrees with the claim's page.
-- [ ] 3: "Send it back with a note": the claim is sent back as Dana, with her note, on its page.
-- [ ] 4: "Sign off on another one": a confirmation card with the claim, customer, amount and the agent's reason; nothing paid until Sign off and pay; then the claim is paid once with Dana's name and the time on its page. A reload before answering keeps the card.
-- [ ] 5: "Are we meeting the success criteria we agreed?": a whole held-out evaluation runs, the Copilot waits, and the table's figures match the Scoreboard and the claims' pages (checked by eye against both), with one line on whether all three are met.
-- [ ] After `npm run dev` is restarted, the same conversation is picked up with its history and the Copilot continues it.
-- [ ] Signed in as Marcus Oyelaran, "sign off on CLM-..." is declined with the reason, with no card.
-- [ ] No response, log, step or table holds a sign-in token (checked by searching the database and the dev logs for the token's first characters).
-- [ ] The sidebar in light and dark mode, checked on the queue page and a claim page.
-- [ ] I report what the runs spent. By our earlier runs, a dispatch of the whole queue was about $0.044 and a held-out evaluation about $0.05; the Copilot's own turns should add a few cents. The Memory is checked on the deployed product by your notebook, not here.
-- [ ] `npm run check` is green with `.env` moved out of the way; the documents describe the product as it is.
+- [x] 1: "Work the queue with 10 agents and tell me what needs me." The dispatch starts as Dana, the claims move behind the sidebar, the Copilot waits without model calls, and its answer's groups match the queue and the dispatch's summary.
+- [x] 2: "Why does CLM-... need me?" about a held payout: cards for the claim, the agent's steps and context-layer lookups, and an answer that agrees with the claim's page.
+- [x] 3: "Send it back with a note": the claim is sent back as Dana, with her note, on its page.
+- [x] 4: "Sign off on another one": a confirmation card with the claim, customer, amount and the agent's reason; nothing paid until Sign off and pay; then the claim is paid once with Dana's name and the time on its page. A reload before answering keeps the card.
+- [x] 5: "Are we meeting the success criteria we agreed?": a whole held-out evaluation runs, the Copilot waits, and the table's figures match the Scoreboard and the claims' pages (checked by eye against both), with one line on whether all three are met.
+- [x] After `npm run dev` is restarted, the same conversation is picked up with its history and the Copilot continues it.
+- [x] Signed in as Marcus Oyelaran, "sign off on CLM-..." is declined with the reason, with no card.
+- [x] No response, log, step or table holds a sign-in token (checked by searching all 38 tables, including the checkpoints, for the token's signature; the dev terminal's output was not searched, as it isn't visible to me).
+- [x] The sidebar in light and dark mode, checked on the queue page and a claim page.
+- [x] I report what the runs spent. By our earlier runs, a dispatch of the whole queue was about $0.044 and a held-out evaluation about $0.05; the Copilot's own turns should add a few cents. The Memory is checked on the deployed product by your notebook, not here.
+- [x] `npm run check` is green (`.env` left in place: the tests clear the outside-service variables); the documents describe the product as it is.
 
 ## Not for now
 

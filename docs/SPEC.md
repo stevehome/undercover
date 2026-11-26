@@ -56,6 +56,7 @@ A judge grades each explanation in an evaluation against the handler's reason, f
 - The Configuration page: the current version and every version with its held-out scores, and what any version changed from the one before.
 - The Settings page: the approval limit, the business objectives, the noise and tolerance, the spending limit for each round, how many claim agents work at once in the improver's evaluations, and the models allowed. A senior handler can change each, and each change records who and when. The appearance, light, dark or the computer's, is kept by each browser.
 - The judge's grade for each claim of an evaluation, with the two checks, and the average grade on the Scoreboard.
+- The Copilot: a chat in a sidebar beside every page, where a handler asks about the queue, a claim or a customer, has the claim agents work the queue, sends a claim back with a note, signs off a payout, and asks whether we meet the success criteria below. It acts as the signed-in handler: it can do only what that handler can, a refusal shows its reason, and a sign-off always waits for the handler's own answer on a confirmation card. Each conversation is kept and picked up where it was, and each step the Copilot takes shows as a card while it works.
 
 ## Success criteria
 
