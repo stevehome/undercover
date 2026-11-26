@@ -1,0 +1,153 @@
+:root {
+  --sea-green: #06d6a0;
+  --cerulean: #118ab2;
+  --midnight: #073b4c;
+  --sea-mist: #cdd8db;
+  --background: #f0f4f5;
+  --panel: #ffffff;
+  --ink: var(--midnight);
+  --link: #0b6f8f;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #04232e;
+    --panel: #000000;
+    --ink: var(--sea-mist);
+    --link: #5fc4e6;
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) .for-light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .for-dark {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #04232e;
+  --panel: #000000;
+  --ink: var(--sea-mist);
+  --link: #5fc4e6;
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] .for-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .for-dark {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font-family: "Instrument Sans", sans-serif;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--link);
+}
+
+.top,
+main,
+footer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 24px;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--midnight);
+  background: var(--sea-green);
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+section {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+h1 {
+  font-size: 2.25rem;
+  margin: 0 0 4px;
+}
+
+h2 {
+  margin: 0 0 8px;
+}
+
+.tagline {
+  margin: 0 0 16px;
+  font-family: "Instrument Serif", serif;
+  font-size: 1.5rem;
+}
+
+nav ol {
+  columns: 2;
+  padding-left: 1.25rem;
+}
+
+figure {
+  margin: 16px 0 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.for-dark {
+  display: none;
+}
+
+.questions li {
+  margin-bottom: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+}
+
+footer {
+  padding-bottom: 48px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  nav ol {
+    columns: 1;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+}

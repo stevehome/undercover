@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UnderCover user guide</title>
+    <meta
+      name="description"
+      content="What each screen of UnderCover is for, with a picture of it."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=Instrument+Serif&family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="guide.css" />
+    <script>
+      try {
+        const saved = localStorage.getItem("guide-theme");
+        if (saved === "light" || saved === "dark") {
+          document.documentElement.dataset.theme = saved;
+        }
+      } catch (_) {}
+    </script>
+  </head>
+  <body>
+    <header class="top">
+      <p class="name">UnderCover</p>
+      <button id="theme" type="button">Switch theme</button>
+    </header>
+    <main>
+      <section class="intro">
+        <h1>The UnderCover user guide</h1>
+        <p class="tagline">What each screen is for, and what to do there.</p>
+        <p>
+          UnderCover is where our claims handlers work: a queue of claims, the
+          agents that decide them, and the Copilot that helps you run it all.
+          The pages below follow the order you'd meet them in.
+        </p>
+        <nav aria-label="Contents">
+          <ol>
+            <li><a href="#signin">Signing in</a></li>
+            <li><a href="#queue">The queue</a></li>
+            <li><a href="#claim">A claim and what the agent did</a></li>
+            <li>
+              <a href="#decision">The decision, the payout and sign-off</a>
+            </li>
+            <li><a href="#scoreboard">The Scoreboard</a></li>
+            <li><a href="#improvement">Improvement</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#settings">Settings</a></li>
+            <li><a href="#copilot-sidebar">The Copilot</a></li>
+            <li><a href="#copilot-answer">Asking a question</a></li>
+            <li><a href="#copilot-steps">Watching it work</a></li>
+            <li><a href="#copilot-confirm">Confirming a sign-off</a></li>
+            <li><a href="#copilot-refusal">When it can't</a></li>
+            <li><a href="#try">Questions to try</a></li>
+          </ol>
+        </nav>
+      </section>
+      <section id="signin">
+        <h2>Signing in</h2>
+        <p>
+          Open the dashboard and sign in with your work email and password.
+          There is no sign-up: your team lead adds you. Once you&#x27;re in,
+          your name sits at the top with a Sign out button, and the Copilot
+          waits in the sidebar on the right.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/signin-light.png"
+            alt="The sign-in page with an email address field, a password field and a Sign in button"
+          />
+          <img
+            class="for-dark"
+            src="images/signin-dark.png"
+            alt="The sign-in page with an email address field, a password field and a Sign in button"
+          />
+        </figure>
+      </section>
+      <section id="queue">
+        <h2>The queue</h2>
+        <p>
+          Your starting point. The counts show where every claim stands:
+          waiting, in progress, waiting for sign-off, sent back or decided.
+          Choose how many claim agents work at once and press Start a dispatch,
+          and the agents take the waiting claims in order. Each claim below
+          updates as its agent works.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/queue-light.png"
+            alt="The claims queue with its counts, the dispatch controls and the list of claims in the latest dispatch"
+          />
+          <img
+            class="for-dark"
+            src="images/queue-dark.png"
+            alt="The claims queue with its counts, the dispatch controls and the list of claims in the latest dispatch"
+          />
+        </figure>
+      </section>
+      <section id="claim">
+        <h2>A claim and what the agent did</h2>
+        <p>
+          Open any claim to see the customer&#x27;s own words, then every step
+          the agent took: what it read, what it looked up in the context layer
+          and where each answer came from, and anything that was refused and by
+          whom. A Context used panel lists everything it looked up, once each.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/claim-light.png"
+            alt="A claim page with its status and the numbered steps the agent took"
+          />
+          <img
+            class="for-dark"
+            src="images/claim-dark.png"
+            alt="A claim page with its status and the numbered steps the agent took"
+          />
+        </figure>
+      </section>
+      <section id="decision">
+        <h2>The decision, the payout and sign-off</h2>
+        <p>
+          The decision shows its whole record: the reason, the claims manual
+          section, the payout worked out line by line, who or what decided and
+          when. A payout over the approval limit waits here for a senior
+          handler, who can sign it off and pay, or send it back to the agent
+          with a note. A sent-back claim shows the note and who wrote it, and
+          the agent decides it again.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/decision-light.png"
+            alt="A claim&#x27;s decision with its payout calculation, a note sent back by a handler and the sign-off controls"
+          />
+          <img
+            class="for-dark"
+            src="images/decision-dark.png"
+            alt="A claim&#x27;s decision with its payout calculation, a note sent back by a handler and the sign-off controls"
+          />
+        </figure>
+      </section>
+      <section id="scoreboard">
+        <h2>The Scoreboard</h2>
+        <p>
+          How well the agent is doing, measured on our two labelled sets with
+          the handlers&#x27; own decisions as the answer key. Each evaluation
+          shows how often the agent agrees with our handlers, what its mistakes
+          would cost, how many claims go straight through, and what a claim
+          costs and how long it takes. Open one to see each claim&#x27;s
+          decision beside the handler&#x27;s.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/scoreboard-light.png"
+            alt="The Scoreboard with a finished evaluation of the held-out set and its accuracy, grade, cost of mistakes and straight-through share"
+          />
+          <img
+            class="for-dark"
+            src="images/scoreboard-dark.png"
+            alt="The Scoreboard with a finished evaluation of the held-out set and its accuracy, grade, cost of mistakes and straight-through share"
+          />
+        </figure>
+      </section>
+      <section id="improvement">
+        <h2>Improvement</h2>
+        <p>
+          Where a round of self-improvement has got to: the proposal waiting
+          with what it changes, the rounds so far with their scores before and
+          after, the verdict and the cost, and a chart of each version&#x27;s
+          held-out accuracy and grade.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/improvement-light.png"
+            alt="The Improvement page with its rounds and the chart of each version&#x27;s scores"
+          />
+          <img
+            class="for-dark"
+            src="images/improvement-dark.png"
+            alt="The Improvement page with its rounds and the chart of each version&#x27;s scores"
+          />
+        </figure>
+      </section>
+      <section id="configuration">
+        <h2>Configuration</h2>
+        <p>
+          The agent&#x27;s current version and every version before it with its
+          held-out scores. Open a version to see what it changed from the one
+          before.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/configuration-light.png"
+            alt="The Configuration page listing the agent&#x27;s versions with their scores"
+          />
+          <img
+            class="for-dark"
+            src="images/configuration-dark.png"
+            alt="The Configuration page listing the agent&#x27;s versions with their scores"
+          />
+        </figure>
+      </section>
+      <section id="settings">
+        <h2>Settings</h2>
+        <p>
+          The approval limit, the business objectives, the noise and tolerance,
+          the spending limit for each round, how many agents work at once in
+          evaluations, and the models allowed. A senior handler can change each
+          one, and each change records who and when. Light, dark or the
+          computer&#x27;s setting is kept by your browser.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/settings-light.png"
+            alt="The Settings page with the approval limit, the objectives and the allowed models"
+          />
+          <img
+            class="for-dark"
+            src="images/settings-dark.png"
+            alt="The Settings page with the approval limit, the objectives and the allowed models"
+          />
+        </figure>
+      </section>
+      <section id="copilot-sidebar">
+        <h2>The Copilot</h2>
+        <p>
+          The Copilot is a chat beside every page. Ask it about the queue, a
+          claim or a customer, have the agents work the queue, send a claim
+          back, sign off a payout, or ask whether we meet our success criteria.
+          It acts as you: it can do only what you can. Collapse it with the
+          arrow at the top when you want the room.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/copilot-sidebar-light.png"
+            alt="The Copilot sidebar beside the queue, with its suggested questions and the box to ask in"
+          />
+          <img
+            class="for-dark"
+            src="images/copilot-sidebar-dark.png"
+            alt="The Copilot sidebar beside the queue, with its suggested questions and the box to ask in"
+          />
+        </figure>
+      </section>
+      <section id="copilot-answer">
+        <h2>Asking a question</h2>
+        <p>
+          Type a question, or press one of the suggestions. The answer arrives
+          as ordinary text with small tables where they help, and every claim
+          number in it is a link to that claim. Each answer ends with what it
+          cost and how long it took. Conversations are kept: pick up any earlier
+          one from the list under New conversation.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/copilot-answer-light.png"
+            alt="A Copilot conversation about what needs a handler after a dispatch, with a table of payouts awaiting sign-off"
+          />
+          <img
+            class="for-dark"
+            src="images/copilot-answer-dark.png"
+            alt="A Copilot conversation about what needs a handler after a dispatch, with a table of payouts awaiting sign-off"
+          />
+        </figure>
+      </section>
+      <section id="copilot-steps">
+        <h2>Watching it work</h2>
+        <p>
+          Each thing the Copilot does appears as a card while it works: a read
+          of a claim or the queue, a lookup in the context layer, an action such
+          as starting a dispatch. An action stands out. While it waits for the
+          agents, it says so, and uses no model calls until they&#x27;re done.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/copilot-steps-light.png"
+            alt="A Copilot conversation showing the step cards for starting a dispatch and checking what needs a handler"
+          />
+          <img
+            class="for-dark"
+            src="images/copilot-steps-dark.png"
+            alt="A Copilot conversation showing the step cards for starting a dispatch and checking what needs a handler"
+          />
+        </figure>
+      </section>
+      <section id="copilot-confirm">
+        <h2>Confirming a sign-off</h2>
+        <p>
+          Before any payout is signed off the Copilot stops and shows a card:
+          the claim, the customer, what it will pay and the agent&#x27;s reason.
+          Nothing is paid until you press Sign off and pay. Cancel leaves the
+          claim as it was. The card stays put if you reload the page.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/copilot-confirm-light.png"
+            alt="A confirmation card for a sign-off showing the claim, customer, payout and the agent&#x27;s reason, with Cancel and Sign off and pay"
+          />
+          <img
+            class="for-dark"
+            src="images/copilot-confirm-dark.png"
+            alt="A confirmation card for a sign-off showing the claim, customer, payout and the agent&#x27;s reason, with Cancel and Sign off and pay"
+          />
+        </figure>
+      </section>
+      <section id="copilot-refusal">
+        <h2>When it can't</h2>
+        <p>
+          A handler who isn&#x27;t allowed to sign off a payout over the
+          approval limit is told so, with the reason, and there is no card. A
+          refusal shows in its own card and says who refused it.
+        </p>
+        <figure>
+          <img
+            class="for-light"
+            src="images/copilot-refusal-light.png"
+            alt="A Copilot conversation in which a sign-off request is refused with the reason"
+          />
+          <img
+            class="for-dark"
+            src="images/copilot-refusal-dark.png"
+            alt="A Copilot conversation in which a sign-off request is refused with the reason"
+          />
+        </figure>
+      </section>
+      <section id="try">
+        <h2>Questions to try</h2>
+        <p>
+          In one Copilot conversation, ask these in turn. Change the claim
+          numbers to ones in your own queue.
+        </p>
+        <ol class="questions">
+          <li>Work the queue with 10 agents and tell me what needs me.</li>
+          <li>Why does CLM-1018 need me?</li>
+          <li>
+            Send CLM-1008 back with a note asking the agent to look again at
+            whether the farmhouse was covered property.
+          </li>
+          <li>Sign off on CLM-1011.</li>
+          <li>Are we meeting the success criteria we agreed?</li>
+        </ol>
+      </section>
+    </main>
+    <footer>
+      <p>
+        UnderCover Travel Insurance is a fictional company. Every customer and
+        claim in these pictures is made up.
+      </p>
+    </footer>
+    <script>
+      const button = document.getElementById("theme");
+      button.addEventListener("click", () => {
+        const dark = getComputedStyle(document.body).colorScheme === "dark";
+        const next = dark ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem("guide-theme", next);
+        } catch (_) {}
+      });
+    </script>
+  </body>
+</html>
