@@ -42,3 +42,19 @@ Phase 5 of `docs/PLAN_COPILOT.md` (the sidebar): the dashboard has the Copilot b
 Phase 6 of `docs/PLAN_COPILOT.md` (the live checks): after a reseed, as Dana Whitfield on the default model, the five handover questions all worked in one conversation: the dispatch of 10 agents and what needs a handler; why CLM-1018 needed her; CLM-1008 sent back with her note, which its page shows, and decided again by the agent; a sign-off of CLM-1011 that waited on its confirmation card (kept over a page reload) and then paid $1,330.00 once as Dana; and the success criteria on a whole held-out evaluation (88.0% straight through, 76.0% accuracy, 1 of 1 over the limit, matching the Scoreboard). After restarting `npm run dev` the same conversation continued with its history. Marcus Oyelaran's sign-off request was declined with the reason and no card. No sign-in token is in any database table. The runs cost about $0.08: the dispatch about $0.04, the evaluation $0.037, the Copilot's own turns under $0.003. Nothing is deployed to AWS: the Gateway, the Memory and the Runtime are checked only by the stand-ins here.
 
 Week 3 Day 5, Phase 1 of `docs/PLAN_GUIDE.md` (a user guide, not in a brief): `guide/index.html` and `guide/guide.css` are a static page with a section for each screen of the dashboard and the Copilot, each with a few sentences for a handler and a picture in light and dark (`guide/images/<name>-light.png` and `-dark.png`), a theme switch that starts from the computer's setting and is remembered, and the five Copilot questions to try. It opens from the file with no server. For now the pictures are grey placeholders; the capture script that makes the real ones is Phase 2. `backend/tests/test_guide.py` checks every picture has alt text, a file and its light or dark pair, every section has a heading and a description, and the page names no token, address of a laptop or AWS identifier.
+
+The Copilot's graph (`agent/copilot_graph.py`, drawn by LangGraph from `build_copilot_graph`; the dotted lines are the conditional edges after `agent`, and the 22 tools sit in `tools`):
+
+```mermaid
+graph TD;
+    __start__ --> recall;
+    recall --> agent;
+    agent -.->|"asks to sign off"| confirm;
+    agent -.->|"other tool calls"| tools;
+    agent -.->|"no tool calls"| remember;
+    confirm -->|"after the handler's answer"| tools;
+    tools --> agent;
+    remember --> __end__;
+```
+
+The first message after a pause failed with a 502 on AWS (found on the deployed Copilot, from its conversation record and the runtime's logs): both runtimes shut a session's container down after 60 idle seconds, so the next message met a container still starting, and Runtime answered 502 before running anything. The app now sends a Copilot payload again, after 3 s, up to 4 tries in all, when the answer is that 502 (`RuntimeNotReady` in `backend/agent_runtime.py`, retried in `backend/copilot_service.py` as it is for a busy session); any other refusal is still sent once. A refusal is logged with the runtime, operation and session, never the payload or the sign-in. The Copilot's runtime now stays up 900 seconds between messages (`agentcore/agentcore.json`). Redeploy both for it to take effect: the app's Lambda, and `agentcore deploy` for the runtime's lifecycle setting.

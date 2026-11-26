@@ -3,9 +3,11 @@
 The Copilot is an AgentCore app. A payload names an operation, and goes to the
 Copilot on a host of its own (`UNDERCOVER_COPILOT`) or, when
 `UNDERCOVER_COPILOT_RUNTIME` names a runtime's ARN, to that runtime in the
-conversation's own session. It carries the handler's sign-in and never the agent's
-key. A turn the Copilot didn't take is undone and the reason passed on; a timeout
-leaves it going, since the Copilot may have it.
+conversation's own session, which is shut down after a minute idle, so the first
+message after a pause meets a container still starting: Runtime answers 502 before
+it has run anything, and the payload is sent again after a short wait. It carries the
+handler's sign-in and never the agent's key. A turn the Copilot didn't take is undone
+and the reason passed on; a timeout leaves it going, since the Copilot may have it.
 """
 
 import os
@@ -22,25 +24,25 @@ from backend import (
 from backend.errors import Conflict, ServiceUnavailable
 
 DEFAULT_COPILOT_URL = "http://127.0.0.1:8081"
-BUSY_TRIES = 4
-BUSY_WAIT_SECONDS = 2
+TRIES = 4
+WAIT_SECONDS = 3
 
 
 def _send(payload: dict[str, Any], conversation_id: str | None) -> dict[str, Any]:
     """Send one payload and return the Copilot's answer.
 
     On Runtime it goes to the conversation's session, again after a short wait while
-    that session is busy.
+    that session is busy or its container is still starting.
     """
     arn = os.environ.get("UNDERCOVER_COPILOT_RUNTIME")
     if not arn:
         url = os.environ.get("UNDERCOVER_COPILOT", DEFAULT_COPILOT_URL)
         return agent_laptop.post(payload, url, with_key=False)
-    for _ in range(BUSY_TRIES - 1):
+    for _ in range(TRIES - 1):
         try:
             return agent_runtime.post(payload, arn, conversation_id)
-        except agent_runtime.SessionBusy:
-            time.sleep(BUSY_WAIT_SECONDS)
+        except (agent_runtime.SessionBusy, agent_runtime.RuntimeNotReady):
+            time.sleep(WAIT_SECONDS)
     return agent_runtime.post(payload, arn, conversation_id)
 
 

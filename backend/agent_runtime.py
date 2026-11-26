@@ -6,6 +6,7 @@ This is the one module that calls Runtime.
 """
 
 import json
+import logging
 import uuid
 from typing import Any
 
@@ -24,10 +25,17 @@ CONNECT_TIMEOUT_SECONDS = 5
 READ_TIMEOUT_SECONDS = 20
 SESSION_PREFIX = "session-"
 BUSY_CODE = "ConflictException"
+CLIENT_ERROR_CODE = "RuntimeClientError"
+NOT_READY = "(502)"
+log = logging.getLogger(__name__)
 
 
 class SessionBusy(ServiceUnavailable):
     """The session is working and can't take another request just now."""
+
+
+class RuntimeNotReady(ServiceUnavailable):
+    """Runtime answered 502 before the container ran anything, as a new one starts."""
 
 
 def _client() -> Any:
@@ -40,13 +48,28 @@ def _client() -> Any:
     return boto3.client("bedrock-agentcore", config=config)
 
 
+def _log_refusal(
+    error: ClientError, payload: dict[str, Any], arn: str, session_id: str | None
+) -> None:
+    """Log which runtime, operation and session refused: never the payload."""
+    log.warning(
+        "Runtime %s refused %s in session %s: %s",
+        arn.rsplit("/", 1)[-1],
+        payload.get("operation"),
+        session_id,
+        error,
+    )
+
+
 def post(
     payload: dict[str, Any], arn: str, session_id: str | None = None
 ) -> dict[str, Any]:
     """Send a payload to a runtime, in a new session unless one is named.
 
     ServiceUnavailable when it never connected or Runtime answered with an error:
-    nothing was started. Unconfirmed when anything else goes wrong once it was sent.
+    nothing was started, and RuntimeNotReady, a kind of it, when the answer was a 502
+    from a container still starting. Unconfirmed when anything else goes wrong once
+    it was sent.
     """
     try:
         response = _client().invoke_agent_runtime(
@@ -59,8 +82,12 @@ def post(
     except (ConnectTimeoutError, EndpointConnectionError) as error:
         raise ServiceUnavailable("The agent's runtime couldn't be reached") from error
     except ClientError as error:
-        if error.response["Error"]["Code"] == BUSY_CODE:
+        _log_refusal(error, payload, arn, session_id)
+        code = error.response["Error"]["Code"]
+        if code == BUSY_CODE:
             raise SessionBusy("The session is busy") from error
+        if code == CLIENT_ERROR_CODE and NOT_READY in str(error):
+            raise RuntimeNotReady(f"The agent's runtime refused: {error}") from error
         raise ServiceUnavailable(f"The agent's runtime refused: {error}") from error
     except BotoCoreError as error:
         raise Unconfirmed(str(error)) from error

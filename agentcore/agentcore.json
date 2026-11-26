@@ -29,7 +29,7 @@
       "runtimeVersion": "PYTHON_3_12",
       "protocol": "HTTP",
       "lifecycleConfiguration": {
-        "idleRuntimeSessionTimeout": 60
+        "idleRuntimeSessionTimeout": 900
       },
       "instrumentation": {
         "enableOtel": false
