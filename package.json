@@ -19,6 +19,7 @@
     "check:server": "uv run --isolated --only-group server python -c \"import backend.main\"",
     "check:ts": "prettier --check -u dashboard e2e scripts *.config.* && eslint dashboard e2e scripts *.config.* && tsc && vitest run --root dashboard --coverage",
     "e2e": "playwright test",
+    "guide": "node --env-file-if-exists=.env scripts/guide.ts",
     "seed": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m backend.seed",
     "dev:context": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m context",
     "dev:copilot": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn agent.copilot_entrypoint:app --host 127.0.0.1 --port 8081 --reload --reload-dir agent",

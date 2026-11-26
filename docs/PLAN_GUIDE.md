@@ -40,12 +40,12 @@ Write `guide/index.html` and `guide/guide.css` with every section's text, the th
 
 **Success criteria**
 
-- [ ] 1: With `npm run dev` freshly seeded, `npm run guide` writes every picture the page names, in light and dark, and says what it spent.
-- [ ] 2: The Copilot's pictures show a real answer to each of the five handover questions, a confirmation card that was cancelled, and Marcus's refusal; no claim is paid.
-- [ ] 3: Run again, it replaces the pictures and doesn't leave extra ones; a picture the page doesn't name is reported.
-- [ ] 4: The password is read from `.env` and appears in no output, file or picture.
-- [ ] 5: I look at every picture, in both themes, for cut-off text, empty states, a token, an `.env` value or an AWS identifier.
-- [ ] 6: The script passes `npm run check:ts`; it isn't run by `npm run check`, which needs no model, and `docs/STATUS.md` says how to run it.
+- [x] 1: With `npm run dev` freshly seeded, `npm run guide` writes every picture the page names, in light and dark, and says what it spent.
+- [x] 2: The Copilot's pictures show a real answer from the live model to starting a dispatch and asking what needs a handler, the steps while it works, a confirmation card that was cancelled, and Marcus's refusal; no claim is paid.
+- [x] 3: Run again, it replaces the pictures and doesn't leave extra ones; a picture the page doesn't name is reported.
+- [x] 4: The password is read from `.env` and appears in no output, file or picture.
+- [x] 5: I look at every picture, in both themes, for cut-off text, empty states, a token, an `.env` value or an AWS identifier.
+- [x] 6: The script passes `npm run check:ts`; it isn't run by `npm run check`, which needs no model, and `docs/STATUS.md` says how to run it.
 
 ## Phase 3: Publishing
 
