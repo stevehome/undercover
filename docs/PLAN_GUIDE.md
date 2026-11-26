@@ -55,8 +55,8 @@ Write `guide/index.html` and `guide/guide.css` with every section's text, the th
 
 - [x] 1: The workflow publishes only `guide/`, on a push to the default branch that changes it, with the permissions Pages needs and no others.
 - [x] 2: `docs/STATUS.md` says to turn on Pages (Source: GitHub Actions), what the address will be, and how to refresh the pictures.
-- [ ] 3: After you push and turn Pages on, I open the address and check the page, its pictures and its theme switch from outside the laptop's files.
-- [ ] 4: `npm run check` is green; I report what the capture run spent (about ten cents by this session's runs).
+- [x] 3: After you push and turn Pages on, I open the address and check the page, its pictures and its theme switch from outside the laptop's files.
+- [x] 4: `npm run check` is green; I report what the capture run spent (about ten cents by this session's runs).
 
 ## Not for now
 
