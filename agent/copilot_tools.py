@@ -8,19 +8,24 @@ context-only route. They record nothing: `copilot_recording.py` records what eac
 tool call did.
 """
 
+from decimal import Decimal
 from typing import Any
 
 from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
-from agent import copilot_api
+from agent import copilot_api, copilot_criteria, copilot_waiting
 from agent.copilot_api import CardKind, EvalSet
 from agent.copilot_context import CopilotContext
+from agent.refusals import BY_COPILOT, Refusal
 from agent.tool_route import CONTEXT
 from agent.tools import TARGETS as CONTEXT_TARGETS
 from agent.tools import Document, Plan, Record
 
 AGENTS_SETTING = "improver_agents_at_once"
+ACCURACY_SETTING = "objective_accuracy"
+ONE_AT_A_TIME = "One sign-off at a time: ask again for this claim after the first."
+DASHBOARD_PLACES = {"dispatch": "the Queue page", "evaluation": "the Scoreboard"}
 
 KINDS: dict[str, CardKind] = {
     "list_claims": "claims",
@@ -36,6 +41,8 @@ KINDS: dict[str, CardKind] = {
     "start_dispatch": "action",
     "start_evaluation": "action",
     "send_back_claim": "action",
+    "sign_off_claim": "action",
+    "check_success_criteria": "agent work",
     **{
         name: "context" for name, target in CONTEXT_TARGETS.items() if target == CONTEXT
     },
@@ -176,18 +183,38 @@ def read_section(
     return _look_up(runtime, "read_section", {"document": document, "number": number})
 
 
+def _outcome(
+    runtime: ToolRuntime[CopilotContext],
+    started: dict[str, Any],
+    count: int,
+    wait: bool,
+) -> dict[str, Any]:
+    """What a start answers with: the run, and how it ended when the handler waits."""
+    result = {**started, "agents": count}
+    if wait:
+        place = DASHBOARD_PLACES["evaluation" if "eval_set" in started else "dispatch"]
+        result["outcome"] = copilot_waiting.wait_for_run(
+            runtime.context.sign_in, started["run_id"], follow_on=place
+        )
+    return result
+
+
 @tool
 def start_dispatch(
-    runtime: ToolRuntime[CopilotContext], agents: int | None = None
+    runtime: ToolRuntime[CopilotContext],
+    agents: int | None = None,
+    wait: bool = False,
 ) -> dict[str, Any]:
     """Start a dispatch of the whole queue.
 
     agents: how many claim agents work at once; leave it out for the number in our
     settings.
+    wait: true when the handler wants to know how it went, so you wait for the
+    dispatch to finish; then what needs a handler is yours to look up.
     """
     count = _agents(runtime, agents)
     started = copilot_api.start_dispatch(runtime.context.sign_in, count)
-    return {**started, "agents": count}
+    return _outcome(runtime, started, count, wait)
 
 
 @tool
@@ -196,6 +223,7 @@ def start_evaluation(
     runtime: ToolRuntime[CopilotContext],
     tiny: bool = False,
     agents: int | None = None,
+    wait: bool = False,
 ) -> dict[str, Any]:
     """Start an evaluation of the claim agent on a labeled set.
 
@@ -203,12 +231,14 @@ def start_evaluation(
     tiny: only the set's five tiny claims, not the whole set.
     agents: how many claim agents work at once; leave it out for the number in our
     settings.
+    wait: true when the handler wants to know how it went, so you wait for the
+    evaluation to finish.
     """
     count = _agents(runtime, agents)
     started = copilot_api.start_evaluation(
         runtime.context.sign_in, count, eval_set, tiny
     )
-    return {**started, "agents": count}
+    return _outcome(runtime, {**started, "eval_set": eval_set}, count, wait)
 
 
 @tool
@@ -217,6 +247,61 @@ def send_back_claim(
 ) -> dict[str, Any]:
     """Send a claim waiting for sign-off back to the claim agent with a note."""
     return copilot_api.send_back_claim(runtime.context.sign_in, claim_id, note)
+
+
+@tool
+def sign_off_claim(
+    claim_id: str, runtime: ToolRuntime[CopilotContext]
+) -> dict[str, Any]:
+    """Sign off a claim waiting for sign-off, which pays it.
+
+    The handler is asked to confirm first; nothing is paid until they do.
+    """
+    state = runtime.state
+    if state["confirmed"] != claim_id:
+        raise Refusal(BY_COPILOT, state["sign_off_note"] or ONE_AT_A_TIME)
+    return copilot_api.sign_off_claim(runtime.context.sign_in, claim_id)
+
+
+@tool
+def check_success_criteria(
+    runtime: ToolRuntime[CopilotContext], agents: int | None = None
+) -> dict[str, Any]:
+    """Check the three success criteria we agreed.
+
+    Runs an evaluation of the whole held-out set and waits for it, then returns each
+    criterion's target, figure and whether it is met, worked out in code. Report
+    those figures as they are.
+    """
+    sign_in = runtime.context.sign_in
+    count = _agents(runtime, agents)
+    measures: dict[str, Any] | None = None
+    try:
+        started = copilot_api.start_evaluation(sign_in, count, "held_out", False)
+    except Refusal as refusal:
+        why_not = f"The evaluation wasn't started: {refusal.detail}"
+    else:
+        outcome = copilot_waiting.wait_for_run(
+            sign_in, started["run_id"], follow_on=DASHBOARD_PLACES["evaluation"]
+        )
+        if outcome["status"] == "finished":
+            measures = next(
+                e["measures"]
+                for e in copilot_api.evaluations(sign_in)
+                if e["run_id"] == started["run_id"]
+            )
+            why_not = ""
+        else:
+            why_not = outcome.get("message") or (
+                f"The evaluation {outcome['status']}: {outcome['stopped_reason']}"
+            )
+    objective = next(
+        s["value"]
+        for s in copilot_api.settings(sign_in)
+        if s["key"] == ACCURACY_SETTING
+    )
+    paid = copilot_api.payments_over_the_limit(sign_in)
+    return copilot_criteria.check(measures, why_not, Decimal(str(objective)), paid)
 
 
 COPILOT_TOOLS: list[BaseTool] = [
@@ -240,4 +325,6 @@ COPILOT_TOOLS: list[BaseTool] = [
     start_dispatch,
     start_evaluation,
     send_back_claim,
+    sign_off_claim,
+    check_success_criteria,
 ]

@@ -90,7 +90,7 @@ def test_a_turn_waiting_for_a_confirmation_is_never_stopped_and_refuses_a_messag
 ):
     conversation_id = make(client)
     ask(client, conversation_id)
-    card = {"claim_id": "CLM-1001", "amount": "1200.00"}
+    card = {"claim_id": "CLM-1001", "payout": "1200.00"}
     client.post(
         f"/api/copilot/conversations/{conversation_id}/waiting", json={"card": card}
     )
@@ -172,7 +172,7 @@ def test_steps_arrive_working_then_done_refused_or_failed_in_order(
 def test_a_waiting_confirmation_keeps_its_card_until_answered(client, copilot_stub):
     conversation_id = make(client)
     ask(client, conversation_id)
-    card = {"claim_id": "CLM-1001", "amount": "1200.00"}
+    card = {"claim_id": "CLM-1001", "payout": "1200.00"}
     client.post(
         f"/api/copilot/conversations/{conversation_id}/waiting", json={"card": card}
     )
@@ -188,6 +188,7 @@ def test_a_waiting_confirmation_keeps_its_card_until_answered(client, copilot_st
     assert answered.status_code == 202
     assert copilot_stub.payloads[-1]["operation"] == "answer_confirmation"
     assert copilot_stub.payloads[-1]["confirmed"] is True
+    assert copilot_stub.payloads[-1]["card"] == card
     seen = read(client, conversation_id)
     assert (seen["status"], seen["card"]) == ("working", None)
 

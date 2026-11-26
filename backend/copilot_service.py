@@ -85,7 +85,11 @@ def answer_confirmation(
         _ask(
             conversation_id,
             _turn_payload(
-                "answer_confirmation", conversation_id, token, confirmed=confirmed
+                "answer_confirmation",
+                conversation_id,
+                token,
+                confirmed=confirmed,
+                card=card,
             ),
         )
     except (Conflict, ServiceUnavailable):

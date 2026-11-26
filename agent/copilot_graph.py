@@ -1,7 +1,8 @@
 """The Copilot's graph: its nodes joined by edges, and the checkpointer.
 
-START -> recall -> agent <-> tools; agent -> remember when it has no more tools to
-call; remember -> END.
+START -> recall -> agent <-> tools; agent -> confirm -> tools when the reply asks for
+a sign-off, which pauses for the handler; agent -> remember when it has no more tools
+to call; remember -> END.
 """
 
 from functools import partial
@@ -14,14 +15,18 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 
 from agent import copilot_nodes, copilot_recording
+from agent.copilot_confirm import SIGN_OFF, confirm
 from agent.copilot_context import CopilotContext
 from agent.copilot_state import CopilotState
 from agent.copilot_tools import COPILOT_TOOLS
 
 
-def after_agent(state: CopilotState) -> Literal["tools", "remember"]:
-    """Run the tools the model asked for, or finish the turn."""
-    return "tools" if state["messages"][-1].tool_calls else "remember"
+def after_agent(state: CopilotState) -> Literal["confirm", "tools", "remember"]:
+    """Ask the handler about a sign-off first, else run the tools, else finish."""
+    calls = state["messages"][-1].tool_calls
+    if any(call["name"] == SIGN_OFF for call in calls):
+        return "confirm"
+    return "tools" if calls else "remember"
 
 
 def build_copilot_graph(
@@ -41,11 +46,15 @@ def build_copilot_graph(
             wrap_tool_call=copilot_recording.record_tool_call,
         ),
     )
+    builder.add_node("confirm", confirm)
     builder.add_node("remember", copilot_nodes.remember)
 
     builder.add_edge(START, "recall")
     builder.add_edge("recall", "agent")
-    builder.add_conditional_edges("agent", after_agent, ["tools", "remember"])
+    builder.add_conditional_edges(
+        "agent", after_agent, ["confirm", "tools", "remember"]
+    )
+    builder.add_edge("confirm", "tools")
     builder.add_edge("tools", "agent")
     builder.add_edge("remember", END)
     return builder.compile(checkpointer=checkpointer)

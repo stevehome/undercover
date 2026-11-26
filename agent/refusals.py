@@ -4,6 +4,7 @@ BY_APP = "the app"
 BY_GATEWAY = "the Gateway"
 BY_CONTEXT_LAYER = "the context layer"
 BY_MEMORY = "the memory"
+BY_COPILOT = "the Copilot"
 
 
 class Refusal(Exception):  # noqa: N818 - a refusal, not a failure

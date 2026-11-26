@@ -104,6 +104,7 @@ class AgentStub(BaseHTTPRequestHandler):
     bodies: list[dict] = []
     keys: list[str | None] = []
     refuse = False
+    on_ask = None
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length") or 0)
@@ -111,6 +112,8 @@ class AgentStub(BaseHTTPRequestHandler):
         self.keys.append(self.headers.get("Authorization"))
         self.calls.append(payload.pop("operation"))
         self.bodies.append(payload)
+        if self.on_ask:
+            self.on_ask(self.calls[-1], payload)
         body = (
             {"refused": "A run is already going"}
             if self.refuse
@@ -131,7 +134,7 @@ def agent_stub(monkeypatch):
     handler = type(
         "Stub",
         (AgentStub,),
-        {"calls": [], "bodies": [], "keys": [], "refuse": False},
+        {"calls": [], "bodies": [], "keys": [], "refuse": False, "on_ask": None},
     )
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()

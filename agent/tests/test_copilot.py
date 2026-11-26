@@ -3,14 +3,13 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from sqlalchemy import select
 
-from agent import backend_http, copilot_api, copilot_turns
+from agent import copilot_api, copilot_turns
 from agent.copilot_memory import HandlerMemory
 from agent.copilot_nodes import MAX_MODEL_CALLS
 from agent.copilot_route import ContextOnlyRoute
 from agent.direct import DirectRoute
 from agent.refusals import BY_APP, Refusal
 from agent.tests.copilot_helpers import (
-    RecordingClient,
     begin,
     forever,
     reply,
@@ -23,14 +22,6 @@ from backend import db, tables
 from conftest import DANA, MARCUS
 
 ASK = "Who needs me today?"
-
-
-@pytest.fixture
-def app_client(monkeypatch):
-    """The Copilot's own client to the app: no key, and it keeps what it sends."""
-    client = RecordingClient()
-    monkeypatch.setattr(backend_http, "client", client)
-    return client
 
 
 @pytest.fixture

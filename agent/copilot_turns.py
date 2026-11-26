@@ -15,6 +15,7 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.types import Command
 
 from agent import copilot_api
 from agent.copilot_context import CopilotContext
@@ -76,9 +77,13 @@ def _context(turn: Turn, handler: dict[str, Any]) -> CopilotContext:
     )
 
 
-def work_turn(turn: Turn, message: str) -> None:
-    """Answer a handler's message and tell the app how it went."""
-    started = time.monotonic()
+def _run(turn: Turn, start: Any, resume_with: Any = None) -> None:
+    """Run the graph on the conversation's thread and tell the app how it went.
+
+    A graph that returns with an interrupt is waiting for the handler: the app is
+    told, with the card. Otherwise the turn is over, with its answer or its failure.
+    """
+    began = time.monotonic()
     try:
         handler = copilot_api.who_is_signed_in(turn.sign_in)
     except Refusal:
@@ -87,14 +92,25 @@ def work_turn(turn: Turn, message: str) -> None:
     graph = build_copilot_graph(turn.checkpointer, turn.model)
     config: Any = {"configurable": {"thread_id": turn.conversation_id}}
     try:
-        saved = graph.get_state(config).values.get("messages", [])
-        if unfinished := _unanswered(saved):
-            # Written as the last node, as if that turn had ended there, so no node
-            # of it is left to run before the new message's turn.
-            graph.update_state(config, {"messages": unfinished}, as_node=LAST_NODE)
-        state = graph.invoke(new_turn(message), config, context=_context(turn, handler))
+        if resume_with is None:
+            saved = graph.get_state(config).values.get("messages", [])
+            if unfinished := _unanswered(saved):
+                # Written as the last node, as if that turn had ended there, so no
+                # node of it is left to run before the new message's turn.
+                graph.update_state(config, {"messages": unfinished}, as_node=LAST_NODE)
+            state = graph.invoke(
+                new_turn(start), config, context=_context(turn, handler)
+            )
+        else:
+            state = graph.invoke(
+                Command(resume=resume_with), config, context=_context(turn, handler)
+            )
+        waiting = graph.get_state(config).interrupts
     except Exception as error:
         copilot_api.turn_failed(turn.sign_in, turn.conversation_id, _failure(error))
+        return
+    if waiting:
+        copilot_api.turn_waiting(turn.sign_in, turn.conversation_id, waiting[0].value)
         return
     copilot_api.turn_done(
         turn.sign_in,
@@ -103,6 +119,16 @@ def work_turn(turn: Turn, message: str) -> None:
             "text": str(state["messages"][-1].content),
             "model_calls": state["model_calls"],
             "cost_nanos": state["cost_nanos"],
-            "work_ms": int((time.monotonic() - started) * MS_PER_SECOND),
+            "work_ms": int((time.monotonic() - began) * MS_PER_SECOND),
         },
     )
+
+
+def work_turn(turn: Turn, message: str) -> None:
+    """Answer a handler's message and tell the app how it went."""
+    _run(turn, message)
+
+
+def answer_confirmation(turn: Turn, confirmed: bool, card: dict[str, Any]) -> None:
+    """Carry a paused turn on with the handler's answer to the card they were shown."""
+    _run(turn, None, {"confirmed": confirmed, "card": card})

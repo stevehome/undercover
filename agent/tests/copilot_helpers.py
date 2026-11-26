@@ -4,30 +4,15 @@ records what it is given, and a client to the app that records what it sends."""
 from types import SimpleNamespace
 from typing import Any
 
-from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage, BaseMessage
 
 from agent.tests.conftest import REPLY_USAGE, StubModel
 from backend import copilot_conversations, copilot_turns
-from backend.main import app
 
 HANDLERS = {
     "dana.whitfield@undercover.example": "HND-01",
     "marcus.oyelaran@undercover.example": "HND-02",
 }
-
-
-class RecordingClient(TestClient):
-    """The app as the Copilot sees it, with no default headers: it keeps the headers
-    of every request it is sent."""
-
-    def __init__(self) -> None:
-        super().__init__(app)
-        self.sent: list[dict[str, str]] = []
-
-    def request(self, method: str, url: Any, *args: Any, **kwargs: Any):  # type: ignore[override]
-        self.sent.append(dict(kwargs.get("headers") or {}))
-        return super().request(method, url, *args, **kwargs)
 
 
 class SeenModel(StubModel):
@@ -50,6 +35,18 @@ def tool_call(name: str, args: dict[str, Any] | None = None, call_id: str = "1")
     return AIMessage(
         content="",
         tool_calls=[{"name": name, "args": args or {}, "id": call_id}],
+        response_metadata=REPLY_USAGE,
+    )
+
+
+def tool_calls(*calls: tuple[str, dict[str, Any]]) -> AIMessage:
+    """A reply that asks for several tools at once."""
+    return AIMessage(
+        content="",
+        tool_calls=[
+            {"name": name, "args": args, "id": str(i)}
+            for i, (name, args) in enumerate(calls)
+        ],
         response_metadata=REPLY_USAGE,
     )
 

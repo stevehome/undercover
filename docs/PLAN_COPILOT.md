@@ -119,7 +119,7 @@ The Copilot's graph answers a handler's question with its lookups and its first 
 
 The Copilot signs off a held payout only after the handler confirms, waits for the agent's work in code, and answers whether we're meeting the criteria from our records.
 
-- `agent/copilot_confirm.py`: the `confirm` node. It checks in code that the handler may sign off that claim (and that the claim is waiting for one), declines in the model's own terms if not, and otherwise reads the claim, customer, payout and the agent's reason from our records and pauses with them. A confirmed answer leaves the sign-off to `tools`; Cancel answers the call itself and the model asks what else. A second sign-off in the same reply is answered "one at a time".
+- `agent/copilot_confirm.py`: the `confirm` node (the card has `payout`, as the app's JSON reads a key named `amount` as money). It checks in code that the handler may sign off that claim (and that the claim is waiting for one), declines in the model's own terms if not, and otherwise reads the claim, customer, payout and the agent's reason from our records and pauses with them. A confirmed answer leaves the sign-off to `tools`; Cancel answers the call itself and the model asks what else. A second sign-off in the same reply is answered "one at a time".
 - `agent/copilot_tools.py`: `sign_off_claim` (the app's sign-off, which pays), `start_dispatch` and `start_evaluation` with `wait`, and `check_success_criteria`.
 - `agent/copilot_waiting.py`: polls a run every few seconds through `GET /api/runs/{id}` and stops after 15 minutes, saying the work is still going and where to follow it.
 - `agent/copilot_criteria.py`: the three criteria in `Decimal`: the held-out evaluation's `straight_through` against 70%, its `accuracy` against `objective_accuracy`, and the count of claims paid over the limit with their sign-offs (met, and say why, when none is paid over it yet).
@@ -128,16 +128,16 @@ The Copilot signs off a held payout only after the handler confirms, waits for t
 
 **Success criteria**
 
-- [ ] `uv run pytest agent -q` passes, adding:
-  - [ ] a sign-off call pauses with a card whose claim, customer, amount and reason are our records', not the model's arguments; nothing is paid and no write is made before the answer
-  - [ ] a handler who can't sign off over the limit (Marcus) is declined in code with the reason, with no card and no pause; a claim that isn't waiting is declined the same way
-  - [ ] a freshly built Copilot on the same saver, given the answer, signs off once (the backend's claim is decided, paid and names the handler), and nothing done before the pause is done again (counted on the stand-in app)
-  - [ ] Cancel pays nothing and the Copilot says so and asks what they'd like
-  - [ ] the answer arrives after a reload, a restart and with another session (a second graph object): the same result
-  - [ ] a wait ends when the run does, with its summary; at 15 minutes (a fake clock) it says it is still going; a dispatch the app refuses (one is running) passes on the reason; and the wait never calls the model
-  - [ ] the criteria come out right for: all three met; each one failing in turn; no claim paid over the limit; one paid over without a sign-off (made in the test); and an evaluation that failed or stopped (no figures for the first two, the third still reported); and the figures in the answer are the tool's
-  - [ ] a mixed reply (a sign-off with another lookup) runs the lookup and pauses once
-- [ ] `uv run pytest -q`, ruff and pyright pass; `docs/STATUS.md` is updated; committed.
+- [x] `uv run pytest agent -q` passes, adding:
+  - [x] a sign-off call pauses with a card whose claim, customer, amount and reason are our records', not the model's arguments; nothing is paid and no write is made before the answer
+  - [x] a handler who can't sign off over the limit (Marcus) is declined in code with the reason, with no card and no pause; a claim that isn't waiting is declined the same way
+  - [x] a freshly built Copilot on the same saver, given the answer, signs off once (the backend's claim is decided, paid and names the handler), and nothing done before the pause is done again (counted on the stand-in app)
+  - [x] Cancel pays nothing and the Copilot says so and asks what they'd like
+  - [x] the answer arrives after a reload, a restart and with another session (a second graph object): the same result
+  - [x] a wait ends when the run does, with its summary; at 15 minutes (a fake clock) it says it is still going; a dispatch the app refuses (one is running) passes on the reason; and the wait never calls the model
+  - [x] the criteria come out right for: all three met; each one failing in turn; no claim paid over the limit; one paid over without a sign-off (made in the test); and an evaluation that failed or stopped (no figures for the first two, the third still reported); and the figures in the answer are the tool's
+  - [x] a mixed reply (a sign-off with another lookup) runs the lookup and pauses once
+- [x] `uv run pytest -q`, ruff and pyright pass; `docs/STATUS.md` is updated; committed.
 
 ## Phase 4: The Copilot as an AgentCore app, and its deployment files
 

@@ -276,3 +276,26 @@ def stretches(monkeypatch):
         lambda round_id, run_id, resume: given.append((round_id, run_id, resume)),
     )
     return given
+
+
+class RecordingClient(TestClient):
+    """The app as the Copilot sees it, with no default headers: it keeps the headers
+    of every request it is sent."""
+
+    def __init__(self) -> None:
+        super().__init__(app)
+        self.sent: list[dict[str, str]] = []
+        self.requests: list[tuple[str, str]] = []
+
+    def request(self, method: str, url: Any, *args: Any, **kwargs: Any):  # type: ignore[override]
+        self.sent.append(dict(kwargs.get("headers") or {}))
+        self.requests.append((method, str(url)))
+        return super().request(method, url, *args, **kwargs)
+
+
+@pytest.fixture
+def app_client(monkeypatch):
+    """The Copilot's own client to the app: no key, and it keeps what it sends."""
+    client = RecordingClient()
+    monkeypatch.setattr(backend_http, "client", client)
+    return client
