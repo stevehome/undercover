@@ -8,25 +8,11 @@ it can't be, and a 400 that says what is wrong with a payload that is not right.
 from collections.abc import Callable
 from typing import Any, NamedTuple
 
-from pydantic import BaseModel, ConfigDict, ValidationError
-
-from agent import key_check, readiness, work_requests
+from agent import key_check, payloads, readiness, work_requests
 from agent.background_work import BackgroundWork
+from agent.payloads import OK, UNAUTHORIZED, Answer, Inputs, NoInputs
 
 HEALTH = "health"
-BAD_REQUEST = 400
-UNAUTHORIZED = 401
-OK = 200
-
-
-class Inputs(BaseModel):
-    """An operation's inputs; any input it doesn't name is wrong."""
-
-    model_config = ConfigDict(extra="forbid")
-
-
-class NoInputs(Inputs):
-    pass
 
 
 class WorkRun(Inputs):
@@ -44,13 +30,6 @@ class CarryRoundOn(Inputs):
 
 class ResumeClaim(Inputs):
     claim_id: str
-
-
-class Answer(NamedTuple):
-    """What a payload is answered with."""
-
-    status: int
-    body: dict[str, Any]
 
 
 class Operation(NamedTuple):
@@ -82,34 +61,15 @@ OPERATIONS = {
 }
 
 
-def _wrong(message: str) -> Answer:
-    return Answer(BAD_REQUEST, {"error": message})
-
-
-def _describe(error: ValidationError) -> str:
-    return "; ".join(
-        f"{'.'.join(str(part) for part in problem['loc'])}: {problem['msg']}"
-        for problem in error.errors()
-    )
-
-
 def handle(
     payload: Any, authorization: str | None, background: BackgroundWork
 ) -> Answer:
     """Check a payload and its key, get the agent ready and do what it asks."""
-    if not isinstance(payload, dict) or "operation" not in payload:
-        return _wrong('Send an object with an "operation" and its inputs')
-    name = payload["operation"]
-    operation = OPERATIONS.get(name)
-    if operation is None:
-        known = ", ".join(OPERATIONS)
-        return _wrong(f"Unknown operation {name!r}; the operations are {known}")
-    given = {key: value for key, value in payload.items() if key != "operation"}
-    try:
-        inputs = operation.inputs.model_validate(given)
-    except ValidationError as error:
-        return _wrong(f"{name}: {_describe(error)}")
+    read = payloads.read(payload, {name: o.inputs for name, o in OPERATIONS.items()})
+    if isinstance(read, Answer):
+        return read
+    name, inputs = read
     if name != HEALTH and (reason := key_check.refusal(authorization)):
         return Answer(UNAUTHORIZED, {"error": reason})
     readiness.ensure()
-    return Answer(OK, operation.run(inputs, background))
+    return Answer(OK, OPERATIONS[name].run(inputs, background))

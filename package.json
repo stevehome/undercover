@@ -7,7 +7,7 @@
   },
   "scripts": {
     "prepare": "lefthook install && playwright install chromium",
-    "dev": "concurrently -k -n backend,agent,dashboard,context npm:dev:backend npm:dev:agent npm:dev:dashboard npm:dev:context",
+    "dev": "concurrently -k -n backend,agent,copilot,dashboard,context npm:dev:backend npm:dev:agent npm:dev:copilot npm:dev:dashboard npm:dev:context",
     "dev:backend": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn backend.main:app --reload --reload-dir backend",
     "dev:dashboard": "vite dashboard",
     "format": "uv run ruff format && prettier --write -u dashboard e2e scripts *.config.*",
@@ -15,12 +15,13 @@
     "check": "npm run check:python && npm run check:server && npm run check:context && npm run check:runtime && npm run check:ts && npm run e2e",
     "check:python": "uv run ruff format --check && uv run ruff check && pyright && uv run pytest -q",
     "check:context": "uv run --isolated --only-group context python -c \"import context.server\"",
-    "check:runtime": "uv run --isolated --only-group runtime python -c \"import runtime.main\"",
+    "check:runtime": "uv run --isolated --only-group runtime python -c \"import runtime.main, runtime.copilot\"",
     "check:server": "uv run --isolated --only-group server python -c \"import backend.main\"",
     "check:ts": "prettier --check -u dashboard e2e scripts *.config.* && eslint dashboard e2e scripts *.config.* && tsc && vitest run --root dashboard --coverage",
     "e2e": "playwright test",
     "seed": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m backend.seed",
     "dev:context": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m context",
+    "dev:copilot": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn agent.copilot_entrypoint:app --host 127.0.0.1 --port 8081 --reload --reload-dir agent",
     "dev:agent": "node --env-file-if-exists=.env scripts/run-with-env.mjs uv run -m uvicorn agent.entrypoint:app --host 127.0.0.1 --port 8080 --reload --reload-dir agent"
   },
   "dependencies": {

@@ -154,11 +154,11 @@ The Copilot answers its health check through the file Runtime starts, takes a tu
 
 **Success criteria**
 
-- [ ] `uv run pytest agent -q` passes: a payload with a missing or wrong input, or an unknown operation, is a 400 that says what; `health` answers without a key; `start_turn` answers `accepted` at once and the turn goes on as a registered task (the ping says `HealthyBusy`); getting ready fails once and works on the next request; nothing is fetched or opened at import.
-- [ ] `npm run check:runtime` passes, and `uv run --env-file .env --isolated --only-group runtime python -m runtime.copilot`'s app answers `{"operation": "health"}` with `{"healthy": true}` on 8081, with only the `runtime` dependency group.
-- [ ] `agentcore/agentcore.json` has two runtimes, both on V2 through the stack's override; `npx cdk synth` through `agentcore/cdk` (or the CLI's own dry run, if it has one) shows both runtimes and the Copilot's role with its policy, without deploying; the claim agent's runtime is unchanged.
-- [ ] `npm run dev` starts the Copilot beside the rest on 8081. A test serves the Copilot's app on a local port with a stub model, as the claim agent's tests serve theirs, and the app reaches it: a message to `POST /api/copilot/conversations/{id}/messages` starts a turn there and the turn's steps and answer come back through the app. No test calls a real model.
-- [ ] `npm run check:python`, `check:server`, `check:context` and `check:runtime` pass; the docs are updated; committed.
+- [x] `uv run pytest agent -q` passes: a payload with a missing or wrong input, or an unknown operation, is a 400 that says what; `health` answers without a key; `start_turn` answers `accepted` at once and the turn goes on as a registered task (the ping says `HealthyBusy`); getting ready fails once and works on the next request; nothing is fetched or opened at import.
+- [x] `npm run check:runtime` passes, and the Copilot's app, started with `uv run --env-file .env --isolated --only-group runtime python -c "from agent.copilot_entrypoint import app; app.run(port=8081)"` (`runtime/copilot.py` itself serves on 8080, as Runtime needs), answers `{"operation": "health"}` with `{"healthy": true}`, with only the `runtime` dependency group.
+- [x] `agentcore/agentcore.json` has two runtimes, both on V2 through the stack's override; `npx cdk synth` through `agentcore/cdk` (or the CLI's own dry run, if it has one) shows both runtimes and the Copilot's role with its policy, without deploying; the claim agent's runtime is unchanged.
+- [x] `npm run dev` starts the Copilot beside the rest on 8081. A test serves the Copilot's app on a local port with a stub model, as the claim agent's tests serve theirs, and the app reaches it: a message to `POST /api/copilot/conversations/{id}/messages` starts a turn there and the turn's steps and answer come back through the app. No test calls a real model.
+- [x] `npm run check:python`, `check:server`, `check:context` and `check:runtime` pass; the docs are updated; committed.
 
 ## Phase 5: The sidebar
 
