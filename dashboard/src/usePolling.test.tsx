@@ -72,3 +72,19 @@ it("does not start a poll while the last one is still waiting", async () => {
   });
   expect(fetchNumber).toHaveBeenCalledTimes(2);
 });
+
+it("polls at the interval it is given", async () => {
+  const loads = vi.fn(() => Promise.resolve());
+  function Probe2() {
+    const load = useCallback(() => loads(), []);
+    usePolling(load, true, 1000);
+    return null;
+  }
+  render(<Probe2 />);
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(3000);
+  });
+
+  expect(loads.mock.calls).toHaveLength(4);
+});

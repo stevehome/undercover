@@ -33,12 +33,18 @@ export default defineConfig({
       url: "http://127.0.0.1:8003/calls",
     },
     {
+      command: "node e2e/copilotStandIn.mjs",
+      url: "http://127.0.0.1:8007/payloads",
+    },
+    {
       command: "uv run -m uvicorn backend.main:app --port 8010",
       url: "http://127.0.0.1:8010/api/health",
       env: {
         UNDERCOVER_API_KEY: agentKey,
         UNDERCOVER_AGENT: "http://127.0.0.1:8003",
         UNDERCOVER_AGENT_RUNTIME: "",
+        UNDERCOVER_COPILOT: "http://127.0.0.1:8007",
+        UNDERCOVER_COPILOT_RUNTIME: "",
         VITE_SUPABASE_URL: authStandIn,
         OPENROUTER_ORIGIN: "http://127.0.0.1:8005",
         OPENROUTER_API_KEY: "e2e-key",

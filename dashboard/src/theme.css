@@ -599,3 +599,348 @@ table.data td.number {
 .panel section + section {
   margin-top: 2rem;
 }
+
+/* The Copilot's sidebar, beside every page. */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+}
+
+.app-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.copilot {
+  position: sticky;
+  top: 0;
+  flex: none;
+  width: 380px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--panel);
+  border-radius: 16px 0 0 16px;
+}
+
+.copilot.collapsed {
+  width: 52px;
+  padding: 0.5rem;
+  align-items: center;
+}
+
+.copilot-tab,
+.icon-button {
+  background: transparent;
+  color: var(--ink);
+  padding: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.copilot.collapsed .copilot-tab {
+  flex-direction: column;
+  padding: 0.6rem 0.4rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sea-green) 22%, transparent);
+}
+
+.copilot-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copilot-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.conversation-list ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 7rem;
+  overflow-y: auto;
+}
+
+button.link {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+  padding: 0.2rem 0;
+  border-radius: 6px;
+  width: 100%;
+}
+
+button.link[aria-current="true"] {
+  font-weight: 700;
+  color: var(--cerulean);
+}
+
+.copilot-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.greeting h3 {
+  margin: 0.5rem 0;
+}
+
+.greeting ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.greeting button {
+  width: 100%;
+  text-align: left;
+  border-radius: 12px;
+}
+
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.message {
+  margin: 0.4rem 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 14px;
+  max-width: 92%;
+}
+
+.message.from-handler {
+  margin-left: auto;
+  background: color-mix(in srgb, var(--sea-green) 26%, transparent);
+}
+
+.message.from-copilot {
+  background: var(--background);
+}
+
+.answer-text > :first-child {
+  margin-top: 0;
+}
+
+.answer-text > :last-child {
+  margin-bottom: 0;
+}
+
+.answer-text table {
+  font-size: 0.85rem;
+}
+
+.usage {
+  display: block;
+  margin-top: 0.7rem;
+  opacity: 0.7;
+}
+
+.step-card {
+  margin: 0.3rem 0 0.3rem 0.5rem;
+  border-radius: 12px;
+  background: var(--background);
+  animation: card-in 0.25s ease-out;
+}
+
+.step-card.action {
+  background: color-mix(in srgb, var(--marigold) 28%, transparent);
+}
+
+.step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+  border-radius: 12px;
+  padding: 0.45rem 0.7rem;
+}
+
+.step-name {
+  font-weight: 700;
+}
+
+.step-input {
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 11rem;
+}
+
+.step-state {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.step-state.working {
+  color: var(--cerulean);
+}
+
+.step-state.done {
+  color: color-mix(in srgb, var(--sea-green) 55%, var(--ink));
+}
+
+.step-state.refused,
+.step-state.failed {
+  color: var(--raspberry);
+  font-weight: 700;
+}
+
+.step-reason {
+  margin: 0;
+  padding: 0 0.7rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--raspberry);
+}
+
+.step-body {
+  padding: 0 0.7rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.step-body h4 {
+  margin: 0.4rem 0 0.1rem;
+}
+
+.step-body pre {
+  max-height: 10rem;
+  overflow: auto;
+  margin: 0;
+}
+
+.step-files {
+  padding-left: 1.1rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--cerulean) 30%, transparent);
+  border-top-color: var(--cerulean);
+  animation: spin 0.9s linear infinite;
+  vertical-align: -0.1rem;
+}
+
+.working-indicator,
+.stopped-note {
+  margin: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.confirmation-card {
+  margin: 0.5rem 0;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--marigold) 30%, transparent);
+}
+
+.confirmation-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.confirmation-card dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0 0 0.75rem;
+}
+
+.confirmation-card dd {
+  margin: 0;
+}
+
+.composer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.composer textarea {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: none;
+  color: var(--ink);
+  background: var(--background);
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.copilot-problem {
+  margin: 0;
+  color: var(--raspberry);
+  font-size: 0.85rem;
+}
+
+.copilot-foot {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-card,
+  .spinner {
+    animation: none;
+  }
+}
+
+/* On a narrow window the sidebar opens over the page. */
+@media (max-width: 900px) {
+  .copilot {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    width: min(420px, 100vw);
+  }
+
+  .copilot.collapsed {
+    height: auto;
+    bottom: auto;
+    top: 4rem;
+    width: 52px;
+    border-radius: 16px 0 0 16px;
+  }
+}

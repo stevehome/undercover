@@ -1,8 +1,16 @@
-import { accessToken, signOut } from "./auth";
+import { accessToken, renewSignIn, signOut } from "./auth";
 import { parseCents, parseNanos } from "./money";
 import type {
+  CardKind,
   Claim,
   ClaimGrade,
+  ConfirmationCard,
+  Conversation,
+  ConversationSummary,
+  CopilotMessage,
+  CopilotStep,
+  StepState,
+  TurnStatus,
   ClaimSummary,
   EvalSet,
   Evaluation,
@@ -404,3 +412,87 @@ export const changeSetting = (key: string, value: string) =>
   post(`/api/settings/${key}`, { value });
 
 export const fetchModels = () => getJson<AllowedModel[]>("/api/models");
+
+const CARD_KINDS: CardKind[] = [
+  "claims",
+  "customers",
+  "context",
+  "agent work",
+  "memory",
+  "action",
+];
+const STEP_STATES: StepState[] = ["working", "done", "refused", "failed"];
+const TURN_STATUSES: TurnStatus[] = [
+  "working",
+  "waiting for a confirmation",
+  "done",
+  "failed",
+  "stopped",
+];
+
+/** Check a value is one of a set, as a step of an unknown kind is refused. */
+function known<T extends string>(what: string, value: string, set: T[]): T {
+  const found = set.find((item) => item === value);
+  if (found === undefined) throw new Error(`A ${what} we don't know: ${value}`);
+  return found;
+}
+
+type WireCopilotStep = Omit<CopilotStep, "kind" | "state"> & {
+  kind: string;
+  state: string;
+};
+type WireMessage = Omit<CopilotMessage, "cost_nanos"> & { cost: string | null };
+type WireConversation = Omit<
+  Conversation,
+  "status" | "card" | "messages" | "steps"
+> & {
+  status: string;
+  card: (Omit<ConfirmationCard, "payout"> & { payout: string }) | null;
+  messages: WireMessage[];
+  steps: WireCopilotStep[];
+};
+
+/** A conversation as the sidebar reads it; a kind, state or status we don't know is an error. */
+export async function fetchConversation(id: string): Promise<Conversation> {
+  const wire = await getJson<WireConversation>(
+    `/api/copilot/conversations/${id}`,
+  );
+  return {
+    ...wire,
+    status: known("turn status", wire.status, TURN_STATUSES),
+    card: wire.card && { ...wire.card, payout: parseCents(wire.card.payout) },
+    messages: wire.messages.map(({ cost, ...message }) => ({
+      ...message,
+      cost_nanos: cost === null ? null : parseNanos(cost),
+    })),
+    steps: wire.steps.map((step) => ({
+      ...step,
+      kind: known("kind of card", step.kind, CARD_KINDS),
+      state: known("step state", step.state, STEP_STATES),
+    })),
+  };
+}
+
+export const fetchConversations = () =>
+  getJson<ConversationSummary[]>("/api/copilot/conversations");
+
+export async function makeConversation(): Promise<string> {
+  const response = await send("/api/copilot/conversations", { method: "POST" });
+  if (!response.ok) throw await refusal("a conversation", response);
+  return ((await response.json()) as { conversation_id: string })
+    .conversation_id;
+}
+
+/** Send a message; the sign-in is renewed first, since the Copilot works with it. */
+export async function sendMessage(id: string, text: string): Promise<void> {
+  await renewSignIn();
+  await post(`/api/copilot/conversations/${id}/messages`, { text });
+}
+
+export async function answerConfirmation(
+  id: string,
+  confirmed: boolean,
+): Promise<void> {
+  await renewSignIn();
+  await post(`/api/copilot/conversations/${id}/confirmation`, { confirmed });
+}

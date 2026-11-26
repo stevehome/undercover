@@ -85,6 +85,7 @@ const dana: Handler = {
 
 function bodyFor(url: string): unknown {
   if (url === "/api/me") return dana;
+  if (url === "/api/copilot/conversations") return [];
   if (url === "/api/claims") return claims.map(summaryToWire);
   if (url.endsWith("/steps")) return [] as Step[];
   return claimToWire(claim);

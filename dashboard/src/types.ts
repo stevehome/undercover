@@ -371,3 +371,61 @@ export interface Round {
   spending_limit: number;
   proposals: Proposal[];
 }
+
+export type CardKind =
+  "claims" | "customers" | "context" | "agent work" | "memory" | "action";
+
+export type StepState = "working" | "done" | "refused" | "failed";
+
+export type TurnStatus =
+  "working" | "waiting for a confirmation" | "done" | "failed" | "stopped";
+
+/** One tool call of a Copilot turn, shown as a card. */
+export interface CopilotStep {
+  id: number;
+  message_id: number;
+  tool: string;
+  kind: CardKind;
+  input: string;
+  state: StepState;
+  started_on: string;
+  seconds: number | null;
+  result: string | null;
+  files: Record<string, FileSource> | null;
+  reason: string | null;
+}
+
+export interface CopilotMessage {
+  id: number;
+  role: "handler" | "copilot";
+  text: string;
+  created_on: string;
+  model_calls: number | null;
+  cost_nanos: number | null;
+  seconds: number | null;
+}
+
+/** What a handler is asked to confirm before a payout is signed off. */
+export interface ConfirmationCard {
+  kind: "sign_off";
+  claim_id: string;
+  customer: { customer_id: string; name: string };
+  payout: number;
+  reason: string;
+}
+
+export interface Conversation {
+  conversation_id: string;
+  title: string | null;
+  status: TurnStatus;
+  card: ConfirmationCard | null;
+  failure: string | null;
+  messages: CopilotMessage[];
+  steps: CopilotStep[];
+}
+
+export interface ConversationSummary {
+  conversation_id: string;
+  title: string | null;
+  created_on: string;
+}

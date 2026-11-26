@@ -175,10 +175,10 @@ A handler sees and uses the Copilot on every page: a conversation with each step
 
 **Success criteria**
 
-- [ ] `npm run check:ts` passes with 80% coverage: component tests for a card in each state and kind, the confirmation card's two buttons, answer text (a table, a list, a claim id link, raw HTML shown as text), the composer's keys and its disabled states, the list, the collapse and its memory, the narrow window's overlay, and the renewal of a sign-in under 20 minutes.
-- [ ] `npm run e2e` passes, adding the Copilot's spec (the scripted turn's cards arrive one by one; the action's card stands out; a refusal shows its reason; Cancel and Sign off and pay each work; a reload keeps the waiting card; a second handler doesn't see the first's conversation), and every existing spec passes with the sidebar open.
-- [ ] Checked in the browser (Playwright MCP) against the stand-in, in light and dark mode: the greeting and suggested questions, the cards' animation, the markdown, the collapsed tab, and a narrow window; the fonts and colors match `docs/BRAND.md`, with no one-edge borders or gradients.
-- [ ] `npm run check` is green with `.env` moved out of the way; `docs/STATUS.md` is updated; committed.
+- [x] `npm run check:ts` passes with 80% coverage: component tests for a card in each state and kind, the confirmation card's two buttons, answer text (a table, a list, a claim id link, raw HTML shown as text), the composer's keys and its disabled states, the list, the collapse and its memory, the narrow window's overlay, and the renewal of a sign-in under 20 minutes.
+- [x] `npm run e2e` passes, adding the Copilot's spec (the scripted turn's cards arrive one by one; the action's card stands out; a refusal shows its reason; Cancel and Sign off and pay each work; a reload keeps the waiting card; a second handler doesn't see the first's conversation), and every existing spec passes with the sidebar open.
+- [x] Checked in the browser (Playwright MCP) against the stand-in, in light and dark mode: the greeting and suggested questions, the cards' animation, the markdown, the collapsed tab, and a narrow window; the fonts and colors match `docs/BRAND.md`, with no one-edge borders or gradients.
+- [x] `npm run check` is green with `.env` moved out of the way; `docs/STATUS.md` is updated; committed.
 
 ## Phase 6: The live checks and the last of the documents
 

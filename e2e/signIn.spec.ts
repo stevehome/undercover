@@ -27,7 +27,9 @@ test("a handler signs in, the header names them, and signing out returns to sign
   page,
 }) => {
   await signIn(page, "marcus.oyelaran");
-  await expect(page.getByText("Marcus Oyelaran")).toBeVisible();
+  await expect(
+    page.getByText("Marcus Oyelaran", { exact: true }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Sign out" }).click();
 

@@ -4,6 +4,7 @@ import { fetchMe } from "./api";
 import { signOut } from "./auth";
 import { LoadError } from "./components/LoadError";
 import { Loading } from "./components/Loading";
+import { CopilotSidebar } from "./components/CopilotSidebar";
 import { Navigation } from "./components/Navigation";
 import { ClaimPage } from "./pages/ClaimPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
@@ -31,29 +32,34 @@ function Shell() {
 
   return (
     <MeContext.Provider value={me}>
-      <header className="app-header">
-        <Navigation />
-        <div className="signed-in">
-          <span>{me.name}</span>
-          <button
-            type="button"
-            onClick={() => {
-              void signOut();
-            }}
-          >
-            Sign out
-          </button>
+      <div className="app-shell">
+        <div className="app-column">
+          <header className="app-header">
+            <Navigation />
+            <div className="signed-in">
+              <span>{me.name}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  void signOut();
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          </header>
+          <Routes>
+            <Route path="/" element={<QueuePage />} />
+            <Route path="/claims/:claimId" element={<ClaimPage />} />
+            <Route path="/scoreboard" element={<ScoreboardPage />} />
+            <Route path="/evaluations/:runId" element={<EvaluationPage />} />
+            <Route path="/improvement" element={<ImprovementPage />} />
+            <Route path="/configuration" element={<ConfigurationPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
         </div>
-      </header>
-      <Routes>
-        <Route path="/" element={<QueuePage />} />
-        <Route path="/claims/:claimId" element={<ClaimPage />} />
-        <Route path="/scoreboard" element={<ScoreboardPage />} />
-        <Route path="/evaluations/:runId" element={<EvaluationPage />} />
-        <Route path="/improvement" element={<ImprovementPage />} />
-        <Route path="/configuration" element={<ConfigurationPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+        <CopilotSidebar me={me} />
+      </div>
     </MeContext.Provider>
   );
 }

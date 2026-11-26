@@ -22,6 +22,21 @@ export async function accessToken(): Promise<string | null> {
   return data.session?.access_token ?? null;
 }
 
+/** Seconds a sign-in may have left before it is renewed: the Copilot works with it. */
+export const RENEW_BELOW_SECONDS = 20 * 60;
+
+/** Renew the session when its sign-in has less than twenty minutes left. */
+export async function renewSignIn(): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const expires = data.session?.expires_at;
+  if (
+    expires !== undefined &&
+    expires - Date.now() / 1000 < RENEW_BELOW_SECONDS
+  ) {
+    await supabase.auth.refreshSession();
+  }
+}
+
 /** Call back with whether a handler is signed in, now and on every change. */
 export function onSignedIn(callback: (signedIn: boolean) => void): () => void {
   const { data } = supabase.auth.onAuthStateChange((_event, session) => {

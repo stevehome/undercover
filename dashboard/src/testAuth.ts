@@ -29,3 +29,5 @@ export const signOut = vi.fn(() => {
 });
 
 export const accessToken = vi.fn(() => Promise.resolve("test-token"));
+
+export const renewSignIn = vi.fn(() => Promise.resolve());

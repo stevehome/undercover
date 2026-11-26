@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 const POLL_MS = 2000;
 
 /**
- * Call `load` now, and every two seconds while `active` is true, skipping a
+ * Call `load` now, and every two seconds (or `intervalMs`) while `active` is true, skipping a
  * tick while the last call is still waiting so slow answers never overlap.
  * Returns whether the latest call failed.
  */
 export function usePolling(
   load: () => Promise<unknown>,
   active: boolean,
+  intervalMs = POLL_MS,
 ): boolean {
   const [failed, setFailed] = useState(false);
 
@@ -33,11 +34,11 @@ export function usePolling(
     };
     run();
     if (!active) return;
-    const interval = setInterval(run, POLL_MS);
+    const interval = setInterval(run, intervalMs);
     return () => {
       clearInterval(interval);
     };
-  }, [load, active]);
+  }, [load, active, intervalMs]);
 
   return failed;
 }

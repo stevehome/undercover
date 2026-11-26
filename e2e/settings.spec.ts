@@ -55,7 +55,7 @@ unsigned(
     await expect(
       page.getByText(/Marcus Oyelaran can't change settings/),
     ).toBeVisible();
-    await expect(page.getByRole("textbox")).toHaveCount(0);
+    await expect(page.getByRole("main").getByRole("textbox")).toHaveCount(0);
     await expect(
       page.getByRole("heading", { name: "Models allowed" }),
     ).toBeVisible();
