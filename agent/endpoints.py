@@ -10,6 +10,7 @@ GATEWAY_URL = "UNDERCOVER_GATEWAY_URL"
 CONTEXT_URL = "UNDERCOVER_CONTEXT"
 MEMORY_ID = "UNDERCOVER_MEMORY_ID"
 API_URL = "UNDERCOVER_API"
+COPILOT_MEMORY_ID = "UNDERCOVER_COPILOT_MEMORY_ID"
 
 
 def gateway_url() -> str | None:
@@ -30,3 +31,8 @@ def memory_id() -> str | None:
 def api_url() -> str | None:
     """Return the app's address, or None for the one on this laptop."""
     return os.environ.get(API_URL) or None
+
+
+def copilot_memory_id() -> str | None:
+    """Return the id of the Copilot's AgentCore Memory, or None when it has none."""
+    return os.environ.get(COPILOT_MEMORY_ID) or None

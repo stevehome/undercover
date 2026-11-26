@@ -8,6 +8,7 @@ where `.env` puts it on a laptop. This is the one module that imports
 """
 
 import os
+from collections.abc import Collection
 
 from bedrock_agentcore.identity.auth import requires_api_key
 
@@ -40,7 +41,11 @@ def from_identity(provider: str) -> str:
     return value()
 
 
-def fetch() -> None:
-    """Put each credential's value from Identity into its setting."""
+def fetch(only: Collection[str] | None = None) -> None:
+    """Put each credential's value from Identity into its setting.
+
+    With `only`, fetch just those settings: the Copilot never fetches the agent's key.
+    """
     for setting, provider in providers().items():
-        os.environ[setting] = from_identity(provider)
+        if only is None or setting in only:
+            os.environ[setting] = from_identity(provider)

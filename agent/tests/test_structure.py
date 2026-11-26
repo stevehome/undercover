@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HTTP_CLIENTS = {
     "api.py",
     "backend_http.py",
+    "copilot_api.py",
     "deadline.py",
     "direct.py",
     "improver_api.py",
@@ -242,3 +243,55 @@ def test_the_apps_address_is_read_only_by_the_endpoints_module():
             assert "UNDERCOVER_API" not in path.read_text().replace(
                 "UNDERCOVER_API_KEY", ""
             ), path.name
+
+
+COPILOT_MODULES = sorted((ROOT / "agent").glob("copilot_*.py"))
+THE_AGENTS_KEY = {"send", "require_key", "API_KEY_VARIABLE", "API_KEY_HEADER"}
+
+
+def _imported_names(path):
+    names = set()
+    for node in ast.walk(ast.parse(path.read_text())):
+        if isinstance(node, ast.ImportFrom):
+            names.update(a.name for a in node.names)
+            names.add(node.module or "")
+    return names
+
+
+def test_the_copilot_never_reaches_the_agents_key_or_the_agents_client():
+    """The Copilot calls the app as a handler. Only its route to the context layer
+    may import the claim agent's routes, and that route refuses the app's target."""
+    assert COPILOT_MODULES
+    for path in COPILOT_MODULES:
+        names = _imported_names(path)
+        assert not names & THE_AGENTS_KEY, path.name
+        assert "agent.api" not in names, path.name
+        assert "UNDERCOVER_API_KEY" not in path.read_text(), path.name
+        if path.name != "copilot_route.py":
+            assert not names & {"agent.direct", "agent.gateway", "agent.routes"}, (
+                path.name
+            )
+
+
+def test_only_the_copilots_client_sends_requests_as_a_handler():
+    callers = [
+        path.name
+        for path in (ROOT / "agent").glob("*.py")
+        if "backend_http.request" in path.read_text()
+    ]
+    assert callers == ["copilot_api.py"]
+
+
+def test_the_copilots_client_cant_reach_the_rounds_the_improver_or_a_decision():
+    forbidden = (
+        "/api/improver",
+        "/api/rounds",
+        "/api/proposals",
+        "/api/configuration",
+        "/api/models",
+    )
+    paths = _paths(ROOT / "agent" / "copilot_api.py")
+    assert paths
+    for path in paths:
+        assert not path.startswith(forbidden), path
+        assert not path.endswith(("/decision", "/payment")), path

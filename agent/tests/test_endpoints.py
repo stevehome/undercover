@@ -46,3 +46,12 @@ def test_the_apps_address_is_this_laptop_when_none_is_set(monkeypatch):
 
     assert endpoints.api_url() is None
     assert str(backend_http._client().base_url) == "http://localhost:8000"  # noqa: SLF001
+
+
+def test_the_copilots_memory_is_read_when_asked(monkeypatch):
+    monkeypatch.delenv(endpoints.COPILOT_MEMORY_ID, raising=False)
+    assert endpoints.copilot_memory_id() is None
+
+    monkeypatch.setenv(endpoints.COPILOT_MEMORY_ID, "copilot-memory-1")
+
+    assert endpoints.copilot_memory_id() == "copilot-memory-1"

@@ -1,8 +1,11 @@
 """The calls to the backend that both of the agent's clients share.
 
-`api.py` is the claim agent's client and `improver_api.py` the improver's. Each
-holds its own operations, so the claim agent has no way to the scores; this holds
-only the plumbing: the one HTTP client and what a refusal looks like.
+`api.py` is the claim agent's client, `improver_api.py` the improver's and
+`copilot_api.py` the Copilot's. Each holds its own operations, so the claim agent has
+no way to the scores; this holds only the plumbing: the one HTTP client and what a
+refusal looks like. The claim agent and the improver call as the agent, with its key
+(`send`); the Copilot calls as a handler, with the handler's sign-in and never the
+key (`request`).
 """
 
 import os
@@ -44,19 +47,26 @@ def require_key() -> str:
     return key
 
 
-def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
-    """Send one request to the backend with the API key, read as it is sent.
+def request(
+    method: str, path: str, headers: dict[str, str], **kwargs: Any
+) -> httpx.Response:
+    """Send one request to the backend with these headers, read as it is sent.
 
     A 429 means the request was not run, as when Lambda has no free slot for it, so
     it is sent again after a wait that grows, up to BUSY_TRIES times in all.
     """
-    headers = {**kwargs.pop("headers", {}), API_KEY_HEADER: require_key()}
     for tries in range(1, BUSY_TRIES):
         response = _client().request(method, path, headers=headers, **kwargs)
         if response.status_code != TOO_MANY_REQUESTS:
             return response
         time.sleep(min(2**tries, LONGEST_WAIT_SECONDS) * random.uniform(0.5, 1.5))  # noqa: S311 - jitter
     return _client().request(method, path, headers=headers, **kwargs)
+
+
+def send(method: str, path: str, **kwargs: Any) -> httpx.Response:
+    """Send one request to the backend with the agent's API key."""
+    headers = {**kwargs.pop("headers", {}), API_KEY_HEADER: require_key()}
+    return request(method, path, headers, **kwargs)
 
 
 class ApiRefusal(Refusal):
@@ -67,7 +77,7 @@ class ApiRefusal(Refusal):
         self.status_code = status_code
 
 
-def _answer(response: httpx.Response) -> Any:
+def answer(response: httpx.Response) -> Any:
     """Return the backend's JSON; a 4xx is an ApiRefusal."""
     if response.is_client_error:
         detail = response.json().get("detail", response.text)
@@ -84,7 +94,7 @@ def call(method: str, path: str, attempts: int = 1, **kwargs: Any) -> Any:
     """
     for _ in range(attempts - 1):
         try:
-            return _answer(send(method, path, **kwargs))
+            return answer(send(method, path, **kwargs))
         except httpx.TimeoutException:
             continue
-    return _answer(send(method, path, **kwargs))
+    return answer(send(method, path, **kwargs))

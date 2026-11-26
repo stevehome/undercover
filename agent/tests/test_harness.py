@@ -39,3 +39,11 @@ def test_model_has_a_request_timeout():
     settings = harness.model_settings(VERSION_1)
 
     assert harness.model(settings).request_timeout == harness.MODEL_TIMEOUT_SECONDS
+
+
+def test_the_copilots_model_is_the_one_the_app_names():
+    named = harness.copilot_model("openai/gpt-6-luna", "medium")
+    unset = harness.copilot_model("openrouter/free", "default")
+
+    assert (named.model_name, named.reasoning_effort) == ("openai/gpt-6-luna", "medium")
+    assert (unset.model_name, unset.reasoning_effort) == ("openrouter/free", None)

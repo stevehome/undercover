@@ -72,6 +72,11 @@ def model(settings: ModelSettings) -> ChatOpenAI:
     )
 
 
+def copilot_model(name: str, reasoning_effort: str) -> ChatOpenAI:
+    """Return the Copilot's model, which the app names in each turn's payload."""
+    return model(ModelSettings(name, reasoning_effort))
+
+
 def improver_model(settings: ModelSettings) -> ChatOpenAI:
     """Return the improver's model, with parallel tool calls off.
 

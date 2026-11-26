@@ -103,17 +103,17 @@ The Copilot's graph answers a handler's question with its lookups and its first 
 
 **Success criteria**
 
-- [ ] `uv run pytest agent -q` passes with a stub model, a stand-in memory and the real backend through `TestClient` with a signed-in Dana (the backend tests' signing helper):
-  - [ ] a turn asks who is signed in before any model call; a refused sign-in ends it with no call to the model
-  - [ ] a lookup, a customer by name and an action each make a card that goes working, then done with its time, in the app's record; a refused call (the backend's 409 for a second dispatch) is a refused card and the answer passes on the reason
-  - [ ] every call to the app carries the handler's sign-in and never the agent's key; a context-layer call goes through the context-only route and the app target is refused
-  - [ ] the sign-in is in no checkpoint (the in-memory saver's storage is searched), no step and no log record
-  - [ ] a turn stops at 25 model calls with a failed turn and a message; its calls and cost are the turn's totals
-  - [ ] with memory on, the first card is the lookup with what it found and the turn's end saves the message and the answer and nothing else, as two events, with the handler's id as the actor and the conversation as the session; with it off there is no card and no save; another handler's memory is never searched
-  - [ ] a turn stopped partway is carried on by a new message, with its unfinished tool calls answered
-  - [ ] a restart (a freshly built graph on the same saver) carries a conversation on with all its earlier messages
-  - [ ] the structure tests pass with the new rules
-- [ ] `uv run pytest -q`, ruff and pyright pass; `docs/STATUS.md` is updated; committed.
+- [x] `uv run pytest agent -q` passes with a stub model, a stand-in memory and the real backend through `TestClient` with a signed-in Dana (the backend tests' signing helper):
+  - [x] a turn asks who is signed in before any model call; a refused sign-in ends it with no call to the model
+  - [x] a lookup, a customer by name and an action each make a card that goes working, then done with its time, in the app's record; a refused call (the backend's 409 for a second dispatch) is a refused card and the answer passes on the reason
+  - [x] every call to the app carries the handler's sign-in and never the agent's key; a context-layer call goes through the context-only route and the app target is refused
+  - [x] the sign-in is in no checkpoint (the in-memory saver's storage is searched), no step and no log record
+  - [x] a turn stops at 25 model calls with a failed turn and a message; its calls and cost are the turn's totals
+  - [x] with memory on, the first card is the lookup with what it found and the turn's end saves the message and the answer and nothing else, as two events, with the handler's id as the actor and the conversation as the session; with it off there is no card and no save; another handler's memory is never searched
+  - [x] a turn stopped partway is carried on by a new message, with its unfinished tool calls answered
+  - [x] a restart (a freshly built graph on the same saver) carries a conversation on with all its earlier messages
+  - [x] the structure tests pass with the new rules
+- [x] `uv run pytest -q`, ruff and pyright pass; `docs/STATUS.md` is updated; committed.
 
 ## Phase 3: The pause, the wait and the success criteria
 
