@@ -12,28 +12,28 @@ import logging
 import os
 from typing import Any
 
-from backend import agent_laptop, agent_runtime, stopwatch
+from backend import agent_answer, agent_laptop, agent_runtime, stopwatch
 from backend.errors import Conflict, ServiceUnavailable, Unconfirmed
+
+DEFAULT_AGENT_URL = "http://127.0.0.1:8080"
 
 logger = logging.getLogger(__name__)
 
 
 def _ask(operation: str, **inputs: Any) -> dict[str, Any]:
     """Send one operation; return the agent's answer when it took the work."""
-    route = (
-        agent_runtime if os.environ.get("UNDERCOVER_AGENT_RUNTIME") else agent_laptop
-    )
+    payload = {"operation": operation, **inputs}
     watch = stopwatch.Stopwatch(f"The agent's answer to {operation}")
     try:
-        answer = route.post({"operation": operation, **inputs})
+        if arn := os.environ.get("UNDERCOVER_AGENT_RUNTIME"):
+            answer = agent_runtime.post(payload, arn)
+        else:
+            url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
+            answer = agent_laptop.post(payload, url, with_key=True)
     finally:
         watch.lap("the agent's answer")
         watch.log()
-    if "refused" in answer:
-        raise Conflict(answer["refused"])
-    if not answer.get("accepted"):
-        raise ServiceUnavailable(f"The agent didn't take it: {answer}")
-    return answer
+    return agent_answer.taken(answer, "The agent")
 
 
 def work_run(run_id: int) -> None:

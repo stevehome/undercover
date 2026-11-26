@@ -84,3 +84,34 @@ class ProposalStatus(StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+
+
+class TurnStatus(StrEnum):
+    """Where a Copilot conversation's turn stands. `STOPPED` is never stored: it is
+    what a turn that has worked too long reads as."""
+
+    WORKING = "working"
+    WAITING = "waiting for a confirmation"
+    DONE = "done"
+    FAILED = "failed"
+    STOPPED = "stopped"
+
+
+class StepState(StrEnum):
+    """Where one step of the Copilot's turn stands."""
+
+    WORKING = "working"
+    DONE = "done"
+    REFUSED = "refused"
+    FAILED = "failed"
+
+
+class CardKind(StrEnum):
+    """What a step of the Copilot's turn looks at or does, for its card."""
+
+    CLAIMS = "claims"
+    CUSTOMERS = "customers"
+    CONTEXT = "context"
+    AGENT_WORK = "agent work"
+    MEMORY = "memory"
+    ACTION = "action"

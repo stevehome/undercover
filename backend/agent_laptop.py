@@ -1,4 +1,8 @@
-"""Asking the agent on a host of its own: a payload to `/invocations` with the key."""
+"""Asking an AgentCore app on a host of its own: a payload to `/invocations`.
+
+The claim agent is asked with the agent's key. The Copilot is asked with none: it
+holds the handler's sign-in, which is in the payload, and never the agent's key.
+"""
 
 import os
 from typing import Any
@@ -7,24 +11,26 @@ import httpx
 
 from backend.errors import ServiceUnavailable, Unconfirmed
 
-DEFAULT_AGENT_URL = "http://127.0.0.1:8080"
 TIMEOUT_SECONDS = 10
 
 
-def post(payload: dict[str, Any]) -> dict[str, Any]:
-    """Post a payload once and return the agent's answer.
+def post(payload: dict[str, Any], url: str, with_key: bool) -> dict[str, Any]:
+    """Post a payload once to the app at a URL and return its answer.
 
     ServiceUnavailable when it was never sent or never connected, or the agent
     answered with an error: nothing was started. Unconfirmed when anything else goes
     wrong once it was sent: it may have been.
     """
-    base_url = os.environ.get("UNDERCOVER_AGENT", DEFAULT_AGENT_URL)
-    key = os.environ["UNDERCOVER_API_KEY"]
+    headers = (
+        {"Authorization": f"Bearer {os.environ['UNDERCOVER_API_KEY']}"}
+        if with_key
+        else {}
+    )
     try:
         response = httpx.post(
-            f"{base_url}/invocations",
+            f"{url}/invocations",
             json=payload,
-            headers={"Authorization": f"Bearer {key}"},
+            headers=headers,
             timeout=TIMEOUT_SECONDS,
         )
     except (httpx.ConnectError, httpx.ConnectTimeout) as error:

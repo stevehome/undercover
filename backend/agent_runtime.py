@@ -1,11 +1,11 @@
 """Asking the agent on AgentCore Runtime: the same payload, through boto3.
 
-Each request starts a session of its own, and is tried once: a retried request could
-start the same work twice. This is the one module that calls Runtime.
+A request is tried once: a retried request could start the same work twice. The claim
+agent's start a session of their own; the Copilot's go to its conversation's session.
+This is the one module that calls Runtime.
 """
 
 import json
-import os
 import uuid
 from typing import Any
 
@@ -23,6 +23,11 @@ from backend.errors import ServiceUnavailable, Unconfirmed
 CONNECT_TIMEOUT_SECONDS = 5
 READ_TIMEOUT_SECONDS = 20
 SESSION_PREFIX = "session-"
+BUSY_CODE = "ConflictException"
+
+
+class SessionBusy(ServiceUnavailable):
+    """The session is working and can't take another request just now."""
 
 
 def _client() -> Any:
@@ -35,16 +40,18 @@ def _client() -> Any:
     return boto3.client("bedrock-agentcore", config=config)
 
 
-def post(payload: dict[str, Any]) -> dict[str, Any]:
-    """Send a payload to the runtime in a new session and return the agent's answer.
+def post(
+    payload: dict[str, Any], arn: str, session_id: str | None = None
+) -> dict[str, Any]:
+    """Send a payload to a runtime, in a new session unless one is named.
 
     ServiceUnavailable when it never connected or Runtime answered with an error:
     nothing was started. Unconfirmed when anything else goes wrong once it was sent.
     """
     try:
         response = _client().invoke_agent_runtime(
-            agentRuntimeArn=os.environ["UNDERCOVER_AGENT_RUNTIME"],
-            runtimeSessionId=f"{SESSION_PREFIX}{uuid.uuid4().hex}",
+            agentRuntimeArn=arn,
+            runtimeSessionId=session_id or f"{SESSION_PREFIX}{uuid.uuid4().hex}",
             payload=json.dumps(payload).encode(),
             contentType="application/json",
             accept="application/json",
@@ -52,6 +59,8 @@ def post(payload: dict[str, Any]) -> dict[str, Any]:
     except (ConnectTimeoutError, EndpointConnectionError) as error:
         raise ServiceUnavailable("The agent's runtime couldn't be reached") from error
     except ClientError as error:
+        if error.response["Error"]["Code"] == BUSY_CODE:
+            raise SessionBusy("The session is busy") from error
         raise ServiceUnavailable(f"The agent's runtime refused: {error}") from error
     except BotoCoreError as error:
         raise Unconfirmed(str(error)) from error

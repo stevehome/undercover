@@ -104,3 +104,33 @@ def test_starts_undos_stops_and_heartbeats_hold_one_connection_at_a_time(
     client.post("/api/rounds")
 
     assert deepest[0] == 1
+
+
+def test_a_copilot_turn_with_steps_a_confirmation_and_the_reads_hold_one_connection(
+    client, copilot_stub, deepest
+):
+    conversation_id = client.post("/api/copilot/conversations").json()[
+        "conversation_id"
+    ]
+    base = f"/api/copilot/conversations/{conversation_id}"
+    client.post(f"{base}/messages", json={"text": "Who needs me?"})
+    step = client.post(
+        f"{base}/steps", json={"tool": "list_claims", "kind": "claims", "input": "all"}
+    ).json()["step_id"]
+    client.post(
+        f"/api/copilot/steps/{step}/finish", json={"state": "done", "result": "ok"}
+    )
+    client.post(f"{base}/waiting", json={"card": {"claim_id": "CLM-1001"}})
+    client.post(f"{base}/confirmation", json={"confirmed": True})
+    client.post(
+        f"{base}/done",
+        json={"text": "Nobody", "model_calls": 1, "cost_nanos": 1, "work_ms": 1},
+    )
+    client.get(base)
+    client.get("/api/copilot/conversations")
+    client.get("/api/copilot/evaluations")
+    client.get("/api/customers", params={"name": "a"})
+    client.get("/api/payments/over-limit")
+    client.get("/api/queue/needs-a-handler")
+
+    assert deepest[0] == 1

@@ -77,25 +77,24 @@ def statements_to_get(client):
     return count
 
 
-class AgentStub(BaseHTTPRequestHandler):
-    """A stand-in for the agent's AgentCore app: it records each operation asked for."""
+class CopilotStub(BaseHTTPRequestHandler):
+    """A stand-in for the Copilot's AgentCore app: it records each payload."""
 
-    calls: list[str] = []
-    bodies: list[dict] = []
-    keys: list[str | None] = []
+    payloads: list[dict] = []
+    authorizations: list[str | None] = []
     refuse = False
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length") or 0)
-        payload = json.loads(self.rfile.read(length) or "{}")
-        self.keys.append(self.headers.get("Authorization"))
-        self.calls.append(payload.pop("operation"))
-        self.bodies.append(payload)
-        body = (
-            {"refused": "A run is already going"}
-            if self.refuse
-            else {"accepted": True, "run_id": 5, "round_id": 5, "proposal_id": 5}
-        )
+        self.payloads.append(json.loads(self.rfile.read(length) or "{}"))
+        self.authorizations.append(self.headers.get("Authorization"))
+        operation = self.payloads[-1]["operation"]
+        if operation == "health":
+            body = {"healthy": True}
+        elif self.refuse:
+            body = {"refused": "The Copilot is busy"}
+        else:
+            body = {"accepted": True}
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
@@ -106,15 +105,13 @@ class AgentStub(BaseHTTPRequestHandler):
 
 
 @pytest.fixture
-def agent_stub(monkeypatch):
-    """Point the backend at a stand-in agent service."""
+def copilot_stub(monkeypatch):
+    """Point the backend at a stand-in Copilot."""
     handler = type(
-        "Stub",
-        (AgentStub,),
-        {"calls": [], "bodies": [], "keys": [], "refuse": False},
+        "Stub", (CopilotStub,), {"payloads": [], "authorizations": [], "refuse": False}
     )
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    monkeypatch.setenv("UNDERCOVER_AGENT", f"http://127.0.0.1:{server.server_port}")
+    monkeypatch.setenv("UNDERCOVER_COPILOT", f"http://127.0.0.1:{server.server_port}")
     yield handler
     server.shutdown()

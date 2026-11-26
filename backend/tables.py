@@ -415,3 +415,48 @@ improver_calls = Table(
     Column("total_tokens", Integer, nullable=False),
     Column("cost_nanos", Integer, nullable=False),
 )
+
+copilot_conversations = Table(
+    "copilot_conversations",
+    metadata,
+    Column("conversation_id", String, primary_key=True),
+    Column("handler_id", String, nullable=False),
+    Column("title", String),
+    Column("created_on", String, nullable=False),
+    Column("turn_status", String, nullable=False),
+    Column("turn_started_on", String),
+    Column("card", JSON(none_as_null=True)),
+    Column("failure", String),
+)
+
+copilot_messages = Table(
+    "copilot_messages",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("conversation_id", String, nullable=False),
+    Column("role", String, nullable=False),
+    Column("text", String, nullable=False),
+    Column("created_on", String, nullable=False),
+    Column("model_calls", Integer),
+    Column("cost_nanos", Integer),
+    Column("work_ms", Integer),
+)
+
+copilot_steps = Table(
+    "copilot_steps",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("conversation_id", String, nullable=False),
+    Column("message_id", Integer, nullable=False),
+    Column("tool", String, nullable=False),
+    Column("kind", String, nullable=False),
+    Column("input", String, nullable=False),
+    Column("state", String, nullable=False),
+    Column("started_on", String, nullable=False),
+    Column("finished_on", String),
+    Column("result", String),
+    Column("files", JSON(none_as_null=True)),
+    Column("reason", String),
+)
+Index("copilot_messages_by_conversation", copilot_messages.c.conversation_id)
+Index("copilot_steps_by_conversation", copilot_steps.c.conversation_id)

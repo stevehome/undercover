@@ -13,9 +13,11 @@ from backend import (
     agent_process,
     agent_service,
     claims,
+    copilot_routes,
     dashboard_files,
     evaluations,
     improver_view,
+    lookup_routes,
     platform_settings,
     proposals,
     reference,
@@ -47,6 +49,8 @@ from backend.runs import RunSettings
 from backend.statuses import ItemStatus, ProposalKind, Stage, StepKind
 
 app = FastAPI(title="UnderCover")
+app.include_router(copilot_routes.router)
+app.include_router(lookup_routes.router)
 
 
 @app.exception_handler(NotFound)

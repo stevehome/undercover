@@ -57,6 +57,14 @@ A judge grades each explanation in an evaluation against the handler's reason, f
 - The Settings page: the approval limit, the business objectives, the noise and tolerance, the spending limit for each round, how many claim agents work at once in the improver's evaluations, and the models allowed. A senior handler can change each, and each change records who and when. The appearance, light, dark or the computer's, is kept by each browser.
 - The judge's grade for each claim of an evaluation, with the two checks, and the average grade on the Scoreboard.
 
+## Success criteria
+
+When we started the pilot we agreed three, and the Copilot checks them when asked:
+
+1. **Straight through:** at least 70% of claims handled straight through on the whole held-out set, by the straight-through share our evaluations record.
+2. **Accuracy:** at least as accurate as we agreed: the accuracy our evaluations record on the whole held-out set is at or above the accuracy objective in Settings.
+3. **Over the limit:** every payout over the approval limit is approved by a person: every claim in our queue paid more than the approval limit has a handler's sign-off on its payment. While none has been paid over the limit, this one is met.
+
 ## Rules
 
 - A payout over the approval limit, $1,000 to start with and a setting, needs a handler's sign-off. The agent can approve such a claim, but the payment waits until a handler signs off. The system must block the payment until then, even if the agent tries to pay.

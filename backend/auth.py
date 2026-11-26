@@ -20,6 +20,7 @@ ALGORITHMS = ["ES256", "RS256"]
 CLOCK_LEEWAY_SECONDS = 10
 
 bearer = HTTPBearer(auto_error=False)
+required_bearer = HTTPBearer()
 
 
 @cache
@@ -58,6 +59,18 @@ def signed_in_handler(
     """Return the handler whose valid token came with the request, or Unauthorized."""
     token = credentials.credentials if credentials else None
     return handler_for_token(token, keys)
+
+
+def signed_in_token(
+    handler: Annotated[dict[str, Any], Depends(signed_in_handler)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(required_bearer)],
+) -> str:
+    """Return the valid token that came with the request, for a handler's turn.
+
+    The token is the handler's sign-in, which the Copilot uses to call the app as
+    them. The handler comes first, so a missing or bad token is a 401.
+    """
+    return credentials.credentials
 
 
 def senior_handler(

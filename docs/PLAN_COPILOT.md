@@ -66,21 +66,21 @@ The app keeps a handler's conversations, one turn at a time, with the steps and 
 
 **Success criteria**
 
-- [ ] `uv run pytest backend -q` passes, covering through the API with the stand-in Copilot:
-  - [ ] a message starts a turn: the message is saved, the title is the first question, and the payload has the model from `for_copilot()`, the conversation's id and the sign-in, and no key
-  - [ ] a second message while a turn works is a 409; after a turn has worked 20 minutes the conversation reads as stopped and a message is accepted; a turn waiting for a confirmation is never stopped and refuses a message
-  - [ ] a turn the Copilot doesn't take (never connected, an error, a refusal) is undone, with the reason passed on
-  - [ ] steps arrive as working, then done, refused or failed, in order, and a result is trimmed
-  - [ ] a waiting confirmation keeps its card until answered, and an answer starts the turn again with the handler's answer
-  - [ ] a failed turn ends with a short message and the handler can send another
-  - [ ] another handler is refused a conversation, a message and an answer, with a 403
-  - [ ] the sign-in is in no table after a turn
-  - [ ] customers are found by name (partial, any case) and by id; `copilot/evaluations` gives measures and no handler's decision for either set
-  - [ ] `payments/over-limit` gives 0 and 0 on the seeded queue, and the right counts after a claim over the limit is approved, paid, and signed off (and one without a sign-off, made in the test)
-- [ ] A test asks every new route with no credentials, with the agent's key alone, and with a handler's, and only the last works. `GET /api/agent/openapi.json` still has exactly the operations it has today.
-- [ ] `backend/tests/test_connections.py` covers the new flows: no request holds two connections.
-- [ ] `agent/tests` for `agent_laptop` and `agent_runtime` pass with the claim agent's calls unchanged.
-- [ ] `uv run pytest -q`, ruff and pyright pass; `docs/SPEC.md` has the three criteria; `docs/STATUS.md` is updated; committed.
+- [x] `uv run pytest backend -q` passes, covering through the API with the stand-in Copilot:
+  - [x] a message starts a turn: the message is saved, the title is the first question, and the payload has the model from `for_copilot()`, the conversation's id and the sign-in, and no key
+  - [x] a second message while a turn works is a 409; after a turn has worked 20 minutes the conversation reads as stopped and a message is accepted; a turn waiting for a confirmation is never stopped and refuses a message
+  - [x] a turn the Copilot doesn't take (never connected, an error, a refusal) is undone, with the reason passed on
+  - [x] steps arrive as working, then done, refused or failed, in order, and a result is trimmed
+  - [x] a waiting confirmation keeps its card until answered, and an answer starts the turn again with the handler's answer
+  - [x] a failed turn ends with a short message and the handler can send another
+  - [x] another handler is refused a conversation, a message and an answer, with a 403
+  - [x] the sign-in is in no table after a turn
+  - [x] customers are found by name (partial, any case) and by id; `copilot/evaluations` gives measures and no handler's decision for either set
+  - [x] `payments/over-limit` gives 0 and 0 on the seeded queue, and the right counts after a claim over the limit is approved, paid, and signed off (and one without a sign-off, made in the test)
+- [x] A test asks every new route with no credentials, with the agent's key alone, and with a handler's, and only the last works. `GET /api/agent/openapi.json` still has exactly the operations it has today.
+- [x] `backend/tests/test_connections.py` covers the new flows: no request holds two connections.
+- [x] `agent/tests` for `agent_laptop` and `agent_runtime` pass with the claim agent's calls unchanged.
+- [x] `uv run pytest -q`, ruff and pyright pass; `docs/SPEC.md` has the three criteria; `docs/STATUS.md` is updated; committed.
 
 ## Phase 2: The Copilot's loop, its reads and its actions
 
