@@ -1,7 +1,9 @@
+from collections import Counter
+
 from backend import db, seed
 
 
-def test_reset_puts_every_claim_back_to_waiting(client):
+def test_reset_puts_every_claim_back_as_it_was_seeded(client):
     client.post(
         "/api/claims/CLM-1001/steps",
         json={"kind": "note", "text": "started", "details": {}},
@@ -10,8 +12,8 @@ def test_reset_puts_every_claim_back_to_waiting(client):
 
     seed.reset()
 
-    statuses = {c["status"] for c in client.get("/api/claims").json()}
-    assert statuses == {"waiting"}
+    statuses = Counter(c["status"] for c in client.get("/api/claims").json())
+    assert statuses == {"waiting": 26, "decided": 8}
     assert client.get("/api/claims/CLM-1001/steps").json() == []
 
 

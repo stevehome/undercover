@@ -60,7 +60,7 @@ def test_the_same_tools_decide_and_pay_a_claim_on_either_route(
     assert texts[-2:] == ["Decided: approve for $420.00", "Paid $420.00"]
     claim = api.get_claim(CLAIM)
     assert claim["decided_by"] == "UnderCover Agent, configuration version 1"
-    assert claim["manual_version"] == "2026.2"
+    assert claim["manual_version"] == "2026.3"
     assert sum(Decimal(s["amount"]) for s in claim["calculation"]) == Decimal("420.00")
 
 

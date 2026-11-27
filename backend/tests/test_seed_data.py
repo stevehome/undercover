@@ -34,14 +34,14 @@ def test_a_new_database_holds_every_record(client):
             )
         }
     assert counts == {
-        "claims": 26,
-        "policies": 51,
-        "customers": 50,
+        "claims": 34,
+        "policies": 59,
+        "customers": 58,
         "plans": 3,
         "add_ons": 3,
         "handlers": 3,
     }
-    assert documents == {"policy_wording": "2026.1", "claims_manual": "2026.2"}
+    assert documents == {"policy_wording": "2026.2", "claims_manual": "2026.3"}
 
 
 def test_amounts_come_back_exact(client):
@@ -69,7 +69,7 @@ def test_amounts_come_back_exact(client):
 def test_starting_again_adds_nothing(client):
     db.forget_engines()
     with db.connection() as conn:
-        assert count(conn, tables.policies) == 51
+        assert count(conn, tables.policies) == 59
 
 
 def test_requests_racing_for_a_new_database_share_one_engine(tmp_path):

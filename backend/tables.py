@@ -176,6 +176,37 @@ CONTENT_COLUMNS = [
     ]
 ]
 
+appeals = Table(
+    "appeals",
+    metadata,
+    Column("claim_id", String, primary_key=True),
+    Column("ombudsman_reference", String, nullable=False),
+    Column("received_on", String, nullable=False),
+    Column("grounds", String, nullable=False),
+    Column("recorded_by", String, nullable=False),
+    Column("recorded_on", String, nullable=False),
+    Column("status", String, nullable=False),
+    Column("decided_on", String),
+    Column("reason", String),
+    Column("outcome_recorded_by", String),
+    Column("outcome_recorded_on", String),
+    Column("claim_amount_cents", Integer),
+    Column("compensation_cents", Integer),
+    Column("interest_cents", Integer),
+    Column("flagged", Boolean, nullable=False, server_default="0"),
+    Column("flag_reason", String),
+    Column("check_cost_nanos", Integer, nullable=False, server_default="0"),
+)
+
+redress_payments = Table(
+    "redress_payments",
+    metadata,
+    Column("claim_id", String, primary_key=True),
+    Column("amount_cents", Integer, nullable=False),
+    Column("signed_off_by", String, nullable=False),
+    Column("paid_on", String, nullable=False),
+)
+
 payout_calculations = Table(
     "payout_calculations",
     metadata,

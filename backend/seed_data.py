@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy import Table
 
-from backend import money, tables
+from backend import appeal_seed, money, tables
 from backend.statuses import ClaimStatus, Verdict
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -104,6 +104,22 @@ def _first_version(**content: str) -> dict[str, Any]:
 
 def records() -> dict[Table, list[dict[str, Any]]]:
     """Return every table's starting rows."""
+    rows = _queue_records()
+    files = ("claims", "policies", "customers", "appeals")
+    appeals = [_load_json(f"appeals/{name}.json") for name in files]
+    for table, extra in appeal_seed.records(*appeals).items():
+        rows[table] = _same_columns([*rows.get(table, []), *extra])
+    return rows
+
+
+def _same_columns(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Give every row the same columns, empty where it had none, to insert together."""
+    columns = {column for row in rows for column in row}
+    return [{column: row.get(column) for column in columns} for row in rows]
+
+
+def _queue_records() -> dict[Table, list[dict[str, Any]]]:
+    """The rows the queue, the settings, the plans and the documents start with."""
     plan_data = _plans()
     return {
         tables.settings: [

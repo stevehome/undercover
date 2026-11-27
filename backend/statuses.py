@@ -13,6 +13,14 @@ class ClaimStatus(StrEnum):
     DECIDED = "decided"
 
 
+class AppealStatus(StrEnum):
+    """Where an appeal to the ombudsman stands."""
+
+    WITH_THE_OMBUDSMAN = "with the ombudsman"
+    UPHELD = "upheld"
+    NOT_UPHELD = "not upheld"
+
+
 class StepKind(StrEnum):
     """What a step of the agent's work is: a note, a tool call, a lookup in the
     context layer, a memory search or save, or a refusal."""

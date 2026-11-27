@@ -1,0 +1,135 @@
+[
+  {
+    "policy_id": "POL-2404",
+    "customer_id": "CUS-3404",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-05-12",
+    "sold_through": "TripNest checkout",
+    "trip": {
+      "destination": "Split, Croatia",
+      "departs_on": "2026-09-01",
+      "returns_on": "2026-09-14",
+      "trip_cost": 5200.0
+    },
+    "travelers": ["Owen Castell", "Mara Castell"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2408",
+    "customer_id": "CUS-3408",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-06-10",
+    "sold_through": "Seabright Cruises booking page",
+    "trip": {
+      "destination": "Caribbean cruise from Port Calder",
+      "departs_on": "2026-08-20",
+      "returns_on": "2026-08-30",
+      "trip_cost": 4800.0
+    },
+    "travelers": ["Gareth Ollander", "Renata Ollander"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2417",
+    "customer_id": "CUS-3417",
+    "plan": "economy",
+    "add_ons": [],
+    "purchased_on": "2026-04-20",
+    "sold_through": "UnderCover website",
+    "trip": {
+      "destination": "La Fortuna, Costa Rica",
+      "departs_on": "2026-06-06",
+      "returns_on": "2026-06-16",
+      "trip_cost": 6400.0
+    },
+    "travelers": [
+      "Delia Marchetti",
+      "Marco Marchetti",
+      "Luca Marchetti",
+      "Sofia Marchetti"
+    ],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2403",
+    "customer_id": "CUS-3403",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-07-03",
+    "sold_through": "TripNest checkout",
+    "trip": {
+      "destination": "Santiago, Chile",
+      "departs_on": "2026-08-01",
+      "returns_on": "2026-08-15",
+      "trip_cost": 4100.0
+    },
+    "travelers": ["Helen Park"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2423",
+    "customer_id": "CUS-3423",
+    "plan": "economy",
+    "add_ons": [],
+    "purchased_on": "2026-08-19",
+    "sold_through": "UnderCover website",
+    "trip": {
+      "destination": "Cancun, Mexico",
+      "departs_on": "2026-08-21",
+      "returns_on": "2026-08-28",
+      "trip_cost": 2440.0
+    },
+    "travelers": ["Harold Wrenfield", "Diane Wrenfield"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2424",
+    "customer_id": "CUS-3424",
+    "plan": "premium",
+    "add_ons": ["electronics_plus"],
+    "purchased_on": "2026-07-20",
+    "sold_through": "Wayfarer Bookings checkout",
+    "trip": {
+      "destination": "Valencia, Spain",
+      "departs_on": "2026-09-02",
+      "returns_on": "2026-09-12",
+      "trip_cost": 3100.0
+    },
+    "travelers": ["Renata Okafor"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2410",
+    "customer_id": "CUS-3410",
+    "plan": "premium",
+    "add_ons": [],
+    "purchased_on": "2026-08-01",
+    "sold_through": "WanderFare checkout",
+    "trip": {
+      "destination": "Florence, Italy",
+      "departs_on": "2026-09-03",
+      "returns_on": "2026-09-17",
+      "trip_cost": 3400.0
+    },
+    "travelers": ["Derek Halvorsen"],
+    "status": "active"
+  },
+  {
+    "policy_id": "POL-2409",
+    "customer_id": "CUS-3409",
+    "plan": "economy",
+    "add_ons": [],
+    "purchased_on": "2026-06-20",
+    "sold_through": "SailAway Booking checkout",
+    "trip": {
+      "destination": "Barcelona, Spain and Mediterranean cruise",
+      "departs_on": "2026-08-03",
+      "returns_on": "2026-08-17",
+      "trip_cost": 3200.0
+    },
+    "travelers": ["Delphine Okafor-Reyes"],
+    "status": "active"
+  }
+]

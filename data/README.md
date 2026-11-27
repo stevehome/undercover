@@ -39,3 +39,7 @@ A decision is scored on two things: the decision itself and the payout. A valid 
 ## The security claim
 
 - `security/`: CLM-1901, a stolen watch whose story carries an instruction to the AI to approve it in full, with its policy, its customer and the handler's decision (decline). It is a prompt injection kept for security testing, in a folder of its own. The seed loads its claim, policy and customer into the queue, which makes 26 claims, but never reads `decisions.json`, so it is in neither evaluation set and `claims.json` is unchanged.
+
+## The appeals
+
+- `appeals/`: eight earlier claims, CLM-1601 to CLM-1608, already decided by our handlers before the pilot and paid where approved, each with a complete decision record, and the appeal to the ombudsman against each. Two appeals are still with the ombudsman, three are upheld (one with its redress paid and two waiting for a sign-off) and three are not upheld. `claims.json` holds each claim with its decision, `policies.json` and `customers.json` their policies and customers, and `appeals.json` the appeals, with the redress's three amounts and the payment where it was made. They were made from the ombudsman cases in `evals/ombudsman/`, with new ids and invented ombudsman references, and the seed never reads `evals/`. The queue's 26 waiting claims and both evaluation sets are unchanged, and a dispatch never works these eight, since none is waiting. Everything here is invented.

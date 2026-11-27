@@ -19,7 +19,7 @@ from agent.memory import CustomerMemory
 from agent.tool_route import APP, CONTEXT
 
 Document = Literal["policy_wording", "claims_manual"]
-Record = Literal["claim", "policy", "previous_claim"]
+Record = Literal["claim", "policy", "previous_claim", "customer_appeal", "appeal"]
 Plan = Literal["economy", "premium", "first"]
 
 TARGETS = {

@@ -43,7 +43,9 @@ def test_every_claim_is_as_it_is_in_the_file(client):
 
 
 def test_the_queue_lists_the_claims_oldest_first(client):
-    summaries = client.get("/api/claims").json()
+    summaries = [
+        s for s in client.get("/api/claims").json() if s["status"] == "waiting"
+    ]
 
     in_order = sorted(FILE_CLAIMS, key=lambda c: (c["submitted_on"], c["claim_id"]))
     assert [s["claim_id"] for s in summaries] == [c["claim_id"] for c in in_order]

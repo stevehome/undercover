@@ -2,9 +2,9 @@
 # section it comes from.
 
 source:
-  system: The policy wording, version 2026.1
+  system: The policy wording, version 2026.2
   owner: Legal
-  reviewed: "2026-09-01"
+  reviewed: "2026-11-27"
 
 terms:
   - term: Carrier
@@ -77,3 +77,31 @@ terms:
       Losses that follow indirectly from an incident, such as lost earnings, missed
       events or contractual penalties.
     sections: [9]
+
+  - term: Final response
+    definition: Our last decision on your claim or your complaint, which we give you in writing with our reasons.
+    sections: [12]
+
+  - term: Ombudsman
+    definition: The independent body that decides complaints about insurers, which you may go to when you are unhappy with our final response.
+    sections: [12]
+
+  - term: Redress
+    definition: What the ombudsman tells us to pay you when it upholds your complaint.
+    sections: [12]
+
+  - term: Upheld
+    definition: >-
+      The ombudsman agrees with your complaint, and we pay what the ombudsman tells us
+      to pay.
+    sections: [13]
+
+  - term: Not upheld
+    definition: The ombudsman does not agree with your complaint, and our decision stands.
+    sections: [13]
+
+  - term: Compensation for distress and inconvenience
+    definition: >-
+      Money the ombudsman can tell us to pay for the distress and inconvenience we
+      caused you, as well as any part of your claim still owed.
+    sections: [13]

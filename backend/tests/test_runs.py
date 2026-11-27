@@ -25,7 +25,11 @@ def decide(client, claim_id, payout):
 
 
 def test_a_dispatch_takes_waiting_and_in_progress_claims_oldest_first(client):
-    queue = [c["claim_id"] for c in client.get("/api/claims").json()]
+    queue = [
+        c["claim_id"]
+        for c in client.get("/api/claims").json()
+        if c["status"] == "waiting"
+    ]
     client.post(
         f"/api/claims/{queue[3]}/steps",
         json={"kind": "note", "text": "started", "details": {}},

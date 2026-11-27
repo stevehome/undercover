@@ -17,7 +17,7 @@ from context import documents, lookups
 from context.answers import Sourced, answer
 from context.files import read_data, read_document
 
-Record = Literal["claim", "policy", "previous_claim"]
+Record = Literal["claim", "policy", "previous_claim", "customer_appeal", "appeal"]
 Plan = Literal["economy", "premium", "first"]
 DocumentName = Literal["policy_wording", "claims_manual"]
 

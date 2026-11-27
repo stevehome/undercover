@@ -107,7 +107,7 @@ def test_a_complete_approval_holds_its_calculation_maker_time_and_manual_version
 
     assert claim["decided_by"] == "The test agent"
     assert claim["decided_on"]
-    assert claim["manual_version"] == "2026.2"
+    assert claim["manual_version"] == "2026.3"
     steps = claim["calculation"]
     assert steps
     assert all(set(step) == {"step", "amount"} for step in steps)
@@ -122,7 +122,7 @@ def test_a_decline_holds_its_maker_and_manual_version_but_no_calculation(client)
 
     assert claim["calculation"] is None
     assert claim["decided_by"] == "The test agent"
-    assert claim["manual_version"] == "2026.2"
+    assert claim["manual_version"] == "2026.3"
 
 
 def test_a_signed_off_payout_adds_who_signed_off_and_when(client):

@@ -363,10 +363,10 @@ OVER = {
 }
 
 
-def test_over_the_limit_counts_nothing_on_the_seeded_queue(client):
+def test_over_the_limit_counts_the_seeded_earlier_claim(client):
     shown = client.get("/api/payments/over-limit").json()
 
-    assert (shown["paid_over_the_limit"], shown["with_a_sign_off"]) == (0, 0)
+    assert (shown["paid_over_the_limit"], shown["with_a_sign_off"]) == (1, 1)
 
 
 def test_over_the_limit_counts_a_paid_sign_off_and_a_payment_without_one(client):
@@ -381,10 +381,11 @@ def test_over_the_limit_counts_a_paid_sign_off_and_a_payment_without_one(client)
 
     shown = client.get("/api/payments/over-limit").json()
 
-    assert (shown["paid_over_the_limit"], shown["with_a_sign_off"]) == (2, 1)
+    assert (shown["paid_over_the_limit"], shown["with_a_sign_off"]) == (3, 2)
     assert {c["claim_id"]: c["signed_off_by"] for c in shown["claims"]} == {
         "CLM-1001": "HND-01",
         "CLM-1002": None,
+        "CLM-1606": "HND-01",
     }
 
 

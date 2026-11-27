@@ -22,7 +22,7 @@ def test_a_document_is_split_at_its_numbered_headings(document):
 def test_the_front_matter_is_never_part_of_a_section(document):
     sections = documents.split(document)
 
-    assert document.version in {"2026.1", "2026.2"}
+    assert document.version in {"2026.2", "2026.3"}
     assert not any("source:" in s.text or s.text.startswith("---") for s in sections)
     assert not any("reviewed:" in s.text for s in sections)
 
@@ -42,7 +42,7 @@ def test_the_document_has_the_sections_the_brief_counts_on():
     wording = documents.split(read_document("policy_wording"))
     manual = documents.split(read_document("claims_manual"))
 
-    assert (len(wording), len(manual)) == (12, 14)
+    assert (len(wording), len(manual)) == (13, 15)
 
 
 def test_a_search_finds_the_sections_with_every_word_in_any_case():
@@ -59,3 +59,24 @@ def test_a_section_that_does_not_exist_is_a_value_error():
 
     with pytest.raises(ValueError, match="no section 99"):
         documents.find(sections, "claims_manual", 99)
+
+
+def test_the_complaints_sections_are_new_and_the_others_keep_their_numbers():
+    wording = documents.split(read_document("policy_wording"))
+    manual = documents.split(read_document("claims_manual"))
+
+    assert wording[-1].title == "If you are unhappy with our decision"
+    assert manual[-1].title == "Appeals to the ombudsman"
+    assert [s.title for s in manual[:14]][-2:] == ["Wording versions", "Records"]
+    assert (
+        read_document("policy_wording").version,
+        read_document("claims_manual").version,
+    ) == ("2026.2", "2026.3")
+
+
+def test_a_search_finds_the_complaints_sections():
+    wording = documents.split(read_document("policy_wording"))
+    manual = documents.split(read_document("claims_manual"))
+
+    assert [s.number for s in documents.search(wording, "ombudsman")][-1] == 13
+    assert 15 in [s.number for s in documents.search(manual, "redress")]

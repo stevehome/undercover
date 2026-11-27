@@ -2,13 +2,13 @@
 source:
   system: Published policy documents
   owner: Legal
-  reviewed: "2026-09-01"
-version: "2026.1"
+  reviewed: "2026-11-27"
+version: "2026.2"
 ---
 
 # UnderCover Travel Insurance: Policy Wording
 
-Version 2026.1, for policies bought on or after January 1, 2026.
+Version 2026.2, for policies bought on or after December 1, 2026. Policies bought from January 1, 2026 to November 30, 2026 stay on version 2026.1, which is the same except that it has no section 13 and its definitions stop at Traveling companion.
 
 This document explains what your UnderCover policy covers, what it leaves out and how we work out what we pay. Your policy record shows your plan, any add-ons you bought, the dates of your covered trip and the travelers on it. All amounts are in US dollars.
 
@@ -121,4 +121,15 @@ File your claim within 90 days of the incident. Tell us what happened in your ow
 - **Covered trip:** the trip on your policy record, from the departure date to the return date.
 - **Family member:** your spouse or partner, child, parent, sibling, grandparent or grandchild.
 - **Physician:** a licensed medical doctor who is not you, a traveling companion or a family member.
+- **Final response:** our last decision on your claim or your complaint, which we give you in writing with our reasons.
+- **Ombudsman:** the independent body that decides complaints about insurers, which you may go to when you are unhappy with our final response.
+- **Redress:** what the ombudsman tells us to pay you when it upholds your complaint.
 - **Traveling companion:** a person named as a traveler on your policy record.
+
+## 13. If you are unhappy with our decision
+
+Tell us if you disagree with a decision on your claim. We will look again and give you our final response in writing, with our reasons.
+
+If you are still unhappy with our final response, you may take your complaint to the ombudsman within six months of the date of that response. The ombudsman looks at what is fair and reasonable in the circumstances, which means the ombudsman can take account of more than the words of this policy. Taking a complaint to the ombudsman does not cost you anything.
+
+If the ombudsman upholds your complaint, we will pay what the ombudsman tells us to pay, which can include any part of your claim still owed, compensation for the distress and inconvenience we caused you, and interest. If the ombudsman does not uphold your complaint, our decision stands.

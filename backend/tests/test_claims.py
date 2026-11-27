@@ -7,9 +7,10 @@ def test_list_claims(client):
     response = client.get("/api/claims")
     assert response.status_code == 200
     claims = response.json()
-    assert len(claims) == 26
-    assert all(claim["status"] == "waiting" for claim in claims)
-    assert claims[0]["claim_id"] == "CLM-1001"
+    waiting = [claim for claim in claims if claim["status"] == "waiting"]
+    assert (len(claims), len(waiting)) == (34, 26)
+    assert {c["status"] for c in claims} == {"waiting", "decided"}
+    assert waiting[0]["claim_id"] == "CLM-1001"
 
 
 def test_get_claim(client):
@@ -39,7 +40,7 @@ def test_seeding_is_idempotent(monkeypatch, tmp_path):
     for _ in range(2):
         with db.connection() as conn:
             count = conn.execute(select(func.count()).select_from(tables.claims))
-            assert count.scalar_one() == 26
+            assert count.scalar_one() == 34
         db.forget_engines()
 
 

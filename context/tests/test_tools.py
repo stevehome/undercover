@@ -98,3 +98,26 @@ def test_a_section_is_read_by_its_document_and_number():
 def test_a_section_that_does_not_exist_is_refused_in_words():
     with pytest.raises(ValueError, match="no section 99"):
         server.read_section("policy_wording", 99)
+
+
+@pytest.mark.parametrize(
+    "term", ["Final response", "Redress", "Upheld", "Not upheld", "Ombudsman"]
+)
+def test_the_appeal_terms_are_in_the_glossary(term):
+    found = server.lookup_term(term)
+
+    assert found["answer"]["term"] == term
+    assert found["answer"]["sections"] in ([12], [13])
+    sources(found)
+
+
+def test_the_appeal_rules_and_records_are_described():
+    rules = {r["rule"] for r in server.get_claim_rules()["answer"]}
+    found = server.describe_fields("customer_appeal")
+
+    assert {"appeal_window", "one_appeal_per_claim", "redress"} <= rules
+    assert [f["field"] for f in found["answer"]["fields"]] == [
+        "claim_id",
+        "outcome",
+        "decided_on",
+    ]

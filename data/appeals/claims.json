@@ -1,0 +1,725 @@
+[
+  {
+    "claim_id": "CLM-1601",
+    "policy_id": "POL-2404",
+    "customer_id": "CUS-3404",
+    "claim_type": "trip_delay",
+    "submitted_on": "2026-09-18",
+    "incident_date": "2026-09-13",
+    "incident_location": "Split, Croatia",
+    "summary": "Held overnight in Split by a ferry crew strike on the way home",
+    "story": "Our ferry from Split to Ancona on September 13 was due to leave at 20:00 and left at 09:00 the next morning because the crew went on strike. To be honest, the strike had been in the local news for a couple of weeks before we flew out, but we hoped it would be settled. We stayed at a hotel near the port, ate at the quay and took taxis. We paid cash for the meals and have no receipts for them. We also lost our first night's hotel in Bologna, which we had already paid for.",
+    "amount_claimed": 661.7,
+    "items": [
+      {
+        "description": "Hotel in Split, one room, one night",
+        "category": "accommodation",
+        "amount": 410.0
+      },
+      {
+        "description": "Meals for two at the quay, cash",
+        "category": "meals",
+        "amount": 75.7
+      },
+      {
+        "description": "Taxi to the hotel",
+        "category": "transport",
+        "amount": 18.0
+      },
+      {
+        "description": "Taxi back to the port",
+        "category": "transport",
+        "amount": 18.0
+      },
+      {
+        "description": "First night's prepaid hotel in Bologna, missed",
+        "category": "other",
+        "amount": 140.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Ferry delay confirmation",
+        "type": "carrier_report",
+        "content": "Adria Lines. Sailing AL 212 Split to Ancona, scheduled September 13, 2026 at 20:00, departed September 14 at 09:00 because of a strike by the crew. The crew union served strike notice on August 18, 2026. Passengers: Owen Castell and Mara Castell. Under our passenger care policy, an overnight accommodation allowance of $40.00 per listed passenger, $80.00 in total, was refunded to the booking card on September 16, 2026."
+      },
+      {
+        "name": "Receipts",
+        "type": "receipt",
+        "content": "Hotel Marjan, September 13 to 14, one room: $410.00. Taxis, receipts 8841 and 8842: $18.00 and $18.00. Hotel Torre, Bologna, no-show September 14: $140.00."
+      }
+    ],
+    "decision": {
+      "decision": "approve",
+      "payout": 376.0,
+      "reason": "The carrier confirms a 13 hour delay caused by a strike, longer than the 6 hour waiting period on Premium. The strike notice was served on August 18, 2026, after the policy was bought on May 12, 2026, so the strike was not publicly known when the policy was bought and the section 9 exclusion does not apply. The hotel is paid at the $350 a night limit for one room for two travelers. There are no meal receipts, so meals are paid at the flat $35 per traveler for one period of 24 hours or part of it, which is $70.00. Both taxis have receipts and are paid at $36.00. The prepaid night in Bologna is a consequential loss under section 9 and is left out. The eligible total is $456.00. Adria Lines refunded an accommodation allowance of $80.00, and that comes off under section 10, leaving $376.00. This is inside the $800 maximum, and Trip Delay has no deductible.",
+      "policy_reference": "Policy wording, sections 3, 9 and 10; claims manual, reasonable accommodation, consequential losses and meals without receipts",
+      "decided_by": "Marcus Oyelaran",
+      "decided_on": "2026-09-22T10:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Hotel, at the $350 a night limit",
+          "amount": 350.0
+        },
+        {
+          "step": "Meals, flat $35 for two travelers for one day",
+          "amount": 70.0
+        },
+        {
+          "step": "Taxi to the hotel",
+          "amount": 18.0
+        },
+        {
+          "step": "Taxi back to the port",
+          "amount": 18.0
+        },
+        {
+          "step": "Less Adria Lines accommodation allowance already refunded",
+          "amount": -80.0
+        }
+      ],
+      "over_approval_limit": false,
+      "paid_on": "2026-09-22T11:00:00+00:00"
+    }
+  },
+  {
+    "claim_id": "CLM-1602",
+    "policy_id": "POL-2408",
+    "customer_id": "CUS-3408",
+    "claim_type": "passport",
+    "submitted_on": "2026-09-08",
+    "incident_date": "2026-08-19",
+    "incident_location": "Port Calder, Florida, USA",
+    "summary": "Both passports lost on the way to the cruise port, replaced at the port passport agency on embarkation day",
+    "story": "We drove down from Columbus to Port Calder for our Seabright cruise and stayed the night near the terminal. I had checked the travel folder with both passports before we left home and put it in my backpack. When we unpacked at the hotel that night the folder was gone. We think it slipped out at one of the rest stops along the highway. We called the rest stops and the highway patrol, but nobody had handed it in. First thing on embarkation morning we took a taxi to the passport agency in town, got photos done across the street and applied for emergency passports. They were ready before lunch, we took a taxi back to the hotel for our bags and we made it on board before the ship sailed. I am claiming the passport fees, the photos and the taxis.",
+    "amount_claimed": 400.0,
+    "items": [
+      {
+        "description": "Emergency passport fees for my wife and me",
+        "category": "fees",
+        "amount": 330.0
+      },
+      {
+        "description": "Passport photos for both of us",
+        "category": "photos",
+        "amount": 24.0
+      },
+      {
+        "description": "Taxis between the hotel and the passport agency, both ways",
+        "category": "transport",
+        "amount": 46.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Passport agency receipt",
+        "type": "receipt",
+        "content": "Port Calder Passport Agency, 400 Harbor Boulevard, Port Calder, FL. August 20, 2026, 9:12 am. Same-day emergency passport applications for Gareth Ollander and Renata Ollander, $165.00 each. Total paid: $330.00. Statement of loss on file: applicant states both passports were last seen at home in Columbus, OH on the morning of August 19, 2026 and were found to be missing on arrival at lodging in Port Calder on the evening of August 19, 2026. Passports issued 11:40 am."
+      },
+      {
+        "name": "Photo receipt",
+        "type": "receipt",
+        "content": "Harbor Photo & Print, 405 Harbor Boulevard, Port Calder, FL. August 20, 2026, 9:01 am. Two sets of passport photos at $12.00. Total: $24.00."
+      },
+      {
+        "name": "Taxi receipts",
+        "type": "receipt",
+        "content": "Calder Cabs. Receipt 1: August 20, 2026, 8:35 am, Harborview Inn to 400 Harbor Boulevard, $22.00. Receipt 2: August 20, 2026, 11:55 am, 400 Harbor Boulevard to Harborview Inn, $24.00. Total: $46.00."
+      },
+      {
+        "name": "Hotel folio",
+        "type": "receipt",
+        "content": "Harborview Inn, Port Calder, FL. Guests: Gareth and Renata Ollander, home address 2210 Tamarack Drive, Columbus, OH. Arrival August 19, 2026, 8:47 pm. Departure August 20, 2026, 12:30 pm. One night, king room: $189.00. Paid by card ending 4471."
+      },
+      {
+        "name": "Cruise booking confirmation",
+        "type": "booking",
+        "content": "Seabright Cruises. Booking SB-55821 for Gareth Ollander and Renata Ollander. Embarkation Port Calder, August 20, 2026, boarding closes 3:30 pm. Disembarkation August 30, 2026. Paid in full: $4,800.00."
+      }
+    ],
+    "decision": {
+      "decision": "decline",
+      "payout": 0.0,
+      "reason": "Section 6 pays when a passport is lost during the covered trip. The covered trip on the policy runs from August 20 to August 30, 2026. The passport agency's statement of loss and the hotel folio show that the passports went missing on the drive to Port Calder and were found to be gone on the evening of August 19, the day before the covered trip began. The replacement costs were all paid on August 20, but the loss itself happened outside the trip dates, and section 9 excludes anything that happens outside the dates of the covered trip, so nothing is payable.",
+      "policy_reference": "Policy wording, sections 6, 9 and 12 (covered trip); claims manual, section 4 step 3",
+      "decided_by": "Priya Raman",
+      "decided_on": "2026-09-15T11:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Emergency passport fees, passports lost August 19, before the covered trip began",
+          "amount": 0.0
+        },
+        {
+          "step": "Passport photos, passports lost August 19, before the covered trip began",
+          "amount": 0.0
+        },
+        {
+          "step": "Taxis to and from the passport agency, passports lost August 19, before the covered trip began",
+          "amount": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "claim_id": "CLM-1603",
+    "policy_id": "POL-2417",
+    "customer_id": "CUS-3417",
+    "claim_type": "emergency_medical",
+    "submitted_on": "2026-06-30",
+    "incident_date": "2026-06-10",
+    "incident_location": "La Fortuna, Alajuela, Costa Rica",
+    "summary": "Sprained ankle and cut knee on a river trip in Costa Rica, treated at a local hospital",
+    "story": "We had a wild river day on June 10. It was a family float trip with local guides on the Lantern Run near La Fortuna. Near the end we stopped on a gravel bar for a swim. When I climbed back into the raft my foot slid on the rocks and my left ankle twisted under me. I also cut my knee open on the edge of a rock. The guides wrapped my ankle and drove me to the hospital in La Fortuna. They X-rayed the ankle, said it was a bad sprain and not broken, and put four stitches in my knee. They gave me a brace and crutches and I hobbled through the rest of the vacation. The doctor said I should get physio once I was back home, so I did four sessions in Tucson. I'm attaching the hospital bill, the hospital notes and the physio receipt. I'm claiming all of it.",
+    "amount_claimed": 1295.0,
+    "items": [
+      {
+        "description": "Emergency room visit and physician examination, Hospital San Carlos de La Fortuna",
+        "category": "medical",
+        "amount": 420.0
+      },
+      {
+        "description": "X-ray of left ankle, two views",
+        "category": "medical",
+        "amount": 180.0
+      },
+      {
+        "description": "Wound cleaning and four sutures, left knee",
+        "category": "medical",
+        "amount": 260.0
+      },
+      {
+        "description": "Ankle brace and crutches",
+        "category": "medical",
+        "amount": 95.0
+      },
+      {
+        "description": "Physiotherapy, four sessions, Desert Motion Physical Therapy, Tucson",
+        "category": "medical",
+        "amount": 340.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Hospital itemized bill",
+        "type": "itemized_bill",
+        "content": "Hospital San Carlos de La Fortuna, Alajuela, Costa Rica. Invoice 2026-06-10-0388. Patient: Delia Marchetti. Date of service: June 10, 2026. Emergency consultation and examination: $420.00. Radiology, left ankle, 2 views: $180.00. Wound irrigation and closure, 4 sutures, left knee: $260.00. Ankle stabilizer brace and pair of crutches: $95.00. Total: $955.00. Paid by Visa ending 3381, June 10, 2026."
+      },
+      {
+        "name": "Hospital medical record",
+        "type": "medical_record",
+        "content": "Hospital San Carlos de La Fortuna, Emergency Department. June 10, 2026, 15:40. Patient: Delia Marchetti, 46, US visitor. Brought in by tour guides. History: patient was on a guided family rafting outing, Lantern Run, with her husband and two children. On a stop she slipped on wet rocks while re-boarding the raft and inverted her left ankle, and she sustained a laceration to the left knee on a rock edge. No loss of consciousness. Past history: no prior injury to the left ankle or knee, no regular medications, no known allergies. Examination: swelling and tenderness over the lateral left ankle, able to bear weight with pain. 3 cm laceration, left knee. X-ray: no fracture. Diagnosis: grade II lateral ankle sprain, left; laceration, left knee. Treatment: wound irrigated and closed with 4 sutures, brace and crutches supplied, ibuprofen advised. Plan: rest, ice and elevation. Sutures out in 10 to 12 days. Physiotherapy recommended after return home. Dr. Mauricio Solano Vargas."
+      },
+      {
+        "name": "Physiotherapy receipt",
+        "type": "receipt",
+        "content": "Desert Motion Physical Therapy, 1180 North Campbell Avenue, Tucson, AZ. Patient: Delia Marchetti. Ankle rehabilitation sessions on June 18, June 22, June 25 and June 29, 2026, $85.00 each. Total: $340.00. Paid in full."
+      },
+      {
+        "name": "Rafting company booking confirmation",
+        "type": "other",
+        "content": "Lantern Run, Rio Cuyo, Costa Rica: a family rafting trip on the lower river, with grade 2 rapids from start to finish."
+      }
+    ],
+    "decision": {
+      "decision": "approve",
+      "payout": 855.0,
+      "reason": "The ankle sprain and knee cut were a sudden injury during the covered trip. Lantern Run is a family rafting trip with grade 2 rapids from start to finish, so it is not white-water rafting above grade 3 and the Adventure Sports add-on is not needed. The hospital record shows no earlier problem with the ankle or knee, and the itemized bill and records are on file, so the hospital charges of $955.00 are covered. The $340.00 of physiotherapy in Tucson was follow-up care after the customer got home, so it is not covered. The Economy deductible of $100.00 comes off, leaving a payout of $855.00, which is under the $25,000 maximum and needs no sign-off.",
+      "policy_reference": "Policy wording, sections 1, 7, 8 and 10; claims manual, sections 6 and 7",
+      "decided_by": "Priya Raman",
+      "decided_on": "2026-07-03T12:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Emergency room visit and examination",
+          "amount": 420.0
+        },
+        {
+          "step": "Ankle X-ray",
+          "amount": 180.0
+        },
+        {
+          "step": "Wound cleaning and sutures",
+          "amount": 260.0
+        },
+        {
+          "step": "Ankle brace and crutches",
+          "amount": 95.0
+        },
+        {
+          "step": "Less the Economy deductible (physiotherapy at home excluded as follow-up care)",
+          "amount": -100.0
+        }
+      ],
+      "over_approval_limit": false,
+      "paid_on": "2026-07-03T13:00:00+00:00"
+    }
+  },
+  {
+    "claim_id": "CLM-1604",
+    "policy_id": "POL-2403",
+    "customer_id": "CUS-3403",
+    "claim_type": "emergency_medical",
+    "submitted_on": "2026-08-24",
+    "incident_date": "2026-08-06",
+    "incident_location": "Santiago, Chile",
+    "summary": "Disc pain and sciatica needing an emergency admission in Santiago",
+    "story": "On August 6 I woke in my hotel in Santiago with severe pain down my left leg and could not stand. The hotel called an ambulance and I was admitted overnight and had an MRI. They told me it was a herniated disc. I saw my doctor once back in April about my back, and I have not had an appointment since. Once I got home I had four physiotherapy sessions, which I have also listed. I have attached everything the hospital gave me.",
+    "amount_claimed": 2876.5,
+    "items": [
+      {
+        "description": "Emergency department assessment",
+        "category": "medical",
+        "amount": 540.0
+      },
+      {
+        "description": "MRI scan",
+        "category": "medical",
+        "amount": 1180.0
+      },
+      {
+        "description": "Orthopedic consultation",
+        "category": "medical",
+        "amount": 320.0
+      },
+      {
+        "description": "Medication dispensed",
+        "category": "medical",
+        "amount": 46.5
+      },
+      {
+        "description": "Overnight observation",
+        "category": "medical",
+        "amount": 610.0
+      },
+      {
+        "description": "Four physiotherapy sessions at home after the trip",
+        "category": "medical",
+        "amount": 180.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Hospital discharge summary",
+        "type": "medical_records",
+        "content": "Clinica Santa Maria, Santiago. Patient: Helen Park. Admitted August 6, 2026, 07:40, discharged August 7, 2026, 11:15. Presenting complaint: acute left leg pain, unable to bear weight. Examination: positive straight leg raise on the left, reduced ankle reflex. MRI lumbar spine: L5-S1 disc herniation compressing the left S1 nerve root. Diagnosis: lumbar disc herniation with left sciatica. Treatment: analgesia, observation overnight, orthopedic review. Medication reconciliation on admission, from the patient's US pharmacy record: multivitamin daily; cetirizine 10 mg as needed; naproxen 500 mg twice daily, increased from 250 mg twice daily by the prescriber on May 7, 2026, after a patient portal message reporting continuing back pain. Plan: discharge with analgesia, avoid flying for 48 hours, follow up with own physician at home."
+      },
+      {
+        "name": "Letter from home physician",
+        "type": "medical_records",
+        "content": "Northlake Family Medicine, Seattle. To whom it may concern: Ms. Park was seen in clinic on April 10, 2026, for a lower back strain after lifting. Naproxen 250 mg twice daily was prescribed. She has had no further office visits with this practice."
+      },
+      {
+        "name": "Itemized bill",
+        "type": "receipt",
+        "content": "Clinica Santa Maria. Emergency assessment $540.00; MRI $1,180.00; orthopedic consultation $320.00; medication $46.50; overnight observation $610.00. Total $2,696.50, paid by card August 7, 2026."
+      },
+      {
+        "name": "Home physiotherapy receipts",
+        "type": "receipt",
+        "content": "Fremont Physical Therapy, Seattle. Four sessions, August 17 to 23, 2026: $180.00."
+      }
+    ],
+    "decision": {
+      "decision": "decline",
+      "payout": 0.0,
+      "reason": "The policy was bought on July 3, so the 60-day look-back runs from May 4 to July 3. The April 10 clinic visit falls outside that window. However, the hospital's medication reconciliation shows that the customer's prescriber increased her naproxen from 250 mg to 500 mg twice daily on May 7 for continuing back pain, which is inside the window, and a change in dose is a change in medication. The back condition is therefore pre-existing, the policy has no Pre-Existing Condition Waiver, and section 7 excludes the claim. The home physiotherapy would also be excluded as treatment after returning home.",
+      "policy_reference": "Policy wording, section 7; claims manual, pre-existing conditions",
+      "decided_by": "Dana Whitfield",
+      "decided_on": "2026-08-30T13:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": []
+    }
+  },
+  {
+    "claim_id": "CLM-1605",
+    "policy_id": "POL-2423",
+    "customer_id": "CUS-3423",
+    "claim_type": "trip_cancellation",
+    "submitted_on": "2026-09-02",
+    "incident_date": "2026-08-20",
+    "incident_location": "Columbus, Ohio, USA",
+    "summary": "Couple cancelled a week in Cancun, Mexico after the airline stopped all flights to Cancun ahead of a hurricane",
+    "story": "My wife and I were booked to fly to Cancun on August 21 for a week at the beach. On August 20 Skylark Airways emailed to say every flight to Cancun was cancelled because of the hurricane, and nothing would fly there for days. There was no way to get there, so we cancelled the trip. The airline would not give us anything back because we were on their basic fare, and the hotel only refunded part of what we paid. Altogether we are out a lot of money for a vacation we never got to take. We have kept every email and receipt, and they are all attached.",
+    "amount_claimed": 2440.0,
+    "items": [
+      {
+        "description": "Return flights for two, Columbus to Cancun, Skylark Airways, basic fare",
+        "category": "transport",
+        "amount": 1180.0
+      },
+      {
+        "description": "Seven nights at Hotel Arena Turquesa, Cancun, prepaid",
+        "category": "accommodation",
+        "amount": 1260.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Skylark Airways flight cancellation notice",
+        "type": "supplier_confirmation",
+        "content": "Booking SK4R8M for Harold Wrenfield and Diane Wrenfield. Flight SK1187 Columbus to Cancun, August 21, 2026, returning SK1188 August 28, 2026. Fare paid by card: $1,180.00, fare type Basic. Notice issued August 20, 2026: Skylark Airways has suspended all service to and from Cancun International Airport from August 20 through August 23, 2026. The suspension follows the National Hurricane Center advisory of 11:00 a.m. EDT on August 18, 2026, which named Tropical Storm Tobias and forecast its arrival on the Cancun coast on August 21, and the storm's upgrade to a hurricane on August 20. Customers on Basic fares who choose not to rebook are not eligible for a refund or a travel credit. The passengers did not rebook, and the booking was cancelled on August 20, 2026."
+      },
+      {
+        "name": "Hotel Arena Turquesa cancellation letter",
+        "type": "supplier_confirmation",
+        "content": "Reservation for Mr and Mrs Wrenfield, August 21 to August 28, 2026, ocean-view double room, prepaid rate, $1,260.00 charged on July 5, 2026. Cancelled by the guest on August 20, 2026. Under the hotel's weather policy, a refund of $520.00 has been returned to the original card. The remaining $740.00 is non-refundable under the rate conditions."
+      },
+      {
+        "name": "Card statement",
+        "type": "receipt",
+        "content": "Visa ending 3318. July 2, 2026: Skylark Airways $1,180.00. July 5, 2026: Hotel Arena Turquesa $1,260.00. August 24, 2026: Hotel Arena Turquesa refund -$520.00."
+      },
+      {
+        "name": "National Hurricane Center advisory",
+        "type": "other",
+        "content": "National Hurricane Center, August 18, 2026: Tropical Storm Tobias has formed in the western Caribbean. It is expected to become a hurricane and to reach the coast of the Yucatan Peninsula near Cancun on August 21."
+      }
+    ],
+    "decision": {
+      "decision": "decline",
+      "payout": 0.0,
+      "reason": "Section 9 says no benefit pays for events that were publicly known before you bought the policy, such as a named storm. The airline's notice shows that Tropical Storm Tobias was named and forecast to reach Cancun on August 18, 2026, and the policy was bought on August 19, 2026. The storm was therefore publicly known before purchase. The flight suspension would otherwise be a covered reason under section 2, but this exclusion applies to every benefit, so the unrefunded flight and hotel costs are not payable.",
+      "policy_reference": "Policy wording, section 9 (events publicly known before purchase) and section 2; claims manual, sections 2 and 4",
+      "decided_by": "Priya Raman",
+      "decided_on": "2026-09-08T14:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Cancellation caused by Tropical Storm Tobias, named and forecast on August 18, 2026, the day before the policy was bought on August 19, 2026: excluded under section 9",
+          "amount": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "claim_id": "CLM-1606",
+    "policy_id": "POL-2424",
+    "customer_id": "CUS-3424",
+    "claim_type": "baggage",
+    "submitted_on": "2026-09-18",
+    "incident_date": "2026-09-12",
+    "incident_location": "Valencia, Spain",
+    "summary": "Cabin bag snatched at Valencia train station on the last day of the trip",
+    "story": "On September 12, the day I was due to fly home, I was standing at the ticket machines in the main train station in Valencia with my cabin bag on my shoulder. A man on a scooter rode past, grabbed the strap and pulled it off me, and he was gone before I could do anything. I had packed my gadgets in that bag so they would not go in the hold, along with a couple of t-shirts. I went straight to the police office in the station and made a report. I flew home that evening as planned. I am claiming for everything that was in the bag.",
+    "amount_claimed": 3176.0,
+    "items": [
+      {
+        "description": "Corvane Lumen X2, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 649.0
+      },
+      {
+        "description": "Vantor Halo, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 449.0
+      },
+      {
+        "description": "Halden Arc, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 899.0
+      },
+      {
+        "description": "Brisa Pocket 2, in the stolen cabin bag",
+        "category": "personal_effects",
+        "amount": 1099.0
+      },
+      {
+        "description": "T-shirt, in the stolen cabin bag",
+        "category": "clothing",
+        "amount": 40.0
+      },
+      {
+        "description": "T-shirt, in the stolen cabin bag",
+        "category": "clothing",
+        "amount": 40.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Police report",
+        "type": "police_report",
+        "content": "Policia Nacional, Valencia, Estacion del Norte office. Report made September 12, 2026 at 10:25 by Renata Okafor. At about 09:40 at the ticket machines, a man on a scooter pulled a cabin bag from the complainant's shoulder and rode off. Contents reported: Corvane Lumen X2, Vantor Halo, Halden Arc, Brisa Pocket 2, two t-shirts. No arrest."
+      },
+      {
+        "name": "Receipts",
+        "type": "receipt",
+        "content": "Corvane store, order 55120, bought April 2026: Corvane Lumen X2, $649.00. Vantor online store, order VH-88213, bought April 2026: Vantor Halo, $449.00. Halden store, bought May 2026: Halden Arc, $899.00. Halden Photo, bought June 2026: Brisa Pocket 2, $1,099.00."
+      },
+      {
+        "name": "Customer's list of clothing",
+        "type": "other",
+        "content": "Two cotton t-shirts, $40.00 each, $80.00 in all."
+      },
+      {
+        "name": "Product details",
+        "type": "other",
+        "content": "Corvane Lumen X2: a smartwatch with GPS, heart-rate tracking and contactless payments, released in March 2026. Vantor Halo: a titanium smart ring that tracks sleep, heart rate and activity. Halden Arc: a pocket projector that throws a picture of up to 100 inches from a phone or laptop. Brisa Pocket 2: a compact digital camera with a 1 inch sensor and a fixed 24-120mm zoom lens."
+      }
+    ],
+    "decision": {
+      "decision": "approve",
+      "payout": 1500.0,
+      "reason": "The bag was snatched from the customer's shoulder on the last day of the trip. It was reported to the police within the hour and receipts are on file, so it is a covered theft. With Electronics Plus, the Corvane Lumen X2 (a smartwatch) and the Brisa Pocket 2 (a camera) are electronics with a $1,200 per-item limit, and both are paid in full. The Vantor Halo (a smart ring) and the Halden Arc (a pocket projector) are not on the electronics list, so each is held to the $300 Premium per-item limit. Each t-shirt counts as a separate item. The total of $2,428 less the $50 deductible is $2,378. This is capped at the $1,500 Premium Baggage and Personal Effects maximum, and the payout needs sign-off.",
+      "policy_reference": "Policy wording, sections 1, 5, 8 (Electronics Plus) and 10; claims manual, sections 3, 6 and 7",
+      "decided_by": "Marcus Oyelaran",
+      "decided_on": "2026-09-24T15:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Corvane Lumen X2, smartwatch, within the $1,200 Electronics Plus limit",
+          "amount": 649.0
+        },
+        {
+          "step": "Vantor Halo, smart ring, not on the electronics list, capped at the $300 per-item limit",
+          "amount": 300.0
+        },
+        {
+          "step": "Halden Arc, pocket projector, not on the electronics list, capped at the $300 per-item limit",
+          "amount": 300.0
+        },
+        {
+          "step": "Brisa Pocket 2, camera, within the $1,200 Electronics Plus limit",
+          "amount": 1099.0
+        },
+        {
+          "step": "T-shirt 1",
+          "amount": 40.0
+        },
+        {
+          "step": "T-shirt 2",
+          "amount": 40.0
+        },
+        {
+          "step": "Less the Premium baggage deductible",
+          "amount": -50.0
+        },
+        {
+          "step": "Reduction to the $1,500 Premium Baggage and Personal Effects maximum",
+          "amount": -878.0
+        }
+      ],
+      "over_approval_limit": true,
+      "paid_on": "2026-09-24T15:00:00+00:00",
+      "signed_off_by": "HND-01",
+      "signed_off_on": "2026-09-24T15:00:00+00:00"
+    }
+  },
+  {
+    "claim_id": "CLM-1607",
+    "policy_id": "POL-2410",
+    "customer_id": "CUS-3410",
+    "claim_type": "baggage",
+    "submitted_on": "2026-09-22",
+    "incident_date": "2026-09-08",
+    "incident_location": "Near Impruneta, Tuscany, Italy",
+    "summary": "Backpack stolen from a locked rental car at a fuel station",
+    "story": "On September 8 I stopped for fuel at a station outside Impruneta. I locked the rental car and went inside to pay. I was gone maybe five minutes. When I came back the car had been broken into and my backpack was gone. It had my passport, my laptop, some cash and some clothes in it. The station attendant helped me call the police and I made a report straight away. I also told the rental company, because the rental came with some cover for belongings, and they have since settled part of it. The next day I took a taxi to the US Consulate in Florence, had new passport photos taken and paid for an emergency passport so I could fly home. I am claiming for everything I lost and what the passport cost me.",
+    "amount_claimed": 1539.0,
+    "items": [
+      {
+        "description": "Laptop, in the backpack",
+        "category": "electronics",
+        "amount": 1000.0
+      },
+      {
+        "description": "Cash, in the backpack",
+        "category": "cash",
+        "amount": 90.0
+      },
+      {
+        "description": "Jacket, in the backpack",
+        "category": "clothing",
+        "amount": 140.0
+      },
+      {
+        "description": "Two shirts, in the backpack",
+        "category": "clothing",
+        "amount": 90.0
+      },
+      {
+        "description": "Emergency passport fee at the consulate",
+        "category": "travel_documents",
+        "amount": 160.0
+      },
+      {
+        "description": "Passport photos",
+        "category": "travel_documents",
+        "amount": 15.0
+      },
+      {
+        "description": "Taxi to the consulate in Florence",
+        "category": "transport",
+        "amount": 44.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Police report",
+        "type": "police_report",
+        "content": "Carabinieri, Impruneta station. Report made September 8, 2026 at 11:25 by Derek Halvorsen. At about 10:50 the reporting person left a locked rental car, a grey hatchback, at the Carburanti Vallebruna fuel station to pay inside. On returning he found the rear hatch lock forced and the parcel shelf cover pulled back. A backpack that had been in the closed luggage compartment under the cover was missing. Reported contents: US passport, laptop computer, about $90 in cash, a jacket, two shirts. No suspects identified."
+      },
+      {
+        "name": "Laptop and clothing receipts",
+        "type": "receipt",
+        "content": "Laptop, bought March 2025: $1,000.00. Clothing, bought 2026: jacket $140.00, two shirts $90.00."
+      },
+      {
+        "name": "Rental company settlement letter",
+        "type": "settlement_letter",
+        "content": "Arno Autonoleggio, Florence. September 15, 2026. Rental agreement RA-77182, renter Derek Halvorsen. Personal Effects Protection claim for theft from vehicle on September 8, 2026. Settlement for the stolen laptop: $200.00, paid to the renter's card. This settlement is final under the terms of the protection."
+      },
+      {
+        "name": "Consulate receipt",
+        "type": "receipt",
+        "content": "US Consulate General, Florence. September 9, 2026. Emergency passport issued to Derek Halvorsen. Fee paid: $160.00."
+      },
+      {
+        "name": "Photo receipt",
+        "type": "receipt",
+        "content": "Foto Lampo Santa Croce, Florence. September 9, 2026. Passport photos, set of 4: $15.00."
+      },
+      {
+        "name": "Taxi receipt",
+        "type": "receipt",
+        "content": "Taxi Colline Fiorentine. September 9, 2026. Impruneta to Lungarno Vespucci, Florence: $44.00."
+      }
+    ],
+    "decision": {
+      "decision": "approve",
+      "payout": 589.0,
+      "reason": "The police report shows the backpack was locked in the closed luggage compartment under the parcel shelf cover and out of sight, so it was attended under section 5 and the manual's vehicles note, and the theft was reported to the police within 24 hours. On Premium with no Electronics Plus, the laptop counts at the $300 per-item limit. The cash of $90 is under the $100 cash limit, and the jacket at $140 and the shirts at $90 are under the limit, giving $620. The rental company's $200 settlement for the laptop comes off next, leaving $420. The $50 Premium deductible then leaves $370 under Baggage and Personal Effects. Separately, section 6 pays the emergency passport fee of $160, photos of $15 and taxi to the consulate of $44, totalling $219. That is within the $250 maximum and carries no deductible. The total payout is $589.",
+      "policy_reference": "Policy wording, sections 1, 5, 6 and 10; claims manual, vehicles and section 6",
+      "decided_by": "Marcus Oyelaran",
+      "decided_on": "2026-09-28T16:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Laptop, capped at the $300 Premium per-item limit",
+          "amount": 300.0
+        },
+        {
+          "step": "Cash, within the $100 cash limit",
+          "amount": 90.0
+        },
+        {
+          "step": "Jacket",
+          "amount": 140.0
+        },
+        {
+          "step": "Two shirts",
+          "amount": 90.0
+        },
+        {
+          "step": "Less rental company Personal Effects Protection settlement",
+          "amount": -200.0
+        },
+        {
+          "step": "Less Premium deductible, Baggage and Personal Effects",
+          "amount": -50.0
+        },
+        {
+          "step": "Emergency passport fee",
+          "amount": 160.0
+        },
+        {
+          "step": "Passport photos",
+          "amount": 15.0
+        },
+        {
+          "step": "Taxi to the consulate",
+          "amount": 44.0
+        }
+      ],
+      "over_approval_limit": false,
+      "paid_on": "2026-09-28T17:00:00+00:00"
+    }
+  },
+  {
+    "claim_id": "CLM-1608",
+    "policy_id": "POL-2409",
+    "customer_id": "CUS-3409",
+    "claim_type": "passport",
+    "submitted_on": "2026-08-10",
+    "incident_date": "2026-08-04",
+    "incident_location": "Barcelona, Spain",
+    "summary": "Passport found missing at passport control on arrival in Barcelona; emergency passport obtained at the consulate",
+    "story": "I flew into Barcelona on August 4 to join a cruise. At passport control I opened my travel wallet and my passport was not there. I think it slipped out on the plane or at the gate, but the airline never found it. The officers let me in so I could go to the consulate. The next morning I had new photos taken, took a taxi to the consulate and paid for an emergency passport, which I got that afternoon. Because I spent the whole day there I missed the Montserrat day trip I had paid for in advance through the cruise line, and they would not refund it. I am claiming the consulate fee, the photos, the taxi and the trip I missed.",
+    "amount_claimed": 355.0,
+    "items": [
+      {
+        "description": "Consulate fee for an emergency passport",
+        "category": "fees",
+        "amount": 95.0
+      },
+      {
+        "description": "Passport photos",
+        "category": "fees",
+        "amount": 12.0
+      },
+      {
+        "description": "Taxi from the hotel to the consulate",
+        "category": "transport",
+        "amount": 38.0
+      },
+      {
+        "description": "Prepaid Montserrat excursion missed while at the consulate",
+        "category": "other",
+        "amount": 210.0
+      }
+    ],
+    "documents": [
+      {
+        "name": "Consulate receipt",
+        "type": "receipt",
+        "content": "Consular Section, Barcelona. August 5, 2026. Emergency passport issued to Delphine Okafor-Reyes. Fee paid by card: $95.00."
+      },
+      {
+        "name": "Photo booth receipt",
+        "type": "receipt",
+        "content": "FotoRapid, Carrer de Balmes, Barcelona. August 5, 2026, 08:52. Passport photo set: $12.00."
+      },
+      {
+        "name": "Taxi receipt",
+        "type": "receipt",
+        "content": "Taxi Ciutat Barcelona. August 5, 2026, 09:15. Hotel Mirador Eixample to Passeig de la Reina Elisenda: $38.00."
+      },
+      {
+        "name": "Cruise line excursion confirmation",
+        "type": "booking_confirmation",
+        "content": "Azura Seas Cruises. Pre-cruise excursion: Montserrat Monastery day trip, August 5, 2026, departing 08:30. Guest: Delphine Okafor-Reyes. Paid in full: $210.00. Non-refundable once the coach has departed. Status: no-show."
+      },
+      {
+        "name": "Customer's account of the loss",
+        "type": "statement",
+        "content": "I arrived on flight NV 2214 at Barcelona on August 4, 2026 at 18:40. At passport control I found my passport was missing from my travel wallet. I reported it to the border officers and to the airline's desk, which had no record of it being found. I went to the consulate the next morning and was issued an emergency passport the same day. Delphine Okafor-Reyes."
+      }
+    ],
+    "decision": {
+      "decision": "approve",
+      "payout": 145.0,
+      "reason": "The passport was lost during the covered trip, and the consulate fee ($95.00), the photos ($12.00) and the taxi to the consulate ($38.00) are receipted. These are exactly what the passport benefit pays, and no deductible applies. The missed Montserrat excursion followed indirectly from the lost passport, so it is a consequential loss and is excluded. The eligible total of $145.00 is inside the $150 Economy maximum for passport and travel documents, so $145.00 is paid. The customer has two earlier claims. The baggage claim filed on 2025-08-02 falls outside the 12 months before this claim was filed on 2026-08-10, so only the trip delay claim filed on 2025-12-14 counts. This is the customer's second claim in 12 months, not the third, and it is decided in the normal way.",
+      "policy_reference": "Policy wording, sections 1, 6, 9 and 10; claims manual, consequential losses and sections 6 and 9",
+      "decided_by": "Dana Whitfield",
+      "decided_on": "2026-08-14T17:00:00+00:00",
+      "manual_version": "2026.2",
+      "calculation": [
+        {
+          "step": "Consulate fee for the emergency passport",
+          "amount": 95.0
+        },
+        {
+          "step": "Passport photos",
+          "amount": 12.0
+        },
+        {
+          "step": "Taxi to the consulate",
+          "amount": 38.0
+        }
+      ],
+      "over_approval_limit": false,
+      "paid_on": "2026-08-14T18:00:00+00:00"
+    }
+  }
+]
