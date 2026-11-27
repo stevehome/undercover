@@ -129,6 +129,19 @@ async function pages(page: Page): Promise<void> {
   await take(page, "settings");
 }
 
+async function appealPictures(page: Page): Promise<void> {
+  await open(page, "/appeals", "Appeals to the ombudsman", true);
+  await take(page, "appeals");
+  await open(page, "/claims/CLM-1602", "An appeal to the ombudsman");
+  await page
+    .getByRole("heading", { name: /An appeal to the ombudsman/ })
+    .evaluate((el) => {
+      el.scrollIntoView({ block: "start" });
+    });
+  await page.waitForTimeout(1_000);
+  await take(page, "claim-appeal");
+}
+
 async function refusal(browser: Browser, held: string): Promise<void> {
   const context = await browser.newContext({ viewport: VIEWPORT });
   const page = await context.newPage();
@@ -154,6 +167,7 @@ async function main(): Promise<void> {
   const side = sidebarOf(page);
   await side.panel.getByText("What needs a handler?").waitFor();
   await take(page, "copilot-sidebar");
+  await appealPictures(page);
   const ids = await dispatch(page, side);
   const held = await handlerWork(page, side, ids);
   await pages(page);

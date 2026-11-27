@@ -1,6 +1,6 @@
 # Plan: appeals to the ombudsman
 
-Builds `docs/APPEALS.md` in six phases: the records and the documents (the tables, the eight starting appeals and the context layer's files), the app's logic and routes (recording, the check for hidden instructions, redress), the Copilot's tools and its pause before redress, the dashboard (the Appeals page and the claim page's panel), the documents and the guide's page, and the live checks. Nothing here creates or deletes anything on AWS. The deployed database and the context layer need a reseed and a redeploy afterwards, which you do.
+Builds `docs/week3day5_product_APPEALS.md` in six phases: the records and the documents (the tables, the eight starting appeals and the context layer's files), the app's logic and routes (recording, the check for hidden instructions, redress), the Copilot's tools and its pause before redress, the dashboard (the Appeals page and the claim page's panel), the documents and the guide's page, and the live checks. Nothing here creates or deletes anything on AWS. The deployed database and the context layer need a reseed and a redeploy afterwards, which you do.
 
 ## What I read
 
@@ -131,10 +131,10 @@ The documents describe the product as it now is, and the guide has an Appeals se
 
 **Success criteria**
 
-- [ ] `uv run pytest backend/tests/test_guide.py -q` passes with the new section: every picture has alt text, a file and its pair.
-- [ ] `npm run check:ts` passes on the script, and `npm run guide` is still not part of `npm run check`.
-- [ ] The documents name each new module's job, and `agent/tests/test_structure.py` and `eslint.config.js` hold any rule I added.
-- [ ] `docs/STATUS.md` says how to run the appeals work and what to redeploy; committed.
+- [x] `uv run pytest backend/tests/test_guide.py -q` passes with the new section: every picture has alt text, a file and its pair.
+- [x] `npm run check:ts` passes on the script, and `npm run guide` is still not part of `npm run check`.
+- [x] The documents name each new module's job, and `agent/tests/test_structure.py` and `eslint.config.js` hold any rule I added.
+- [x] `docs/STATUS.md` says how to run the appeals work and what to redeploy; committed.
 
 ## Phase 6: The live checks
 
