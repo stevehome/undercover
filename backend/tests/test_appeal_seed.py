@@ -65,7 +65,7 @@ def test_each_appeal_fits_its_claim_and_its_outcome(client):
             assert sum(amounts) > 0
         else:
             assert amounts == [None, None, None]
-        assert (appeal["reason"] is None) == (
+        assert (appeal["ombudsman_reason"] is None) == (
             appeal["status"] == AppealStatus.WITH_THE_OMBUDSMAN
         )
 

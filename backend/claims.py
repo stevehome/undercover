@@ -6,7 +6,16 @@ from typing import Any
 
 from sqlalchemy import insert, or_, select, update
 
-from backend import calculations, db, decision_record, money, payouts, reference, tables
+from backend import (
+    appeals,
+    calculations,
+    db,
+    decision_record,
+    money,
+    payouts,
+    reference,
+    tables,
+)
 from backend.errors import Conflict, NotFound
 from backend.statuses import ClaimStatus, StepKind
 
@@ -66,6 +75,7 @@ def get_full(claim_id: str) -> dict[str, Any]:
         "customer_previous_claims": reference.customer(claim["customer_id"])[
             "previous_claims"
         ],
+        "customer_appeals": appeals.history_lines(claim["customer_id"]),
     }
 
 

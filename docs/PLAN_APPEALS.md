@@ -69,16 +69,16 @@ A handler can record an appeal and an outcome, a senior handler can pay redress,
 
 **Success criteria**
 
-- [ ] `uv run pytest backend -q` passes, through the API with the sign-in helper and the check answered by the stand-in:
+- [x] `uv run pytest backend -q` passes, through the API with the sign-in helper and the check answered by the stand-in:
   - an appeal is recorded on a decided claim; refused on a claim that is waiting, in progress, held, sent back, referred or an evaluation's; and refused when the claim has one already
   - an outcome is recorded on an open appeal only; an upheld one needs its amounts and a not upheld one takes none
   - a handler who can't sign off is refused redress, with the reason, and a senior handler pays it once with their name and the time; the amount is the recorded three, a second payment is refused, and the claim's own payment is untouched
   - a marked appeal is saved with its reason and the check's cost; a failed check is a 503 and saves nothing
-- [ ] A test asks every new route with no credentials, with the agent's key alone, and with a handler's, and only a handler's works; `GET /api/agent/openapi.json` has exactly the operations it has today.
-- [ ] `get_claim` with the agent's key has `customer_appeals` as one line each and holds no appeal's grounds or reason, with a marked and an unmarked appeal on the customer's claims; the Copilot's two reads leave out a marked appeal's texts and keep an unmarked appeal's.
-- [ ] `backend/tests/test_connections.py` covers recording and paying: no request holds two connections.
-- [ ] The Appeals figures (open, upheld, not upheld, the upheld share, redress paid and waiting) match the records, with none decided as a case; a structure test says only `appeals.py` and `appeal_view.py` read the grounds and reason columns.
-- [ ] `uv run pytest -q`, ruff and pyright pass; `docs/SPEC.md` and `docs/STATUS.md` are updated; committed.
+- [x] A test asks every new route with no credentials, with the agent's key alone, and with a handler's, and only a handler's works; `GET /api/agent/openapi.json` has exactly the operations it has today.
+- [x] `get_claim` with the agent's key has `customer_appeals` as one line each and holds no appeal's grounds or reason, with a marked and an unmarked appeal on the customer's claims; the Copilot's two reads leave out a marked appeal's texts and keep an unmarked appeal's.
+- [x] The tests' autouse connection guard (`backend/tests/conftest.py`) fails any request that holds two connections, and every recording and payment test runs under it.
+- [x] The Appeals figures (open, upheld, not upheld, the upheld share, redress paid and waiting) match the records, with none decided as a case; a structure test says only `appeals.py` and `appeal_view.py` read the grounds and reason columns.
+- [x] `uv run pytest -q`, ruff and pyright pass; `docs/SPEC.md` and `docs/STATUS.md` are updated; committed.
 
 ## Phase 3: The Copilot
 

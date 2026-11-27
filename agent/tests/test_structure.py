@@ -1,6 +1,7 @@
 """Checks on how the code is organized, so structure can't drift past a review."""
 
 import ast
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -105,6 +106,23 @@ def test_only_seed_data_reads_the_data_folder():
         if path.name != "seed_data.py":
             assert "DATA_DIR" not in path.read_text(), path.name
             assert '"data"' not in path.read_text(), path.name
+
+
+APPEAL_TEXT_READERS = {
+    "tables.py",
+    "appeal_seed.py",
+    "appeals.py",
+    "appeal_view.py",
+    "appeal_check.py",
+}
+
+
+def test_only_the_appeal_modules_touch_an_appeals_free_text():
+    for path in (ROOT / "backend").glob("*.py"):
+        if path.name not in APPEAL_TEXT_READERS:
+            text = path.read_text()
+            assert not re.search(r"\.grounds\b|[\"']grounds[\"']", text), path.name
+            assert "ombudsman_reason" not in text, path.name
 
 
 ANSWER_KEY_READERS = {

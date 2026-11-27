@@ -8,7 +8,7 @@ from typing import Any
 
 from sqlalchemy import func, or_, select
 
-from backend import db, money, tables
+from backend import appeals, db, money, tables
 from backend.statuses import ClaimStatus, ItemStatus, RunKind
 
 
@@ -22,7 +22,11 @@ def _latest_dispatch() -> Any:
 
 
 def get() -> dict[str, list[dict[str, Any]]]:
-    """Return the three groups of claims that need a handler, each oldest first."""
+    """Return the groups that need a handler, each oldest first.
+
+    Three groups of claims, and the appeals waiting for an outcome and the redress
+    waiting for a sign-off.
+    """
     claims = tables.claims.c
     in_run = tables.run_claims.c
     left = (
@@ -66,6 +70,21 @@ def get() -> dict[str, list[dict[str, Any]]]:
         "held_for_sign_off": [_held(r) for r in held],
         "referred_or_left_for_a_handler": [_plain(r) for r in others],
         "sent_back_not_yet_worked": [_plain(r) for r in sent_back],
+        "appeals_waiting_for_an_outcome": [
+            _appeal(r) for r in appeals.waiting_for_outcome()
+        ],
+        "redress_waiting_for_sign_off": [
+            {**_appeal(r), "redress": money.from_cents(appeals.redress_cents(r))}
+            for r in appeals.redress_waiting()
+        ],
+    }
+
+
+def _appeal(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "claim_id": row["claim_id"],
+        "summary": row["claim_summary"],
+        "ombudsman_reference": row["ombudsman_reference"],
     }
 
 

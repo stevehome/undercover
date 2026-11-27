@@ -187,7 +187,7 @@ appeals = Table(
     Column("recorded_on", String, nullable=False),
     Column("status", String, nullable=False),
     Column("decided_on", String),
-    Column("reason", String),
+    Column("ombudsman_reason", String),
     Column("outcome_recorded_by", String),
     Column("outcome_recorded_on", String),
     Column("claim_amount_cents", Integer),

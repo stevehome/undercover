@@ -16,6 +16,8 @@ IMPROVER_MODEL = "openai/gpt-6-luna"
 IMPROVER_EFFORT = "medium"
 COPILOT_MODEL = IMPROVER_MODEL
 COPILOT_EFFORT = IMPROVER_EFFORT
+APPEAL_CHECK_MODEL = "openai/gpt-6-luna"
+APPEAL_CHECK_EFFORT = "none"
 
 
 def for_claim_agent() -> RunSettings:
@@ -33,6 +35,15 @@ def for_copilot() -> tuple[str, str]:
     """The model and effort a Copilot turn runs on: the improver's general model."""
     name = os.getenv("MODEL_NAME")
     return (name, NO_EFFORT) if name else (COPILOT_MODEL, COPILOT_EFFORT)
+
+
+def for_appeal_check() -> tuple[str, str | None]:
+    """The model and effort that check an appeal's text, as the claims' check does.
+
+    With `MODEL_NAME` set the effort is left to the model.
+    """
+    name = os.getenv("MODEL_NAME")
+    return (name, None) if name else (APPEAL_CHECK_MODEL, APPEAL_CHECK_EFFORT)
 
 
 def for_improver() -> tuple[str, str]:
