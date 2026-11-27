@@ -74,3 +74,5 @@ graph TD;
 ```
 
 The first message after a pause failed with a 502 on AWS (found on the deployed Copilot, from its conversation record and the runtime's logs): both runtimes shut a session's container down after 60 idle seconds, so the next message met a container still starting, and Runtime answered 502 before running anything. The app now sends a Copilot payload again, after 3 s, up to 4 tries in all, when the answer is that 502 (`RuntimeNotReady` in `backend/agent_runtime.py`, retried in `backend/copilot_service.py` as it is for a busy session); any other refusal is still sent once. A refusal is logged with the runtime, operation and session, never the payload or the sign-in. The Copilot's runtime now stays up 900 seconds between messages (`agentcore/agentcore.json`). Redeploy both for it to take effect: the app's Lambda, and `agentcore deploy` for the runtime's lifecycle setting.
+
+To put a change on AWS, `docs/DEPLOYING.md` says what to run for each kind of change: the app, the context layer, the two agents, the database, the Gateway, the app's settings and the user guide.
