@@ -2,14 +2,14 @@ import json
 import threading
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import event
 
-from backend import appeal_check, db
+from backend import db
 from backend.main import app
+from backend.tests import appeal_check_fake
 from conftest import API_KEY
 
 
@@ -118,32 +118,7 @@ def copilot_stub(monkeypatch):
     server.shutdown()
 
 
-class FakeChat:
-    """A stand-in for OpenRouter's chat endpoint, answering the appeal check."""
-
-    def __init__(self):
-        self.calls = []
-        self.found = False
-        self.reason = "The text only says what happened."
-        self.unreadable = False
-
-    def send(self, **kwargs):
-        self.calls.append(kwargs)
-        content = "not json"
-        if not self.unreadable:
-            content = json.dumps(
-                {"reason": self.reason, "instructions_found": self.found}
-            )
-        message = SimpleNamespace(content=content)
-        return SimpleNamespace(
-            choices=[SimpleNamespace(message=message)],
-            usage=SimpleNamespace(cost=0.00002),
-        )
-
-
 @pytest.fixture
 def check(monkeypatch):
     """The model that checks an appeal's text, finding no instruction unless told to."""
-    chat = FakeChat()
-    monkeypatch.setattr(appeal_check, "_client", lambda: SimpleNamespace(chat=chat))
-    return chat
+    return appeal_check_fake.install(monkeypatch)

@@ -92,15 +92,15 @@ The Copilot can look up appeals, record them and their outcomes, and pay redress
 
 **Success criteria**
 
-- [ ] `uv run pytest agent -q` passes with a stub model and the real backend through `TestClient`:
+- [x] `uv run pytest agent -q` passes with a stub model and the real backend through `TestClient`:
   - the reads, the two recordings and a refusal passed on with its reason
   - the pause before redress, answered by a freshly built Copilot on the same saved state: nothing is paid before the answer, Cancel pays nothing, and the answer pays once
   - a handler who can't sign off gets no card
   - the card's amounts and reason come from our records, not the call's arguments, and a marked appeal's card has no reason
   - no tool result holds a marked appeal's grounds or reason
-- [ ] `agent/tests/test_structure.py` passes: no `copilot_*` module imports the agent's key, `send` or `api`, and none calls the dashboard's whole appeal reads.
-- [ ] `what_needs_a_handler` answers with the two new groups.
-- [ ] `uv run pytest -q`, ruff and pyright pass; `npm run check:runtime` passes; `docs/STATUS.md` is updated; committed.
+- [x] `agent/tests/test_structure.py` passes: no `copilot_*` module imports the agent's key, `send` or `api`, and none calls the dashboard's whole appeal reads.
+- [x] `what_needs_a_handler` answers with the two new groups.
+- [x] `uv run pytest -q`, ruff and pyright pass; `npm run check:runtime` passes; `docs/STATUS.md` is updated; committed.
 
 ## Phase 4: The dashboard
 

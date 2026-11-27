@@ -31,6 +31,7 @@ from agent.sigv4 import SigV4Auth
 from agent.tests.gateway_stand_in import StandInGateway, answer
 from agent.tests.stand_in_memory import StandInMemory
 from backend.main import app
+from backend.tests import appeal_check_fake
 from conftest import API_KEY
 from context import server as context_server
 
@@ -299,3 +300,9 @@ def app_client(monkeypatch):
     client = RecordingClient()
     monkeypatch.setattr(backend_http, "client", client)
     return client
+
+
+@pytest.fixture
+def check(monkeypatch):
+    """The model that checks an appeal's text, finding no instruction unless told to."""
+    return appeal_check_fake.install(monkeypatch)

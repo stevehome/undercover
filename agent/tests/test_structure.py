@@ -313,3 +313,9 @@ def test_the_copilots_client_cant_reach_the_rounds_the_improver_or_a_decision():
     for path in paths:
         assert not path.startswith(forbidden), path
         assert not path.endswith(("/decision", "/payment")), path
+
+
+def test_the_copilot_reads_an_appeal_only_as_a_model_may():
+    text = (ROOT / "agent" / "copilot_api.py").read_text()
+    whole = r'"GET",\s*(f?"/api/appeals"|f"/api/claims/\{claim_id\}/appeal")'
+    assert not re.search(whole, text)

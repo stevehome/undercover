@@ -5,8 +5,18 @@ from langchain_core.messages import ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 from agent import copilot_turns
+from agent.tests import copilot_helpers as helpers
 from agent.tests import records
-from agent.tests.copilot_helpers import begin, reply, seen_model, tool_call, tool_calls
+from agent.tests.copilot_helpers import (
+    answer,
+    begin,
+    read,
+    reply,
+    seen_model,
+    tool_call,
+    tool_result,
+    turn_for,
+)
 from backend import copilot_turns as app_turns
 from conftest import DANA, MARCUS
 
@@ -31,43 +41,8 @@ def hold(backend, claim_id=CLAIM, payout="1200.00"):
     )
 
 
-def turn_for(conversation, email, model, saver, token_for):
-    return copilot_turns.Turn(
-        conversation.conversation_id, token_for(email), model, saver, None
-    )
-
-
 def pause(backend, token_for, email=DANA, calls=(SIGN_OFF,), saver=None):
-    """Work a turn whose first reply asks for these tools; return what it left."""
-    saver = saver or InMemorySaver()
-    conversation = begin(email, ASK)
-    model = seen_model(tool_calls(*calls), reply("All done."))
-    turn = turn_for(conversation, email, model, saver, token_for)
-    copilot_turns.work_turn(turn, ASK)
-    return conversation, saver, model
-
-
-def answer(conversation, saver, token_for, confirmed):
-    """Answer the waiting card with a Copilot built fresh on the same saved state."""
-    shown = app_turns.answer_confirmation(
-        conversation.conversation_id, conversation.handler_id
-    )
-    model = seen_model(reply("Back again."))
-    turn = turn_for(conversation, DANA, model, saver, token_for)
-    copilot_turns.answer_confirmation(turn, confirmed, shown)
-    return model
-
-
-def read(backend, conversation, as_handler, email=DANA):
-    path = f"/api/copilot/conversations/{conversation.conversation_id}"
-    return backend.get(path, headers=as_handler(email)).json()
-
-
-def tool_result(model, name):
-    message = next(
-        m for m in model.seen[-1] if isinstance(m, ToolMessage) and m.name == name
-    )
-    return message
+    return helpers.pause(token_for, ASK, email, calls, saver)
 
 
 def test_a_sign_off_pauses_with_a_card_from_our_records_and_pays_nothing(
@@ -215,7 +190,7 @@ def test_a_second_sign_off_in_the_same_reply_is_answered_one_at_a_time(
     assert backend.get(f"/api/claims/{CLAIM}").json()["paid_amount"] == "1200.00"
     assert backend.get(f"/api/claims/{OTHER}").json()["paid_amount"] is None
     messages = [m for m in model.seen[-1] if isinstance(m, ToolMessage)]
-    assert "One sign-off at a time" in messages[1].content
+    assert "One payment at a time" in messages[1].content
     assert json.loads(str(messages[0].content))["paid_amount"] == "1200.00"
 
 

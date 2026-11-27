@@ -1,8 +1,8 @@
 """The Copilot's graph: its nodes joined by edges, and the checkpointer.
 
 START -> recall -> agent <-> tools; agent -> confirm -> tools when the reply asks for
-a sign-off, which pauses for the handler; agent -> remember when it has no more tools
-to call; remember -> END.
+a payment, a sign-off or redress, which pauses for the handler; agent -> remember when
+it has no more tools to call; remember -> END.
 """
 
 from functools import partial
@@ -15,16 +15,16 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 
 from agent import copilot_nodes, copilot_recording
-from agent.copilot_confirm import SIGN_OFF, confirm
+from agent.copilot_confirm import PAYMENTS, confirm
 from agent.copilot_context import CopilotContext
 from agent.copilot_state import CopilotState
 from agent.copilot_tools import COPILOT_TOOLS
 
 
 def after_agent(state: CopilotState) -> Literal["confirm", "tools", "remember"]:
-    """Ask the handler about a sign-off first, else run the tools, else finish."""
+    """Ask the handler about a payment first, else run the tools, else finish."""
     calls = state["messages"][-1].tool_calls
-    if any(call["name"] == SIGN_OFF for call in calls):
+    if any(call["name"] in PAYMENTS for call in calls):
         return "confirm"
     return "tools" if calls else "remember"
 

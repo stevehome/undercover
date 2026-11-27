@@ -111,6 +111,41 @@ def sign_off_claim(sign_in: str, claim_id: str) -> dict[str, Any]:
     return _call(sign_in, "POST", f"/api/claims/{claim_id}/sign-off")
 
 
+def list_appeals(sign_in: str) -> list[dict[str, Any]]:
+    """List every appeal as a model reads it: a marked appeal has no text."""
+    return _call(sign_in, "GET", "/api/copilot/appeals")
+
+
+def get_appeal(sign_in: str, claim_id: str) -> dict[str, Any]:
+    """Return a claim's appeal as a model reads it: a marked appeal has no text."""
+    return _call(sign_in, "GET", f"/api/copilot/appeals/{claim_id}")
+
+
+def appeal_figures(sign_in: str) -> dict[str, Any]:
+    """Return the counts, the upheld share and the redress on the Appeals page."""
+    return _call(sign_in, "GET", "/api/appeals/figures")
+
+
+def record_appeal(sign_in: str, claim_id: str, body: dict[str, str]) -> dict[str, Any]:
+    """Record an appeal on a claim; the answer is the appeal as a model reads it."""
+    _call(sign_in, "POST", f"/api/claims/{claim_id}/appeal", json=body)
+    return get_appeal(sign_in, claim_id)
+
+
+def record_appeal_outcome(
+    sign_in: str, claim_id: str, body: dict[str, str]
+) -> dict[str, Any]:
+    """Record the ombudsman's decision; the answer is the appeal as a model reads it."""
+    _call(sign_in, "POST", f"/api/claims/{claim_id}/appeal/outcome", json=body)
+    return get_appeal(sign_in, claim_id)
+
+
+def pay_redress(sign_in: str, claim_id: str) -> dict[str, Any]:
+    """Pay an upheld appeal's redress; the answer is the appeal as a model reads it."""
+    _call(sign_in, "POST", f"/api/claims/{claim_id}/appeal/redress")
+    return get_appeal(sign_in, claim_id)
+
+
 def start_step(
     sign_in: str, conversation_id: str, tool: str, kind: CardKind, input_text: str
 ) -> int:

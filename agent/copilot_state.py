@@ -8,8 +8,8 @@ from langgraph.graph.message import add_messages
 
 class CopilotState(TypedDict):
     """The conversation, what the memory gave this turn, and this turn's model calls
-    and cost, which each turn starts again from nothing, the claim the handler has
-    confirmed signing off, and why a sign-off was declined."""
+    and cost, which each turn starts again from nothing, the payment the handler has
+    confirmed (the tool and the claim), and why a payment was declined."""
 
     messages: Annotated[list, add_messages]
     remembered: list[str]

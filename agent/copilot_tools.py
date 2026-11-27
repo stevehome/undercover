@@ -14,8 +14,9 @@ from typing import Any
 from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
-from agent import copilot_api, copilot_criteria, copilot_waiting
+from agent import copilot_api, copilot_appeal_tools, copilot_criteria, copilot_waiting
 from agent.copilot_api import CardKind, EvalSet
+from agent.copilot_confirm import ONE_AT_A_TIME, SIGN_OFF, confirmation_key
 from agent.copilot_context import CopilotContext
 from agent.refusals import BY_COPILOT, Refusal
 from agent.tool_route import CONTEXT
@@ -24,7 +25,6 @@ from agent.tools import Document, Plan, Record
 
 AGENTS_SETTING = "improver_agents_at_once"
 ACCURACY_SETTING = "objective_accuracy"
-ONE_AT_A_TIME = "One sign-off at a time: ask again for this claim after the first."
 DASHBOARD_PLACES = {"dispatch": "the Queue page", "evaluation": "the Scoreboard"}
 
 KINDS: dict[str, CardKind] = {
@@ -43,6 +43,7 @@ KINDS: dict[str, CardKind] = {
     "send_back_claim": "action",
     "sign_off_claim": "action",
     "check_success_criteria": "agent work",
+    **copilot_appeal_tools.KINDS,
     **{
         name: "context" for name, target in CONTEXT_TARGETS.items() if target == CONTEXT
     },
@@ -258,7 +259,7 @@ def sign_off_claim(
     The handler is asked to confirm first; nothing is paid until they do.
     """
     state = runtime.state
-    if state["confirmed"] != claim_id:
+    if state["confirmed"] != confirmation_key(SIGN_OFF, claim_id):
         raise Refusal(BY_COPILOT, state["sign_off_note"] or ONE_AT_A_TIME)
     return copilot_api.sign_off_claim(runtime.context.sign_in, claim_id)
 
@@ -327,4 +328,5 @@ COPILOT_TOOLS: list[BaseTool] = [
     send_back_claim,
     sign_off_claim,
     check_success_criteria,
+    *copilot_appeal_tools.APPEAL_TOOLS,
 ]
