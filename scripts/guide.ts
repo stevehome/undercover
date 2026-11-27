@@ -15,6 +15,7 @@ import { compare, removeExtra, shoot } from "./guide/pictures.ts";
 
 const APP = "http://localhost:5173";
 const VIEWPORT = { width: 1280, height: 800 };
+const TALL = { width: 1280, height: 1100 };
 const PASSWORD = process.env.HANDLER_PASSWORD ?? "";
 const made = new Set<string>();
 let spend = 0n;
@@ -101,7 +102,9 @@ async function handlerWork(page: Page, side: Sidebar, ids: string[]) {
   await page.waitForTimeout(1_000);
   await take(page, "decision");
   await question(side, `Sign off on ${held}`, "Confirm the sign-off");
+  await page.setViewportSize(TALL);
   await take(page, "copilot-confirm", side, true, "Confirm the sign-off");
+  await page.setViewportSize(VIEWPORT);
   await page.getByRole("button", { name: "Cancel" }).click();
   return held;
 }

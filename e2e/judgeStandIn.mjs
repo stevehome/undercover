@@ -69,6 +69,11 @@ createServer((request, response) => {
   request.on("data", (chunk) => (text += chunk));
   request.on("end", () => {
     if (request.url.includes("chat/completions")) {
+      if (request.url !== "/api/v1/chat/completions") {
+        response.statusCode = 404;
+        response.end("<!DOCTYPE html><html><body>Not found</body></html>");
+        return;
+      }
       checks += 1;
       response.end(JSON.stringify(checkAnswer(text)));
       return;

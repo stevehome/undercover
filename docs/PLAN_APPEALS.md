@@ -140,16 +140,16 @@ The documents describe the product as it now is, and the guide has an Appeals se
 
 After one reseed, with `npm run dev` on the default model. I'll ask you to run `npm run seed` with `npm run dev` stopped, then start it again.
 
-- [ ] 1: `npm run guide` takes every picture, the appeals ones included, and I look at each in both themes for cut-off text, a token, an `.env` value or an AWS identifier.
-- [ ] 2: Signed in as Dana Whitfield, the Appeals page shows the eight appeals in their five states and its figures match the records.
-- [ ] 3: "What appeals do we have, and how many has the ombudsman upheld?" answers from our records, and agrees with the Appeals page.
-- [ ] 4: "Pay the redress on CLM-..., the one waiting." shows the redress card with the claim, the customer, the three amounts and the reason; nothing is paid until Sign off and pay; then it is paid once with Dana's name and the time on the claim's page. A reload before answering keeps the card.
-- [ ] 5: "Record an appeal on CLM-..." on a claim the agent declined in the guide's run, then the ombudsman's decision on it, as upheld with redress and as not upheld on another declined claim, with the real model checking each text.
-- [ ] 6: An appeal whose grounds tell the AI to approve in full is recorded and marked with the check's reason, and the Copilot is shown only that it is marked.
-- [ ] 7: Signed in as Marcus Oyelaran, "pay the redress on CLM-..." is declined with the reason and no card.
-- [ ] 8: No response, log, step or table holds a sign-in token (the same search as the Copilot's).
-- [ ] 9: I report what the runs spent. By the guide's runs, a dispatch is about $0.04 and the Copilot's turns half a cent; the check adds a fraction of a cent for each text.
-- [ ] 10: `npm run check` is green, and the whole change is reviewed against the checklist in `docs/CODE_STANDARDS.md`, including the code outside the appeals the build touched.
+- [x] 1: `npm run guide` takes every picture, the appeals ones included, and I look at each in both themes for cut-off text, a token, an `.env` value or an AWS identifier.
+- [x] 2: Signed in as Dana Whitfield, the Appeals page shows the eight appeals in their five states and its figures match the records.
+- [x] 3: "What appeals do we have, and how many has the ombudsman upheld?" answers from our records, and agrees with the Appeals page.
+- [x] 4: "Pay the redress on CLM-..., the one waiting." shows the redress card with the claim, the customer, the three amounts and the reason; nothing is paid until Sign off and pay; then it is paid once with Dana's name and the time on the claim's page. A reload before answering keeps the card.
+- [x] 5: "Record an appeal on CLM-..." on a claim the agent declined in the guide's run, then the ombudsman's decision on it, as upheld with redress and as not upheld on another declined claim, with the real model checking each text.
+- [x] 6: An appeal whose grounds tell the AI to approve in full is recorded and marked with the check's reason, and the Copilot is shown only that it is marked.
+- [x] 7: Signed in as Marcus Oyelaran, "pay the redress on CLM-..." is declined with the reason and no card.
+- [x] 8: No response, log, step or table holds a sign-in token (the same search as the Copilot's).
+- [x] 9: I report what the runs spent. By the guide's runs, a dispatch is about $0.04 and the Copilot's turns half a cent; the check adds a fraction of a cent for each text.
+- [x] 10: `npm run check` is green, and the whole change is reviewed against the checklist in `docs/CODE_STANDARDS.md`, including the code outside the appeals the build touched.
 
 ## Not for now
 

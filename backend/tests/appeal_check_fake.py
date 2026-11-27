@@ -14,9 +14,12 @@ class FakeChat:
         self.found = False
         self.reason = "The text only says what happened."
         self.unreadable = False
+        self.fails: Exception | None = None
 
     def send(self, **kwargs):
         self.calls.append(kwargs)
+        if self.fails:
+            raise self.fails
         content = "not json"
         if not self.unreadable:
             content = json.dumps(
