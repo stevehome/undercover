@@ -19,6 +19,20 @@ const CARD = {
   reason: "Covered by section 3.",
 };
 
+const REDRESS_CLAIM = "CLM-1602";
+const REDRESS_CARD = {
+  kind: "redress",
+  claim_id: REDRESS_CLAIM,
+  customer: { customer_id: "CUS-3408", name: "Gareth Ollander" },
+  redress: {
+    claim_amount: "400.00",
+    compensation: "150.00",
+    interest: "6.40",
+    total: "556.40",
+  },
+  reason: "The wording was unclear about when the cover began.",
+};
+
 const ANSWER = [
   "I signed off **CLM-1003** and paid it.",
   "",
@@ -62,7 +76,48 @@ const refused = (reason) => ({
   reason,
 });
 
+async function startRedressTurn(payload) {
+  const { conversation_id: id, sign_in: signIn } = payload;
+  await step(
+    payload,
+    "get_appeal",
+    "claims",
+    `claim_id: ${REDRESS_CLAIM}`,
+    done("An upheld appeal, redress waiting"),
+  );
+  await call(signIn, `/conversations/${id}/waiting`, { card: REDRESS_CARD });
+}
+
+async function answerRedress(payload) {
+  const { conversation_id: id, sign_in: signIn } = payload;
+  const confirmed = payload.confirmed;
+  if (confirmed) {
+    await fetch(`${APP}/api/claims/${REDRESS_CLAIM}/appeal/redress`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${signIn}` },
+    });
+  }
+  await step(
+    payload,
+    "pay_redress",
+    "action",
+    `claim_id: ${REDRESS_CLAIM}`,
+    confirmed
+      ? done("Paid")
+      : refused("The handler cancelled. Nothing was paid."),
+  );
+  await call(signIn, `/conversations/${id}/done`, {
+    text: confirmed
+      ? "I paid the redress on **CLM-1602**: $556.40."
+      : "I haven't paid it. What would you like instead?",
+    model_calls: 2,
+    cost_nanos: 800000,
+    work_ms: 1800,
+  });
+}
+
 async function startTurn(payload) {
+  if (/redress/i.test(payload.message)) return startRedressTurn(payload);
   const { conversation_id: id, sign_in: signIn } = payload;
   await step(payload, "list_claims", "claims", "", done("26 claims"));
   await step(
@@ -76,6 +131,7 @@ async function startTurn(payload) {
 }
 
 async function answerConfirmation(payload) {
+  if (payload.card?.kind === "redress") return answerRedress(payload);
   const { conversation_id: id, sign_in: signIn } = payload;
   const confirmed = payload.confirmed;
   await step(

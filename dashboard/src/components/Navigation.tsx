@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 const PAGES = [
   ["/", "Queue"],
   ["/scoreboard", "Scoreboard"],
+  ["/appeals", "Appeals"],
   ["/improvement", "Improvement"],
   ["/configuration", "Configuration"],
   ["/settings", "Settings"],

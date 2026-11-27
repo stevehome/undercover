@@ -116,10 +116,10 @@ Handlers can see, record and pay appeals on the dashboard, and the Copilot's sid
 
 **Success criteria**
 
-- [ ] `npm run check:ts` passes with 80% coverage: component tests for each form's validation, the three outcomes' panels, the label in each state, the figures, the filter, the empty page, the can't-do message, and the redress card's two buttons.
-- [ ] `npm run e2e` passes, adding the Appeals spec (the page's figures and rows; recording an appeal and an outcome on a claim; paying redress; Marcus sees why he can't; a marked appeal shows its reason) and the Copilot spec's redress card, and every existing spec passes with the new counts.
-- [ ] Checked in the browser with the Playwright MCP server, in light and dark and on a narrow window: the Appeals page, a claim with each appeal state, and the redress card; the fonts and colors match `docs/BRAND.md`, with no one-edge borders or gradients.
-- [ ] `npm run check` is green with `.env` moved out of the way; `docs/STATUS.md` is updated; committed.
+- [x] `npm run check:ts` passes with 80% coverage: component tests for each form's validation, the three outcomes' panels, the label in each state, the figures, the filter, the empty page, the can't-do message, and the redress card's two buttons.
+- [x] `npm run e2e` passes, adding the Appeals spec (the page's figures and rows; recording an appeal and an outcome on a claim; paying redress; Marcus sees why he can't; a marked appeal shows its reason) and the Copilot spec's redress card, and every existing spec passes with the new counts.
+- [x] Checked in the browser with the Playwright MCP server, in light and dark and on a narrow window: the Appeals page, a claim with each appeal state, and the redress card; the fonts and colors match `docs/BRAND.md`, with no one-edge borders or gradients.
+- [x] `npm run check` is green with `.env` moved out of the way; `docs/STATUS.md` is updated; committed.
 
 ## Phase 5: The documents and the guide's page
 

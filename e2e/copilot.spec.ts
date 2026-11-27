@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { signIn, test } from "./signIn";
+import { handlerHeaders, signIn, test } from "./signIn";
 
 const ASK = "Sign off on CLM-1003";
 
@@ -138,4 +138,40 @@ test("on a narrow window the sidebar opens over the page", async ({ page }) => {
   const sidebar = page.getByRole("complementary", { name: "Copilot" });
 
   await expect(sidebar).toHaveCSS("position", "fixed");
+});
+
+test("the Copilot asks before paying redress, pays nothing on Cancel, and pays once on Pay redress", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  await ask(page, "Pay the redress on CLM-1602");
+
+  const card = page.getByRole("region", { name: "Confirm the redress" });
+  await expect(card).toContainText("Gareth Ollander");
+  for (const amount of ["$400.00", "$150.00", "$6.40", "$556.40"]) {
+    await expect(card).toContainText(amount);
+  }
+  await expect(card).toContainText("The wording was unclear");
+  const paid = async () =>
+    (
+      (await (
+        await request.get("/api/claims/CLM-1602/appeal", {
+          headers: await handlerHeaders(request),
+        })
+      ).json()) as { redress_payment: unknown }
+    ).redress_payment;
+
+  await card.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByText("I haven't paid it.")).toBeVisible();
+  expect(await paid()).toBeNull();
+
+  await ask(page, "Pay the redress on CLM-1602");
+  await page
+    .getByRole("region", { name: "Confirm the redress" })
+    .getByRole("button", { name: "Pay redress" })
+    .click();
+
+  await expect(page.getByText(/I paid the redress on/)).toBeVisible();
+  expect(await paid()).not.toBeNull();
 });

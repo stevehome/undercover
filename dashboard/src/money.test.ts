@@ -37,3 +37,16 @@ it("reads a wire model cost as billionths of a dollar and formats it", () => {
   expect(formatCost(0)).toBe("$0.0000");
   expect(formatCost(1500000000)).toBe("$1.5000");
 });
+
+it.each([
+  ["120", 12000],
+  ["120.5", 12050],
+  [" 0.99 ", 99],
+  ["", null],
+  ["12.345", null],
+  ["-5", null],
+  ["abc", null],
+] as const)("reads a typed amount %j as %s cents", async (text, cents) => {
+  const { parseTypedAmount } = await import("./money");
+  expect(parseTypedAmount(text)).toBe(cents);
+});

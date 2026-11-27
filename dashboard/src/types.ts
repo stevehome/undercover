@@ -405,14 +405,27 @@ export interface CopilotMessage {
   seconds: number | null;
 }
 
-/** What a handler is asked to confirm before a payout is signed off. */
-export interface ConfirmationCard {
-  kind: "sign_off";
+interface CardClaim {
   claim_id: string;
   customer: { customer_id: string; name: string };
+}
+
+/** What a handler is asked to confirm before a payout is signed off. */
+export interface SignOffCard extends CardClaim {
+  kind: "sign_off";
   payout: number;
   reason: string;
 }
+
+/** What a handler is asked to confirm before an appeal's redress is paid. */
+export interface RedressCard extends CardClaim {
+  kind: "redress";
+  redress: Redress;
+  /** The ombudsman's reason, left out of an appeal marked as holding an instruction. */
+  reason: string | null;
+}
+
+export type ConfirmationCard = SignOffCard | RedressCard;
 
 export interface Conversation {
   conversation_id: string;
@@ -428,4 +441,78 @@ export interface ConversationSummary {
   conversation_id: string;
   title: string | null;
   created_on: string;
+}
+
+export type AppealStatus = "with the ombudsman" | "upheld" | "not upheld";
+
+/** The three parts of an upheld appeal's redress, and their total, in cents. */
+export interface Redress {
+  claim_amount: number;
+  compensation: number;
+  interest: number;
+  total: number;
+}
+
+export interface RedressPayment {
+  amount: number;
+  signed_off_by: string;
+  paid_on: string;
+}
+
+/** An appeal to the ombudsman against a claim's final decision. */
+export interface Appeal {
+  claim_id: string;
+  status: AppealStatus;
+  /** Where the appeal and its redress stand, such as "appeal upheld, redress paid". */
+  label: string;
+  ombudsman_reference: string;
+  received_on: string;
+  recorded_by: string;
+  recorded_on: string;
+  decided_on: string | null;
+  outcome_recorded_by: string | null;
+  outcome_recorded_on: string | null;
+  grounds: string | null;
+  ombudsman_reason: string | null;
+  /** True when the check found an instruction in an appeal's text. */
+  flagged: boolean;
+  flag_reason: string | null;
+  redress: Redress | null;
+  redress_payment: RedressPayment | null;
+  claim: {
+    summary: string;
+    claim_type: string;
+    decision: Decision;
+    payout: number | null;
+    plan: string;
+    customer: { customer_id: string; name: string };
+  };
+}
+
+/** The figures at the top of the Appeals page. */
+export interface AppealFigures {
+  open: number;
+  upheld: number;
+  not_upheld: number;
+  /** Of the appeals decided, from 0 to 1; null while none is decided. */
+  upheld_share: number | null;
+  redress_paid: number;
+  redress_waiting: number;
+}
+
+/** An appeal as a handler records it; amounts are in cents. */
+export interface NewAppeal {
+  ombudsman_reference: string;
+  received_on: string;
+  grounds: string;
+}
+
+/** The ombudsman's decision as a handler records it; amounts are in cents. */
+export interface NewOutcome {
+  outcome: "upheld" | "not upheld";
+  decided_on: string;
+  reason: string;
+  claim_amount: number;
+  compensation: number;
+  interest: number;
 }

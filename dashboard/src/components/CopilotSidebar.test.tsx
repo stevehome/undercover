@@ -171,7 +171,9 @@ it("starts a new conversation from the list", async () => {
   expect(
     await screen.findByRole("heading", { name: "Hello, Dana" }),
   ).toBeDefined();
-  expect(localStorage.getItem(SHOWN)).toBeNull();
+  await waitFor(() => {
+    expect(localStorage.getItem(SHOWN)).toBeNull();
+  });
 });
 
 it("shows the reason a message was refused", async () => {

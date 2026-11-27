@@ -6,6 +6,7 @@ import { LoadError } from "./components/LoadError";
 import { Loading } from "./components/Loading";
 import { CopilotSidebar } from "./components/CopilotSidebar";
 import { Navigation } from "./components/Navigation";
+import { AppealsPage } from "./pages/AppealsPage";
 import { ClaimPage } from "./pages/ClaimPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
 import { EvaluationPage } from "./pages/EvaluationPage";
@@ -52,6 +53,7 @@ function Shell() {
             <Route path="/" element={<QueuePage />} />
             <Route path="/claims/:claimId" element={<ClaimPage />} />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
+            <Route path="/appeals" element={<AppealsPage />} />
             <Route path="/evaluations/:runId" element={<EvaluationPage />} />
             <Route path="/improvement" element={<ImprovementPage />} />
             <Route path="/configuration" element={<ConfigurationPage />} />

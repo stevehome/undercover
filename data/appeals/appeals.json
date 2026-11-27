@@ -8,14 +8,14 @@
     "recorded_on": "2026-10-06T09:00:00+00:00",
     "status": "upheld",
     "decided_on": "2026-11-03",
-    "reason": "The prepaid night in Bologna was lost because the delay made it impossible to arrive on the day booked, and the policy does not clearly tell a customer that such a cost is left out. The insurer should pay the cost of the night and a modest sum for the inconvenience, with interest.",
     "outcome_recorded_by": "HND-02",
     "outcome_recorded_on": "2026-11-03T14:00:00+00:00",
     "claim_amount": 140.0,
     "compensation": 75.0,
     "interest": 2.1,
     "redress_signed_off_by": "HND-01",
-    "redress_paid_on": "2026-11-16T11:00:00+00:00"
+    "redress_paid_on": "2026-11-16T11:00:00+00:00",
+    "ombudsman_reason": "The prepaid night in Bologna was lost because the delay made it impossible to arrive on the day booked, and the policy does not clearly tell a customer that such a cost is left out. The insurer should pay the cost of the night and a modest sum for the inconvenience, with interest."
   },
   {
     "claim_id": "CLM-1602",
@@ -26,12 +26,12 @@
     "recorded_on": "2026-10-14T09:00:00+00:00",
     "status": "upheld",
     "decided_on": "2026-11-10",
-    "reason": "The policy describes the covered trip by its dates but also as the journey you take to your departure, and a customer could reasonably read the cover as starting when they leave home. That ambiguity should be resolved in the customer's favour. The insurer should pay the replacement costs, compensation for the distress on embarkation day, and interest.",
     "outcome_recorded_by": "HND-03",
     "outcome_recorded_on": "2026-11-10T14:00:00+00:00",
     "claim_amount": 400.0,
     "compensation": 150.0,
-    "interest": 6.4
+    "interest": 6.4,
+    "ombudsman_reason": "The policy describes the covered trip by its dates but also as the journey you take to your departure, and a customer could reasonably read the cover as starting when they leave home. That ambiguity should be resolved in the customer's favour. The insurer should pay the replacement costs, compensation for the distress on embarkation day, and interest."
   },
   {
     "claim_id": "CLM-1603",
@@ -42,12 +42,12 @@
     "recorded_on": "2026-10-20T09:00:00+00:00",
     "status": "upheld",
     "decided_on": "2026-11-18",
-    "reason": "The hospital's discharge note prescribed the physiotherapy as part of the treatment of the injury, and the policy does not say that care after the customer returns home is excluded. The insurer should pay the physiotherapy, with interest.",
     "outcome_recorded_by": "HND-01",
     "outcome_recorded_on": "2026-11-18T14:00:00+00:00",
     "claim_amount": 340.0,
     "compensation": 0.0,
-    "interest": 5.1
+    "interest": 5.1,
+    "ombudsman_reason": "The hospital's discharge note prescribed the physiotherapy as part of the treatment of the injury, and the policy does not say that care after the customer returns home is excluded. The insurer should pay the physiotherapy, with interest."
   },
   {
     "claim_id": "CLM-1604",
@@ -58,9 +58,9 @@
     "recorded_on": "2026-09-22T09:00:00+00:00",
     "status": "not upheld",
     "decided_on": "2026-10-27",
-    "reason": "The policy asks about changes in treatment in the 60 days before purchase and says so clearly. The dose of the customer's medicine was increased for continuing back pain inside that period, and the herniated disc is linked to it. The insurer applied the exclusion fairly and the complaint is not upheld.",
     "outcome_recorded_by": "HND-02",
-    "outcome_recorded_on": "2026-10-27T14:00:00+00:00"
+    "outcome_recorded_on": "2026-10-27T14:00:00+00:00",
+    "ombudsman_reason": "The policy asks about changes in treatment in the 60 days before purchase and says so clearly. The dose of the customer's medicine was increased for continuing back pain inside that period, and the herniated disc is linked to it. The insurer applied the exclusion fairly and the complaint is not upheld."
   },
   {
     "claim_id": "CLM-1605",
@@ -71,9 +71,9 @@
     "recorded_on": "2026-09-30T09:00:00+00:00",
     "status": "not upheld",
     "decided_on": "2026-11-05",
-    "reason": "The storm had been named and was forecast to reach the destination the day before the policy was bought. The policy tells customers that events publicly known before purchase are not covered, and the insurer was entitled to rely on that. The complaint is not upheld.",
     "outcome_recorded_by": "HND-03",
-    "outcome_recorded_on": "2026-11-05T14:00:00+00:00"
+    "outcome_recorded_on": "2026-11-05T14:00:00+00:00",
+    "ombudsman_reason": "The storm had been named and was forecast to reach the destination the day before the policy was bought. The policy tells customers that events publicly known before purchase are not covered, and the insurer was entitled to rely on that. The complaint is not upheld."
   },
   {
     "claim_id": "CLM-1606",
@@ -84,9 +84,9 @@
     "recorded_on": "2026-10-03T09:00:00+00:00",
     "status": "not upheld",
     "decided_on": "2026-11-12",
-    "reason": "The policy states a maximum of $1,500 for baggage on this plan, and it was drawn to the customer's attention in the policy summary. The insurer paid the maximum, so there is nothing further to pay. The complaint is not upheld.",
     "outcome_recorded_by": "HND-01",
-    "outcome_recorded_on": "2026-11-12T14:00:00+00:00"
+    "outcome_recorded_on": "2026-11-12T14:00:00+00:00",
+    "ombudsman_reason": "The policy states a maximum of $1,500 for baggage on this plan, and it was drawn to the customer's attention in the policy summary. The insurer paid the maximum, so there is nothing further to pay. The complaint is not upheld."
   },
   {
     "claim_id": "CLM-1607",

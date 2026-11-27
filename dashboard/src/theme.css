@@ -944,3 +944,50 @@ button.link[aria-current="true"] {
     border-radius: 16px 0 0 16px;
   }
 }
+
+/* Appeals. */
+form label.wide {
+  flex-basis: 100%;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.figures dt {
+  font-size: 0.85rem;
+}
+
+.figures dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.appeal-text {
+  white-space: pre-wrap;
+}
+
+.appeal-flag {
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--marigold) 30%, transparent);
+}
+
+/* The header wraps, so the signed-in handler never slides under the sidebar. */
+.app-header {
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.app-header .top-nav {
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.signed-in span {
+  white-space: nowrap;
+}

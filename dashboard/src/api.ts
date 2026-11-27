@@ -5,6 +5,7 @@ import type {
   Claim,
   ClaimGrade,
   ConfirmationCard,
+  Redress,
   Conversation,
   ConversationSummary,
   CopilotMessage,
@@ -71,7 +72,7 @@ interface WireStep {
   details: Record<string, unknown>;
 }
 
-const optionalCents = (amount: string | null) =>
+export const optionalCents = (amount: string | null) =>
   amount === null ? null : parseCents(amount);
 
 /** Call the backend with the signed-in handler's token; a 401 signs them out. */
@@ -84,7 +85,7 @@ async function send(path: string, init: RequestInit = {}): Promise<Response> {
   return response;
 }
 
-async function getJson<T>(path: string): Promise<T> {
+export async function getJson<T>(path: string): Promise<T> {
   const response = await send(path);
   if (!response.ok) throw new Error(`${path}: ${String(response.status)}`);
   return (await response.json()) as T;
@@ -102,7 +103,7 @@ async function refusal(path: string, response: Response): Promise<Error> {
   );
 }
 
-async function post(path: string, body?: object): Promise<void> {
+export async function post(path: string, body?: object): Promise<void> {
   const response = await send(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -431,10 +432,44 @@ const TURN_STATUSES: TurnStatus[] = [
 ];
 
 /** Check a value is one of a set, as a step of an unknown kind is refused. */
-function known<T extends string>(what: string, value: string, set: T[]): T {
+export function known<T extends string>(
+  what: string,
+  value: string,
+  set: T[],
+): T {
   const found = set.find((item) => item === value);
   if (found === undefined) throw new Error(`A ${what} we don't know: ${value}`);
   return found;
+}
+
+export interface WireRedress {
+  claim_amount: string;
+  compensation: string;
+  interest: string;
+  total: string;
+}
+
+type WireCard =
+  | (Omit<Extract<ConfirmationCard, { kind: "sign_off" }>, "payout"> & {
+      payout: string;
+    })
+  | (Omit<Extract<ConfirmationCard, { kind: "redress" }>, "redress"> & {
+      redress: WireRedress;
+    });
+
+export function redressFromWire(redress: WireRedress): Redress {
+  return {
+    claim_amount: parseCents(redress.claim_amount),
+    compensation: parseCents(redress.compensation),
+    interest: parseCents(redress.interest),
+    total: parseCents(redress.total),
+  };
+}
+
+function cardFromWire(card: WireCard): ConfirmationCard {
+  return card.kind === "sign_off"
+    ? { ...card, payout: parseCents(card.payout) }
+    : { ...card, redress: redressFromWire(card.redress) };
 }
 
 type WireCopilotStep = Omit<CopilotStep, "kind" | "state"> & {
@@ -447,7 +482,7 @@ type WireConversation = Omit<
   "status" | "card" | "messages" | "steps"
 > & {
   status: string;
-  card: (Omit<ConfirmationCard, "payout"> & { payout: string }) | null;
+  card: WireCard | null;
   messages: WireMessage[];
   steps: WireCopilotStep[];
 };
@@ -460,7 +495,7 @@ export async function fetchConversation(id: string): Promise<Conversation> {
   return {
     ...wire,
     status: known("turn status", wire.status, TURN_STATUSES),
-    card: wire.card && { ...wire.card, payout: parseCents(wire.card.payout) },
+    card: wire.card && cardFromWire(wire.card),
     messages: wire.messages.map(({ cost, ...message }) => ({
       ...message,
       cost_nanos: cost === null ? null : parseNanos(cost),

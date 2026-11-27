@@ -145,21 +145,7 @@
       "policy_reference": "Policy wording, sections 6, 9 and 12 (covered trip); claims manual, section 4 step 3",
       "decided_by": "Priya Raman",
       "decided_on": "2026-09-15T11:00:00+00:00",
-      "manual_version": "2026.2",
-      "calculation": [
-        {
-          "step": "Emergency passport fees, passports lost August 19, before the covered trip began",
-          "amount": 0.0
-        },
-        {
-          "step": "Passport photos, passports lost August 19, before the covered trip began",
-          "amount": 0.0
-        },
-        {
-          "step": "Taxis to and from the passport agency, passports lost August 19, before the covered trip began",
-          "amount": 0.0
-        }
-      ]
+      "manual_version": "2026.2"
     }
   },
   {
@@ -328,8 +314,7 @@
       "policy_reference": "Policy wording, section 7; claims manual, pre-existing conditions",
       "decided_by": "Dana Whitfield",
       "decided_on": "2026-08-30T13:00:00+00:00",
-      "manual_version": "2026.2",
-      "calculation": []
+      "manual_version": "2026.2"
     }
   },
   {
@@ -384,13 +369,7 @@
       "policy_reference": "Policy wording, section 9 (events publicly known before purchase) and section 2; claims manual, sections 2 and 4",
       "decided_by": "Priya Raman",
       "decided_on": "2026-09-08T14:00:00+00:00",
-      "manual_version": "2026.2",
-      "calculation": [
-        {
-          "step": "Cancellation caused by Tropical Storm Tobias, named and forecast on August 18, 2026, the day before the policy was bought on August 19, 2026: excluded under section 9",
-          "amount": 0.0
-        }
-      ]
+      "manual_version": "2026.2"
     }
   },
   {

@@ -36,3 +36,8 @@ export function formatCost(nanos: number): string {
   const dollars = Math.trunc(tenThousandths / 1e4);
   return `$${String(dollars)}.${String(tenThousandths % 1e4).padStart(4, "0")}`;
 }
+
+/** Read an amount a person typed, such as "120" or "120.50", as whole cents; null if it isn't one. */
+export function parseTypedAmount(text: string): number | null {
+  return /^\d+(\.\d{1,2})?$/.test(text.trim()) ? parseCents(text.trim()) : null;
+}

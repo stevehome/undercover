@@ -33,3 +33,17 @@ it("marks the queue only on its own page", () => {
     screen.getByRole("link", { name: "Queue" }).getAttribute("aria-current"),
   ).toBe("page");
 });
+
+it("has the Appeals page beside the Scoreboard", () => {
+  render(
+    <MemoryRouter initialEntries={["/appeals"]}>
+      <Navigation />
+    </MemoryRouter>,
+  );
+
+  const links = screen.getAllByRole("link").map((link) => link.textContent);
+  expect(links.slice(0, 3)).toEqual(["Queue", "Scoreboard", "Appeals"]);
+  expect(
+    screen.getByRole("link", { name: "Appeals" }).getAttribute("aria-current"),
+  ).toBe("page");
+});

@@ -1,9 +1,9 @@
 import type {
   CardKind,
-  ConfirmationCard,
   Conversation,
   CopilotStep,
   Handler,
+  SignOffCard,
   StepState,
 } from "./types";
 
@@ -36,7 +36,7 @@ export function step(
   };
 }
 
-export const card: ConfirmationCard = {
+export const card: SignOffCard = {
   kind: "sign_off",
   claim_id: "CLM-1003",
   customer: { customer_id: "CUS-3003", name: "Ana Souza" },

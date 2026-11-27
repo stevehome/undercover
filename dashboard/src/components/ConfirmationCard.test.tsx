@@ -41,3 +41,49 @@ it("answers no with Cancel", () => {
 
   expect(onAnswer).toHaveBeenCalledWith(false);
 });
+
+const redressCard = {
+  kind: "redress",
+  claim_id: "CLM-1602",
+  customer: { customer_id: "CUS-3408", name: "Gareth Ollander" },
+  redress: {
+    claim_amount: 40000,
+    compensation: 15000,
+    interest: 640,
+    total: 55640,
+  },
+  reason: "The wording was unclear.",
+} as const;
+
+it("shows a redress card with its three amounts, the total and the ombudsman's reason", () => {
+  render(
+    <MemoryRouter>
+      <ConfirmationCard card={redressCard} onAnswer={() => undefined} />
+    </MemoryRouter>,
+  );
+
+  const region = screen.getByRole("region", { name: "Confirm the redress" });
+  expect(region.textContent).toContain("Gareth Ollander");
+  for (const amount of ["$400.00", "$150.00", "$6.40", "$556.40"]) {
+    expect(region.textContent).toContain(amount);
+  }
+  expect(region.textContent).toContain("The wording was unclear.");
+});
+
+it("leaves out the reason of a marked appeal, and answers Pay redress or Cancel", () => {
+  const answers: boolean[] = [];
+  render(
+    <MemoryRouter>
+      <ConfirmationCard
+        card={{ ...redressCard, reason: null }}
+        onAnswer={(confirmed) => answers.push(confirmed)}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(screen.queryByText("The ombudsman's reason")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+  fireEvent.click(screen.getByRole("button", { name: "Pay redress" }));
+
+  expect(answers).toEqual([false, true]);
+});

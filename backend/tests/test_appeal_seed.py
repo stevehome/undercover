@@ -89,6 +89,7 @@ def test_each_earlier_claim_has_a_complete_decision_record(client):
             assert claim["paid_cents"] == claim["payout_cents"]
             assert claim["paid_on"]
         else:
+            assert claim["calculation"] is None
             assert claim["paid_cents"] is None
 
 

@@ -37,7 +37,7 @@ it("reads a conversation, with its cost and payout converted", async () => {
 
   const read = await fetchConversation("copilot-1");
 
-  expect(read.card?.payout).toBe(375000);
+  expect(read.card).toMatchObject({ kind: "sign_off", payout: 375000 });
   expect(read.messages[1].cost_nanos).toBe(624000);
   expect(read.messages[0].cost_nanos).toBeNull();
   expect(read.status).toBe("waiting for a confirmation");

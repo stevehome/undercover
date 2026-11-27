@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, expect, it, vi } from "vitest";
+import { appeal, appealToWire, decidedClaim } from "../appealFixtures";
 import { claimToWire, requestUrl, stepToWire } from "../testHelpers";
 import type { FetchInput } from "../testHelpers";
 import type { Claim, Step } from "../types";
@@ -98,7 +99,9 @@ it("shows a decided claim's story, items and decision", async () => {
     ],
   });
   const impl = (input: FetchInput): Promise<Response> => {
-    const body = requestUrl(input).endsWith("/steps") ? [] : claimToWire(claim);
+    const url = requestUrl(input);
+    if (url.endsWith("/appeal")) return Promise.resolve(new Response("null"));
+    const body = url.endsWith("/steps") ? [] : claimToWire(claim);
     return Promise.resolve(new Response(JSON.stringify(body)));
   };
   vi.stubGlobal("fetch", vi.fn(impl));
@@ -139,6 +142,7 @@ it("runs the agent and polls the step log as it works", async () => {
 
   const impl = (input: FetchInput): Promise<Response> => {
     const url = requestUrl(input);
+    if (url.endsWith("/appeal")) return Promise.resolve(new Response("null"));
     if (url.endsWith("/run")) {
       return Promise.resolve(
         new Response(JSON.stringify(claimToWire(inProgress))),
@@ -179,6 +183,9 @@ it("runs the agent and polls the step log as it works", async () => {
 it("updates a waiting claim when a run picks it up", async () => {
   let claimCalls = 0;
   const impl = (input: FetchInput): Promise<Response> => {
+    if (requestUrl(input).endsWith("/appeal")) {
+      return Promise.resolve(new Response("null"));
+    }
     if (requestUrl(input).endsWith("/steps")) {
       return Promise.resolve(new Response("[]"));
     }
@@ -197,4 +204,33 @@ it("updates a waiting claim when a run picks it up", async () => {
   vi.advanceTimersByTime(2000);
 
   expect(await screen.findByText("in progress")).toBeDefined();
+});
+
+it("labels the claim with its appeal and shows the appeal below the decision", async () => {
+  const claim = decidedClaim({ claim_id: "CLM-1001" });
+  const impl = (input: FetchInput): Promise<Response> => {
+    const url = requestUrl(input);
+    if (url.endsWith("/appeal")) {
+      return Promise.resolve(
+        new Response(
+          JSON.stringify(appealToWire(appeal({ claim_id: "CLM-1001" }))),
+        ),
+      );
+    }
+    const body = url.endsWith("/steps") ? [] : claimToWire(claim);
+    return Promise.resolve(new Response(JSON.stringify(body)));
+  };
+  vi.stubGlobal("fetch", vi.fn(impl));
+
+  renderClaimPage();
+
+  const heading = await screen.findByRole("heading", { name: /CLM-1001/ });
+  expect(heading.textContent).toContain("decided");
+  expect(heading.textContent).toContain("appeal open");
+  expect(
+    await screen.findByRole("region", { name: "Appeal to the ombudsman" }),
+  ).toBeDefined();
+  expect(
+    screen.getByText("The ferry was late and the hotel was lost."),
+  ).toBeDefined();
 });
