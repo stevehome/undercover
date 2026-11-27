@@ -1,6 +1,6 @@
 # Plan: appeals to the ombudsman
 
-Builds `docs/week3day5_product_APPEALS.md` in six phases: the records and the documents (the tables, the eight starting appeals and the context layer's files), the app's logic and routes (recording, the check for hidden instructions, redress), the Copilot's tools and its pause before redress, the dashboard (the Appeals page and the claim page's panel), the documents and the guide's page, and the live checks. Nothing here creates or deletes anything on AWS. The deployed database and the context layer need a reseed and a redeploy afterwards, which you do.
+Builds `docs/APPEALS.md` in six phases: the records and the documents (the tables, the eight starting appeals and the context layer's files), the app's logic and routes (recording, the check for hidden instructions, redress), the Copilot's tools and its pause before redress, the dashboard (the Appeals page and the claim page's panel), the documents and the guide's page, and the live checks. Nothing here creates or deletes anything on AWS. The deployed database and the context layer need a reseed and a redeploy afterwards, which you do.
 
 ## What I read
 
